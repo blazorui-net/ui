@@ -6,48 +6,60 @@ A comprehensive UI component library for Blazor based on [shadcn/ui](https://ui.
 
 BlazorUI brings the beautiful design system of shadcn/ui to Blazor applications. This library provides plug-and-play UI components with full shadcn/ui compatibility, featuring both styled components and headless primitives that work across all Blazor hosting models (Server, WebAssembly, and Hybrid).
 
-## Project Structure
-
-```
-BlazorUI/
-├── src/
-│   ├── BlazorUI.Components/   # Styled components (shadcn/ui design)
-│   ├── BlazorUI.Primitives/   # Headless UI primitives
-│   └── BlazorUI.Icons/        # Lucide icon integration
-├── demo/
-│   └── BlazorUI.Demo/         # Demo Blazor Server app
-└── .devflow/                  # DevFlow documentation
-```
-
-## Technology Stack
-
-- **.NET 8 (LTS)**
-- **Blazor** (Server, WebAssembly, Hybrid)
-- **Tailwind CSS** (standalone CLI, no Node.js required)
-- **CSS Variables** for theming
-- **Lucide Icons** (1000+ beautiful icons)
-
 ## Getting Started
 
-### Prerequisites
+### Installation
 
-- .NET 8 SDK
-- Tailwind CSS standalone CLI (included in demo app)
-
-### Building the Solution
+Install BlazorUI packages from NuGet:
 
 ```bash
-dotnet build
+# Styled components with shadcn/ui design
+dotnet add package BlazorUI.Components
+
+# Headless primitives for custom styling
+dotnet add package BlazorUI.Primitives
+
+# Lucide icon library
+dotnet add package BlazorUI.Icons
 ```
 
-### Running the Demo
+### Quick Start
 
-```bash
-cd demo/BlazorUI.Demo
-dotnet watch run
+1. **Add to your `_Imports.razor`:**
+
+```razor
+@using BlazorUI.Components
 ```
 
-The demo app will be available at `https://localhost:5001`
+2. **Configure Tailwind CSS** (required for styled components)
+
+   BlazorUI components use Tailwind CSS for styling. See the [demo app](demo/BlazorUI.Demo) for a complete setup example.
+
+3. **Start using components:**
+
+```razor
+<Button Variant="ButtonVariant.Default">Click me</Button>
+
+<Dialog>
+    <DialogTrigger AsChild>
+        <Button>Open Dialog</Button>
+    </DialogTrigger>
+    <DialogContent>
+        <DialogHeader>
+            <DialogTitle>Welcome to BlazorUI</DialogTitle>
+            <DialogDescription>
+                Beautiful Blazor components inspired by shadcn/ui
+            </DialogDescription>
+        </DialogHeader>
+    </DialogContent>
+</Dialog>
+```
+
+### Learn More
+
+- **Demo Application**: Explore all components in the [demo app](demo/BlazorUI.Demo)
+- **Contributing**: See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup and guidelines
+- **Architecture**: Detailed documentation in [.devflow/architecture.md](.devflow/architecture.md)
 
 ## Components
 
@@ -149,94 +161,22 @@ BlazorUI uses a **two-layer architecture**:
 
 For detailed architecture documentation, see `.devflow/architecture.md`
 
-## Development
-
-This project uses [DevFlow](https://github.com/mathewtaylor/devflow) for structured feature development.
-
-### Quality Standards
-
-- **Naming Conventions**
-  - PascalCase for public members
-  - camelCase for private fields (no underscore prefix)
-  - Component files: `ComponentName.razor` + `ComponentName.razor.cs`
-
-- **Documentation**
-  - XML documentation for all public APIs
-  - Inline comments for complex logic
-  - README files for each major feature
-
-- **Testing**
-  - Manual testing across all Blazor hosting models (Server, WASM, Hybrid)
-  - Cross-browser compatibility testing (Chrome, Firefox, Edge, Safari)
-  - Accessibility validation with screen readers
-  - Keyboard navigation verification
-
-- **Code Quality**
-  - Follow Blazor best practices
-  - Avoid unnecessary re-renders
-  - Proper disposal of resources
-  - Null-safety throughout
-
-## Publishing Releases
-
-BlazorUI publishes three independent NuGet packages with automated CI/CD:
-
-- **BlazorUI.Primitives** - Headless UI primitives
-- **BlazorUI.Components** - Styled components
-- **BlazorUI.Icons** - Lucide icon library
-
-### Release Process
-
-Each package can be released independently with its own version number using the provided release scripts:
-
-```bash
-# Release Primitives
-./scripts/release-primitives.sh 1.0.0-beta.4
-
-# Release Components
-./scripts/release-components.sh 1.1.0-beta.2
-
-# Release Icons
-./scripts/release-icons.sh 1.0.3
-```
-
-The scripts will:
-1. Validate the version format (semantic versioning)
-2. Check for uncommitted changes
-3. Create and push a git tag (e.g., `primitives/v1.0.0-beta.4`)
-4. Trigger automated GitHub Actions workflow
-
-### Automated Publishing
-
-When a tag is pushed, GitHub Actions will automatically:
-1. Build the project
-2. Run tests (if any)
-3. Pack the NuGet package
-4. Publish to NuGet.org
-
-Monitor the release workflow at: https://github.com/blazorui-net/ui/actions
-
-### Versioning Strategy
-
-- Each package maintains its own independent version
-- Versions are determined by git tags (e.g., `primitives/v1.0.0-beta.4`)
-- MinVer automatically calculates package versions from git tags
-- Pre-release versions use `-beta.X` suffix for beta releases
-
-### Prerequisites for Publishing
-
-To publish packages, you need:
-1. Write access to the GitHub repository
-2. NUGET_API_KEY secret configured in GitHub repository settings
-3. Git tag push permissions
-
 ## License
 
-TBD
+BlazorUI is open source software licensed under the [MIT License](LICENSE).
+
 
 ## Acknowledgments
 
-- [shadcn/ui](https://ui.shadcn.com/) - Original design system and inspiration
-- [Radix UI](https://www.radix-ui.com/) - Primitive component patterns and accessibility standards
+BlazorUI is inspired by [shadcn/ui](https://ui.shadcn.com/) and based on the design principles of [Radix UI](https://www.radix-ui.com/).
+
+While BlazorUI is a complete reimplementation for Blazor/C# and contains no code from these projects, we are grateful for their excellent work which inspired this library.
+
+- shadcn/ui: MIT License - Copyright (c) 2023 shadcn
+- Radix UI: MIT License - Copyright (c) 2022-present WorkOS
+
+BlazorUI is an independent project and is not affiliated with or endorsed by shadcn or Radix UI.
+
+
 - [Tailwind CSS](https://tailwindcss.com/) - Utility-first CSS framework
 - [Lucide Icons](https://lucide.dev/) - Beautiful icon library
