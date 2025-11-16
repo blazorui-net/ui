@@ -45,10 +45,12 @@ cd ui
 dotnet build
 ```
 
-This builds all three NuGet packages:
+This builds all five NuGet packages:
 - `BlazorUI.Components` - Styled components
 - `BlazorUI.Primitives` - Headless primitives
-- `BlazorUI.Icons` - Icon library
+- `BlazorUI.Icons.Lucide` - Lucide icon library
+- `BlazorUI.Icons.Heroicons` - Heroicons library
+- `BlazorUI.Icons.Feather` - Feather icon library
 
 ### Run the Demo Application
 
@@ -68,16 +70,18 @@ This is a mono-repo containing:
 ```
 BlazorUI/
 ├── src/
-│   ├── BlazorUI.Components/   # Styled components (shadcn/ui design)
-│   ├── BlazorUI.Primitives/   # Headless UI primitives
-│   └── BlazorUI.Icons/        # Lucide icon integration
+│   ├── BlazorUI.Components/      # Styled components (shadcn/ui design)
+│   ├── BlazorUI.Primitives/      # Headless UI primitives
+│   ├── BlazorUI.Icons.Lucide/    # Lucide icon integration
+│   ├── BlazorUI.Icons.Heroicons/ # Heroicons integration
+│   └── BlazorUI.Icons.Feather/   # Feather icon integration
 ├── demo/
-│   └── BlazorUI.Demo/         # Demo Blazor Server app
+│   └── BlazorUI.Demo/            # Demo Blazor Server app
 ├── website/
-│   └── BlazorUI.Website/      # Documentation website
-├── .devflow/                  # DevFlow documentation and standards
-├── scripts/                   # Release automation scripts
-└── .github/                   # CI/CD workflows
+│   └── BlazorUI.Website/         # Documentation website
+├── .devflow/                     # DevFlow documentation and standards
+├── scripts/                      # Release automation scripts
+└── .github/                      # CI/CD workflows
 ```
 
 ### Technology Stack
