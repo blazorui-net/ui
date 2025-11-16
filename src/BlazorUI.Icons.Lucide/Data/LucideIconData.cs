@@ -1,7 +1,7 @@
 ﻿// This file is auto-generated. Do not edit manually.
 // Generated from lucide.json on 2025-11-02 15:28:14
 
-namespace BlazorUI.Icons.Data;
+namespace BlazorUI.Icons.Lucide.Data;
 
 /// <summary>
 /// Provides access to Lucide icon SVG data.

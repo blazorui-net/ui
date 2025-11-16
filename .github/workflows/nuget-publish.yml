@@ -5,7 +5,9 @@ on:
     tags:
       - 'primitives/v*'
       - 'components/v*'
-      - 'icons/v*'
+      - 'icons-lucide/v*'
+      - 'icons-heroicons/v*'
+      - 'icons-feather/v*'
   workflow_dispatch:
     inputs:
       package:
@@ -15,7 +17,9 @@ on:
         options:
           - primitives
           - components
-          - icons
+          - icons-lucide
+          - icons-heroicons
+          - icons-feather
       version:
         description: 'Version (e.g., 1.0.0-beta.4)'
         required: true
@@ -82,9 +86,17 @@ jobs:
               echo "project_path=src/BlazorUI.Components/BlazorUI.Components.csproj" >> $GITHUB_OUTPUT
               echo "display_name=BlazorUI.Components" >> $GITHUB_OUTPUT
               ;;
-            icons)
-              echo "project_path=src/BlazorUI.Icons/BlazorUI.Icons.csproj" >> $GITHUB_OUTPUT
-              echo "display_name=BlazorUI.Icons" >> $GITHUB_OUTPUT
+            icons-lucide)
+              echo "project_path=src/BlazorUI.Icons.Lucide/BlazorUI.Icons.Lucide.csproj" >> $GITHUB_OUTPUT
+              echo "display_name=BlazorUI.Icons.Lucide" >> $GITHUB_OUTPUT
+              ;;
+            icons-heroicons)
+              echo "project_path=src/BlazorUI.Icons.Heroicons/BlazorUI.Icons.Heroicons.csproj" >> $GITHUB_OUTPUT
+              echo "display_name=BlazorUI.Icons.Heroicons" >> $GITHUB_OUTPUT
+              ;;
+            icons-feather)
+              echo "project_path=src/BlazorUI.Icons.Feather/BlazorUI.Icons.Feather.csproj" >> $GITHUB_OUTPUT
+              echo "display_name=BlazorUI.Icons.Feather" >> $GITHUB_OUTPUT
               ;;
             *)
               echo "Unknown package: $PACKAGE"
@@ -96,16 +108,33 @@ jobs:
           echo "🏷️  Version: $VERSION"
 
       - name: Restore dependencies
-        run: dotnet restore ${{ steps.package-info.outputs.project_path }}
+        run: |
+          # For components package, use NuGet package references instead of project references
+          if [ "${{ steps.package-info.outputs.package }}" = "components" ]; then
+            dotnet restore ${{ steps.package-info.outputs.project_path }} -p:UsePackageReferences=true
+          else
+            dotnet restore ${{ steps.package-info.outputs.project_path }}
+          fi
 
       - name: Build
         run: |
-          dotnet build ${{ steps.package-info.outputs.project_path }} --configuration Release --no-restore
+          # For components package, use NuGet package references instead of project references
+          if [ "${{ steps.package-info.outputs.package }}" = "components" ]; then
+            dotnet build ${{ steps.package-info.outputs.project_path }} --configuration Release --no-restore -p:UsePackageReferences=true
+          else
+            dotnet build ${{ steps.package-info.outputs.project_path }} --configuration Release --no-restore
+          fi
           echo "Checking MinVer calculated version..."
           dotnet msbuild ${{ steps.package-info.outputs.project_path }} -getProperty:Version -p:Configuration=Release
 
       - name: Pack
-        run: dotnet pack ${{ steps.package-info.outputs.project_path }} --configuration Release --no-build --output ./packages
+        run: |
+          # For components package, use NuGet package references instead of project references
+          if [ "${{ steps.package-info.outputs.package }}" = "components" ]; then
+            dotnet pack ${{ steps.package-info.outputs.project_path }} --configuration Release --no-build --output ./packages -p:UsePackageReferences=true
+          else
+            dotnet pack ${{ steps.package-info.outputs.project_path }} --configuration Release --no-build --output ./packages
+          fi
 
       - name: Verify package version
         shell: bash

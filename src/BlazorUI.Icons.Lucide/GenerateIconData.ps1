@@ -22,7 +22,7 @@ $sb = New-Object System.Text.StringBuilder
 [void]$sb.AppendLine("// This file is auto-generated. Do not edit manually.")
 [void]$sb.AppendLine("// Generated from lucide.json on $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')")
 [void]$sb.AppendLine("")
-[void]$sb.AppendLine("namespace ShadcnBlazor.Icons.Lucide.Data;")
+[void]$sb.AppendLine("namespace BlazorUI.Icons.Lucide.Data;")
 [void]$sb.AppendLine("")
 [void]$sb.AppendLine("/// <summary>")
 [void]$sb.AppendLine("/// Provides access to Lucide icon SVG data.")

@@ -4,11 +4,13 @@ This document describes the automated NuGet publishing system for BlazorUI.
 
 ## Overview
 
-BlazorUI uses a **monorepo with independent package versioning**. Each of the three packages can be released independently with its own version number:
+BlazorUI uses a **monorepo with independent package versioning**. Each of the five packages can be released independently with its own version number:
 
 - **BlazorUI.Primitives** - Headless UI primitives
 - **BlazorUI.Components** - Styled components
-- **BlazorUI.Icons** - Lucide icon library
+- **BlazorUI.Icons.Lucide** - Lucide icon library
+- **BlazorUI.Icons.Heroicons** - Heroicons library
+- **BlazorUI.Icons.Feather** - Feather icon library
 
 ## Quick Start
 
@@ -17,7 +19,9 @@ To release a package, simply run the appropriate script:
 ```bash
 ./scripts/release-primitives.sh 1.0.0-beta.4
 ./scripts/release-components.sh 1.1.0-beta.2
-./scripts/release-icons.sh 1.0.3
+./scripts/release-icons-lucide.sh 1.0.3
+./scripts/release-icons-heroicons.sh 1.0.0-beta.1
+./scripts/release-icons-feather.sh 1.0.0-beta.1
 ```
 
 That's it! The rest is automated.
@@ -41,7 +45,9 @@ Tags follow the pattern: `<package>/v<version>`
 Examples:
 - `primitives/v1.0.0-beta.4`
 - `components/v1.1.0-beta.2`
-- `icons/v1.0.3`
+- `icons-lucide/v1.0.3`
+- `icons-heroicons/v1.0.0-beta.1`
+- `icons-feather/v1.0.0-beta.1`
 
 ### 3. MinVer Versioning
 
@@ -49,12 +55,13 @@ Each project uses [MinVer](https://github.com/adamralph/minver) to automatically
 
 **Configuration** (in each `.csproj` file):
 ```xml
-<MinVerTagPrefix>primitives/v</MinVerTagPrefix>
+<MinVerTagPrefix>primitives/v</MinVerTagPrefix>  <!-- or icons-lucide/v, etc. -->
 <MinVerDefaultPreReleaseIdentifiers>beta.0</MinVerDefaultPreReleaseIdentifiers>
 ```
 
 **How it works:**
 - Tag `primitives/v1.0.0-beta.4` → Version `1.0.0-beta.4`
+- Tag `icons-lucide/v1.0.3` → Version `1.0.3`
 - Tag `components/v2.0.0` → Version `2.0.0`
 - No matching tag → Version `0.0.0-beta.0.<commit-count>`
 
@@ -80,9 +87,11 @@ When a tag is pushed, GitHub Actions automatically:
 Each package can have a different version number:
 
 ```
-BlazorUI.Primitives 1.2.0
-BlazorUI.Components 1.1.5
-BlazorUI.Icons      1.0.3
+BlazorUI.Primitives       1.2.0
+BlazorUI.Components       1.1.5
+BlazorUI.Icons.Lucide     1.0.3
+BlazorUI.Icons.Heroicons  1.0.0-beta.1
+BlazorUI.Icons.Feather    1.0.0-beta.1
 ```
 
 This allows you to:
@@ -155,7 +164,9 @@ Each release creates a workflow run showing:
 Packages appear at:
 - https://www.nuget.org/packages/BlazorUI.Primitives
 - https://www.nuget.org/packages/BlazorUI.Components
-- https://www.nuget.org/packages/BlazorUI.Icons
+- https://www.nuget.org/packages/BlazorUI.Icons.Lucide
+- https://www.nuget.org/packages/BlazorUI.Icons.Heroicons
+- https://www.nuget.org/packages/BlazorUI.Icons.Feather
 
 **Note:** It may take 5-10 minutes for packages to appear on NuGet.org after publishing.
 
@@ -183,8 +194,13 @@ Ensure version follows semantic versioning:
 Delete the tag if you need to recreate it:
 
 ```bash
+# Example for primitives
 git tag -d primitives/v1.0.0-beta.4
 git push origin :refs/tags/primitives/v1.0.0-beta.4
+
+# Example for icons
+git tag -d icons-lucide/v1.0.3
+git push origin :refs/tags/icons-lucide/v1.0.3
 ```
 
 ### Package version mismatch
@@ -192,8 +208,8 @@ git push origin :refs/tags/primitives/v1.0.0-beta.4
 This usually means the git tag doesn't match the MinVer configuration.
 
 Check:
-1. Tag format: `primitives/v1.0.0-beta.4` (note the prefix)
-2. MinVerTagPrefix in `.csproj`: `<MinVerTagPrefix>primitives/v</MinVerTagPrefix>`
+1. Tag format: `icons-lucide/v1.0.3` (note the prefix)
+2. MinVerTagPrefix in `.csproj`: `<MinVerTagPrefix>icons-lucide/v</MinVerTagPrefix>`
 
 ### GitHub Actions failing
 

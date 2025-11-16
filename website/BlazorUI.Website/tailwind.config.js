@@ -5,9 +5,6 @@ module.exports = {
     './Pages/**/*.{razor,html,cs}',
     './Shared/**/*.{razor,html,cs}',
     './Components/**/*.{razor,html,cs}',
-    '../../src/BlazorUI.Components/**/*.{razor,html,cs}',
-    '../../src/BlazorUI.Primitives/**/*.{razor,html,cs}',
-    '../../src/BlazorUI.Icons/**/*.{razor,html,cs}',
   ],
   theme: {
     container: {

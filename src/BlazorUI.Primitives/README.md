@@ -110,7 +110,7 @@ BlazorUI.Primitives follows the "headless component" pattern popularized by Radi
 
 **Consider [BlazorUI.Components](https://www.nuget.org/packages/BlazorUI.Components) when:**
 - Want beautiful defaults with shadcn/ui design
-- Prefer pre-styled components with Tailwind CSS
+- Prefer zero-configuration setup with pre-built CSS
 - Need to ship quickly without custom styling
 
 ## Documentation
