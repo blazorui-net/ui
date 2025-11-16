@@ -1,13 +1,15 @@
 # BlazorUI.Components
 
-Pre-styled Blazor components built with shadcn/ui design and Tailwind CSS. Beautiful defaults that you can customize to match your brand.
+Pre-styled Blazor components with shadcn/ui design. Beautiful defaults with zero configuration - no Tailwind setup required!
 
 ## Features
 
+- **Zero Configuration**: Pre-built CSS included - no Tailwind setup required
 - **shadcn/ui Design**: Beautiful, modern design language inspired by shadcn/ui
-- **Pre-Styled Components**: Ready-to-use components with Tailwind CSS styling
+- **Pre-Styled Components**: Production-ready components with pre-built styling
 - **Dark Mode**: Built-in dark mode support using CSS variables
-- **Fully Customizable**: Override styles with Tailwind classes or custom CSS
+- **shadcn/ui Theme Compatible**: Use any theme from shadcn/ui or tweakcn.com
+- **Fully Customizable**: Override styles with custom CSS or Tailwind classes
 - **Accessible**: Built on BlazorUI.Primitives with WCAG 2.1 AA compliance
 - **Composable**: Flexible component composition patterns
 - **Type-Safe**: Full C# type safety with IntelliSense support
@@ -21,39 +23,64 @@ dotnet add package BlazorUI.Components
 
 This package automatically includes:
 - `BlazorUI.Primitives` - Headless primitives providing behavior and accessibility
-- `BlazorUI.Icons` - Lucide icon library
+- Pre-built CSS - No Tailwind setup required!
 
-### Tailwind CSS Setup
+## Quick Start
 
-BlazorUI Components requires Tailwind CSS. Add to your project:
+### 1. Add to your `_Imports.razor`:
 
-1. Install Tailwind CSS:
-```bash
-npm install -D tailwindcss
-npx tailwindcss init
+```razor
+@using BlazorUI.Components
 ```
 
-2. Configure `tailwind.config.js`:
-```js
-module.exports = {
-  content: [
-    './**/*.{razor,html}',
-  ],
-  theme: {
-    extend: {},
-  },
-  plugins: [],
-}
+### 2. Add CSS to your `App.razor`:
+
+BlazorUI Components come with pre-built CSS - no Tailwind setup required!
+
+```razor
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <base href="/" />
+
+    <!-- Optional: Your custom theme (defines CSS variables) -->
+    <link rel="stylesheet" href="styles/theme.css" />
+
+    <!-- Pre-built BlazorUI styles (included in NuGet package) -->
+    <link rel="stylesheet" href="_content/BlazorUI.Components/blazorui.css" />
+
+    <HeadOutlet @rendermode="InteractiveServer" />
+</head>
+<body>
+    <Routes @rendermode="InteractiveServer" />
+    <script src="_framework/blazor.web.js"></script>
+</body>
+</html>
 ```
 
-3. Add Tailwind directives to your CSS file:
-```css
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+### 3. Start using components:
+
+```razor
+<Button Variant="ButtonVariant.Default">Click me</Button>
+
+<Dialog>
+    <DialogTrigger AsChild>
+        <Button>Open Dialog</Button>
+    </DialogTrigger>
+    <DialogContent>
+        <DialogHeader>
+            <DialogTitle>Welcome to BlazorUI</DialogTitle>
+            <DialogDescription>
+                Beautiful Blazor components with zero configuration
+            </DialogDescription>
+        </DialogHeader>
+    </DialogContent>
+</Dialog>
 ```
 
-For complete setup instructions, see our [documentation](https://github.com/blazorui-net/ui).
+That's it! No Tailwind installation, no build configuration needed.
 
 ## Available Components
 
@@ -80,6 +107,53 @@ For complete setup instructions, see our [documentation](https://github.com/blaz
 - **Switch**: Toggle control for on/off states
 - **Tabs**: Tabbed interface for organizing related content
 - **Tooltip**: Brief informational popups on hover or focus
+
+## Theming
+
+BlazorUI is **100% compatible with shadcn/ui themes**. Customize your application's appearance using CSS variables.
+
+### Using Themes from shadcn/ui and tweakcn
+
+You can use any theme from:
+- **[shadcn/ui themes](https://ui.shadcn.com/themes)** - Official shadcn/ui theme gallery
+- **[tweakcn.com](https://tweakcn.com)** - Advanced theme customization tool
+
+Simply copy the CSS variables and paste them into your `wwwroot/styles/theme.css` file.
+
+### Example Theme
+
+Create `wwwroot/styles/theme.css`:
+
+```css
+@layer base {
+  :root {
+    --background: oklch(1 0 0);
+    --foreground: oklch(0.1450 0 0);
+    --primary: oklch(0.2050 0 0);
+    --primary-foreground: oklch(0.9850 0 0);
+    /* ... other variables */
+  }
+
+  .dark {
+    --background: oklch(0.1450 0 0);
+    --foreground: oklch(0.9850 0 0);
+    --primary: oklch(0.9220 0 0);
+    --primary-foreground: oklch(0.2050 0 0);
+    /* ... other variables */
+  }
+}
+```
+
+Reference it in your `App.razor` **before** the BlazorUI CSS:
+
+```razor
+<link rel="stylesheet" href="styles/theme.css" />
+<link rel="stylesheet" href="_content/BlazorUI.Components/blazorui.css" />
+```
+
+### Dark Mode
+
+Dark mode automatically activates when you add the `.dark` class to the `<html>` element. All components will switch to dark mode colors.
 
 ## Usage Example
 
@@ -155,7 +229,7 @@ For complete setup instructions, see our [documentation](https://github.com/blaz
 
 ### Override Default Styles
 
-Use the `Class` parameter to add custom Tailwind classes:
+Use the `Class` parameter to add custom CSS classes or Tailwind classes (if you have Tailwind set up):
 
 ```razor
 <Button Class="bg-purple-600 hover:bg-purple-700">
@@ -167,15 +241,7 @@ Use the `Class` parameter to add custom Tailwind classes:
 </Card>
 ```
 
-### Dark Mode
-
-Components automatically support dark mode using CSS variables:
-
-```razor
-@* Automatically adapts to dark mode *@
-<Button Variant="default">Themed Button</Button>
-<Card>Themed Card</Card>
-```
+**Note:** BlazorUI Components include pre-built CSS and don't require Tailwind. However, you can still use Tailwind classes for customization if you've set up Tailwind in your project.
 
 ### Component Composition
 
@@ -206,26 +272,29 @@ Build complex UIs by composing components:
 
 ## Design Philosophy
 
-BlazorUI.Components follows the shadcn/ui philosophy:
+BlazorUI.Components follows the shadcn/ui philosophy with zero-configuration deployment:
 
-1. **Copy-Paste Friendly**: Components are simple and can be customized in your project
-2. **Tailwind First**: Uses Tailwind CSS for all styling
+1. **Zero Configuration**: Pre-built CSS included - just install and use
+2. **shadcn/ui Compatible**: Uses the same design tokens and CSS variables
 3. **Built on Primitives**: All behavior comes from BlazorUI.Primitives
-4. **Design Tokens**: Uses CSS variables for theming
+4. **Theme Tokens**: Fully themeable using CSS variables
 5. **Accessible by Default**: WCAG 2.1 AA compliance built-in
+6. **Customizable**: Override with custom CSS or add Tailwind if needed
 
 ## When to Use
 
 **Use BlazorUI.Components when:**
 - Want beautiful defaults with shadcn/ui design
-- Using or planning to use Tailwind CSS
-- Need to ship quickly without building components from scratch
-- Want dark mode support out of the box
+- Need zero-configuration setup (no build tools required)
+- Want to ship quickly without building components from scratch
+- Need dark mode and theming support out of the box
+- Want shadcn/ui theme compatibility
 
 **Consider [BlazorUI.Primitives](https://www.nuget.org/packages/BlazorUI.Primitives) when:**
 - Building a completely custom design system
 - Want zero opinions about styling
 - Need to match a specific brand or design language
+- Prefer full control over all CSS
 
 ## Documentation
 
@@ -236,9 +305,12 @@ For full documentation, examples, and API reference, visit:
 
 ## Dependencies
 
-- [BlazorUI.Primitives](https://www.nuget.org/packages/BlazorUI.Primitives) - Headless component primitives
-- [BlazorUI.Icons](https://www.nuget.org/packages/BlazorUI.Icons) - Lucide icon library
-- Tailwind CSS (not included, must be installed separately)
+- [BlazorUI.Primitives](https://www.nuget.org/packages/BlazorUI.Primitives) - Headless component primitives (auto-installed)
+- Pre-built CSS (included in package)
+- No external dependencies required!
+
+**Optional:**
+- Tailwind CSS (if you want to use Tailwind classes for customization)
 
 ## License
 
