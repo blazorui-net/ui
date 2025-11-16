@@ -1,25 +1,31 @@
-@page "/components/icons"
+@page "/icons/feather"
+@using BlazorUI.Icons.Feather.Components
+@using BlazorUI.Icons.Feather.Data
 
-<PageTitle>Lucide Icons - BlazorUI</PageTitle>
+<PageTitle>Feather Icons - BlazorUI</PageTitle>
 
 <div class="space-y-8 max-w-4xl">
     <div>
         <div class="space-y-3">
-        <h1 class="text-4xl font-bold tracking-tight">Lucide Icons</h1>
-        <p class="text-xl text-muted-foreground">
-            Browse and search through @TotalIconCount beautiful icons from the Lucide icon library.
-        </p>
+            <div class="flex items-center gap-3">
+                <a href="/icons" class="text-muted-foreground hover:text-foreground transition-colors">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="15 18 9 12 15 6"/>
+                    </svg>
+                </a>
+                <h1 class="text-4xl font-bold tracking-tight">Feather Icons</h1>
+            </div>
+            <p class="text-xl text-muted-foreground">
+                Browse and search through @TotalIconCount minimalist, stroke-based icons from the Feather icon library.
+            </p>
         </div>
-    </div>
-
-    <div class="space-y-6">
     </div>
 
     <!-- Search and Stats -->
     <div class="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
         <div class="w-full md:w-96">
             <div class="relative">
-                <LucideIcon Name="search" Size="20" Class="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
+                <FeatherIcon Name="search" Size="20" Class="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
                 <input
                     type="text"
                     placeholder="Search icons..."
@@ -43,7 +49,7 @@
                 <div class="flex flex-col items-center justify-center p-4 border border-border rounded-lg hover:bg-accent hover:border-accent-foreground/20 transition-colors cursor-pointer group"
                      title="@iconName">
                     <div class="mb-2 text-foreground group-hover:scale-110 transition-transform">
-                        <LucideIcon Name="@iconName" Size="32" />
+                        <FeatherIcon Name="@iconName" Size="32" />
                     </div>
                     <span class="text-xs text-center text-muted-foreground group-hover:text-foreground font-mono break-all">
                         @iconName
@@ -55,7 +61,7 @@
     else
     {
         <div class="flex flex-col items-center justify-center py-16 text-center">
-            <LucideIcon Name="search-x" Size="48" Class="text-muted-foreground mb-4" />
+            <FeatherIcon Name="search" Size="48" Class="text-muted-foreground mb-4" />
             <h3 class="text-lg font-semibold mb-2">No icons found</h3>
             <p class="text-muted-foreground">
                 Try adjusting your search query
@@ -72,15 +78,17 @@
             <h3 class="text-xl font-semibold">Basic Usage</h3>
             <div class="p-6 border border-border rounded-lg bg-card space-y-4">
                 <div class="flex items-center gap-4">
-                    <LucideIcon Name="house" />
-                    <LucideIcon Name="settings" />
-                    <LucideIcon Name="user" />
-                    <LucideIcon Name="heart" />
-                    <LucideIcon Name="star" />
+                    <FeatherIcon Name="home" />
+                    <FeatherIcon Name="settings" />
+                    <FeatherIcon Name="user" />
+                    <FeatherIcon Name="heart" />
+                    <FeatherIcon Name="star" />
                 </div>
-                <pre class="bg-muted p-4 rounded text-sm overflow-x-auto"><code>&lt;LucideIcon Name="house" /&gt;
-&lt;LucideIcon Name="settings" /&gt;
-&lt;LucideIcon Name="user" /&gt;</code></pre>
+                <pre class="bg-muted p-4 rounded text-sm overflow-x-auto"><code>@@using BlazorUI.Icons.Feather.Components
+
+&lt;FeatherIcon Name="home" /&gt;
+&lt;FeatherIcon Name="settings" /&gt;
+&lt;FeatherIcon Name="user" /&gt;</code></pre>
             </div>
         </div>
 
@@ -89,15 +97,15 @@
             <h3 class="text-xl font-semibold">Different Sizes</h3>
             <div class="p-6 border border-border rounded-lg bg-card space-y-4">
                 <div class="flex items-center gap-6">
-                    <LucideIcon Name="camera" Size="16" />
-                    <LucideIcon Name="camera" Size="24" />
-                    <LucideIcon Name="camera" Size="32" />
-                    <LucideIcon Name="camera" Size="48" />
-                    <LucideIcon Name="camera" Size="64" />
+                    <FeatherIcon Name="camera" Size="16" />
+                    <FeatherIcon Name="camera" Size="24" />
+                    <FeatherIcon Name="camera" Size="32" />
+                    <FeatherIcon Name="camera" Size="48" />
+                    <FeatherIcon Name="camera" Size="64" />
                 </div>
-                <pre class="bg-muted p-4 rounded text-sm overflow-x-auto"><code>&lt;LucideIcon Name="camera" Size="16" /&gt;
-&lt;LucideIcon Name="camera" Size="24" /&gt;
-&lt;LucideIcon Name="camera" Size="32" /&gt;</code></pre>
+                <pre class="bg-muted p-4 rounded text-sm overflow-x-auto"><code>&lt;FeatherIcon Name="camera" Size="16" /&gt;
+&lt;FeatherIcon Name="camera" Size="24" /&gt;
+&lt;FeatherIcon Name="camera" Size="32" /&gt;</code></pre>
             </div>
         </div>
 
@@ -106,15 +114,31 @@
             <h3 class="text-xl font-semibold">Custom Colors</h3>
             <div class="p-6 border border-border rounded-lg bg-card space-y-4">
                 <div class="flex items-center gap-6">
-                    <LucideIcon Name="heart" Size="32" Color="red" />
-                    <LucideIcon Name="star" Size="32" Color="gold" />
-                    <LucideIcon Name="circle-check" Size="32" Color="green" />
-                    <LucideIcon Name="circle-alert" Size="32" Color="orange" />
-                    <LucideIcon Name="circle-x" Size="32" Color="#ef4444" />
+                    <FeatherIcon Name="heart" Size="32" Color="red" />
+                    <FeatherIcon Name="star" Size="32" Color="gold" />
+                    <FeatherIcon Name="check-circle" Size="32" Color="green" />
+                    <FeatherIcon Name="alert-circle" Size="32" Color="orange" />
+                    <FeatherIcon Name="x-circle" Size="32" Color="#ef4444" />
                 </div>
-                <pre class="bg-muted p-4 rounded text-sm overflow-x-auto"><code>&lt;LucideIcon Name="heart" Size="32" Color="red" /&gt;
-&lt;LucideIcon Name="star" Size="32" Color="gold" /&gt;
-&lt;LucideIcon Name="circle-check" Size="32" Color="green" /&gt;</code></pre>
+                <pre class="bg-muted p-4 rounded text-sm overflow-x-auto"><code>&lt;FeatherIcon Name="heart" Size="32" Color="red" /&gt;
+&lt;FeatherIcon Name="star" Size="32" Color="gold" /&gt;
+&lt;FeatherIcon Name="check-circle" Size="32" Color="green" /&gt;</code></pre>
+            </div>
+        </div>
+
+        <!-- Custom Stroke Width -->
+        <div class="space-y-4">
+            <h3 class="text-xl font-semibold">Custom Stroke Width</h3>
+            <div class="p-6 border border-border rounded-lg bg-card space-y-4">
+                <div class="flex items-center gap-6">
+                    <FeatherIcon Name="circle" Size="48" StrokeWidth="1" />
+                    <FeatherIcon Name="circle" Size="48" StrokeWidth="2" />
+                    <FeatherIcon Name="circle" Size="48" StrokeWidth="3" />
+                    <FeatherIcon Name="circle" Size="48" StrokeWidth="4" />
+                </div>
+                <pre class="bg-muted p-4 rounded text-sm overflow-x-auto"><code>&lt;FeatherIcon Name="circle" Size="48" StrokeWidth="1" /&gt;
+&lt;FeatherIcon Name="circle" Size="48" StrokeWidth="2" /&gt;
+&lt;FeatherIcon Name="circle" Size="48" StrokeWidth="3" /&gt;</code></pre>
             </div>
         </div>
 
@@ -125,42 +149,42 @@
                 <div class="flex flex-wrap items-center gap-3">
                     <Button>
                         <Icon>
-                            <LucideIcon Name="download" Size="20" />
+                            <FeatherIcon Name="download" Size="20" />
                         </Icon>
                         <ChildContent>Download</ChildContent>
                     </Button>
 
                     <Button Variant="ButtonVariant.Outline">
                         <Icon>
-                            <LucideIcon Name="trash" Size="20" />
+                            <FeatherIcon Name="trash-2" Size="20" />
                         </Icon>
                         <ChildContent>Delete</ChildContent>
                     </Button>
 
                     <Button Variant="ButtonVariant.Secondary">
                         <Icon>
-                            <LucideIcon Name="settings" Size="20" />
+                            <FeatherIcon Name="settings" Size="20" />
                         </Icon>
                         <ChildContent>Settings</ChildContent>
                     </Button>
 
                     <Button Variant="ButtonVariant.Destructive">
                         <Icon>
-                            <LucideIcon Name="triangle-alert" Size="20" />
+                            <FeatherIcon Name="alert-triangle" Size="20" />
                         </Icon>
                         <ChildContent>Warning</ChildContent>
                     </Button>
 
                     <Button Variant="ButtonVariant.Ghost">
                         <Icon>
-                            <LucideIcon Name="send-horizontal" Size="20" />
+                            <FeatherIcon Name="send" Size="20" />
                         </Icon>
                         <ChildContent>Send</ChildContent>
                     </Button>
                 </div>
                 <pre class="bg-muted p-4 rounded text-sm overflow-x-auto"><code>&lt;Button&gt;
     &lt;Icon&gt;
-        &lt;LucideIcon Name="download" Size="20" /&gt;
+        &lt;FeatherIcon Name="download" Size="20" /&gt;
     &lt;/Icon&gt;
     Download
 &lt;/Button&gt;</code></pre>
@@ -174,31 +198,49 @@
                 <div class="flex flex-wrap items-center gap-3">
                     <Button IconPosition="IconPosition.Start">
                         <Icon>
-                            <LucideIcon Name="arrow-left" Size="20" />
+                            <FeatherIcon Name="arrow-left" Size="20" />
                         </Icon>
                         <ChildContent>Back</ChildContent>
                     </Button>
 
                     <Button IconPosition="IconPosition.End">
                         <Icon>
-                            <LucideIcon Name="arrow-right" Size="20" />
+                            <FeatherIcon Name="arrow-right" Size="20" />
                         </Icon>
                         <ChildContent>Next</ChildContent>
                     </Button>
 
                     <Button IconPosition="IconPosition.Start">
                         <Icon>
-                            <LucideIcon Name="save" Size="20" />
+                            <FeatherIcon Name="save" Size="20" />
                         </Icon>
                         <ChildContent>Save Changes</ChildContent>
                     </Button>
                 </div>
                 <pre class="bg-muted p-4 rounded text-sm overflow-x-auto"><code>&lt;Button IconPosition="IconPosition.End"&gt;
     &lt;Icon&gt;
-        &lt;LucideIcon Name="arrow-right" Size="20" /&gt;
+        &lt;FeatherIcon Name="arrow-right" Size="20" /&gt;
     &lt;/Icon&gt;
     Next
 &lt;/Button&gt;</code></pre>
+            </div>
+        </div>
+
+        <!-- Minimalist Design Note -->
+        <div class="space-y-4">
+            <h3 class="text-xl font-semibold">About Feather Icons</h3>
+            <div class="p-6 border border-border rounded-lg bg-card">
+                <div class="flex items-start gap-3">
+                    <FeatherIcon Name="info" Size="20" Class="flex-shrink-0 mt-0.5" />
+                    <div class="space-y-2">
+                        <p class="text-sm">
+                            Feather Icons is a carefully curated collection of 286 minimalist stroke-based icons. Each icon is designed on a 24x24 grid with a 2px stroke width for consistency.
+                        </p>
+                        <p class="text-sm text-muted-foreground">
+                            Perfect for projects that prioritize simplicity and elegance with a smaller, focused icon set.
+                        </p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -208,7 +250,7 @@
     private string searchQuery = string.Empty;
     private IEnumerable<string> allIcons = Enumerable.Empty<string>();
 
-    private int TotalIconCount => LucideIconData.IconCount;
+    private int TotalIconCount => FeatherIconData.IconCount;
 
     private IEnumerable<string> FilteredIcons
     {
@@ -226,6 +268,6 @@
 
     protected override void OnInitialized()
     {
-        allIcons = LucideIconData.GetAvailableIcons().OrderBy(x => x).ToList();
+        allIcons = FeatherIconData.GetAvailableIcons().OrderBy(x => x).ToList();
     }
 }

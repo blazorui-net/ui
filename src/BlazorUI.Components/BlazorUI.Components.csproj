@@ -39,7 +39,7 @@
 
   <!-- Use ProjectReference for local development, PackageReference for packing -->
   <ItemGroup Condition="'$(UsePackageReferences)' != 'true'">
-    <ProjectReference Include="..\BlazorUI.Icons\BlazorUI.Icons.csproj" />
+    <ProjectReference Include="..\BlazorUI.Icons.Lucide\BlazorUI.Icons.Lucide.csproj" />
     <ProjectReference Include="..\BlazorUI.Primitives\BlazorUI.Primitives.csproj" />
   </ItemGroup>
 

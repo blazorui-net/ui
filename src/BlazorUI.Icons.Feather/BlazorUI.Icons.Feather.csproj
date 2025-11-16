@@ -6,11 +6,11 @@
     <ImplicitUsings>enable</ImplicitUsings>
 
     <!-- NuGet Package Configuration -->
-    <PackageId>BlazorUI.Icons</PackageId>
-    <RootNamespace>BlazorUI.Icons</RootNamespace>
-    <AssemblyName>BlazorUI.Icons</AssemblyName>
-    <Description>Lucide icon library for BlazorUI - 1,600+ beautiful, consistent SVG icons for Blazor applications.</Description>
-    <PackageTags>blazor;icons;lucide;shadcn;svg;ui;components;blazor-components</PackageTags>
+    <PackageId>BlazorUI.Icons.Feather</PackageId>
+    <RootNamespace>BlazorUI.Icons.Feather</RootNamespace>
+    <AssemblyName>BlazorUI.Icons.Feather</AssemblyName>
+    <Description>Feather icon library for BlazorUI - 286 beautiful, minimalist SVG icons for Blazor applications.</Description>
+    <PackageTags>blazor;icons;feather;shadcn;svg;ui;components;blazor-components;minimalist</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <!-- <PackageIcon>icon.png</PackageIcon> -->
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
@@ -20,7 +20,7 @@
     <Copyright>Copyright (c) 2025-present Mathew Taylor</Copyright>
 
     <!-- MinVer Configuration - Version from git tags -->
-    <MinVerTagPrefix>icons/v</MinVerTagPrefix>
+    <MinVerTagPrefix>icons-feather/v</MinVerTagPrefix>
     <MinVerDefaultPreReleaseIdentifiers>beta.0</MinVerDefaultPreReleaseIdentifiers>
   </PropertyGroup>
 

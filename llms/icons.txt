@@ -1,84 +1,276 @@
-# BlazorUI Icons - LucideIcon Component
+# BlazorUI Icon Libraries
 
-The BlazorUI.Icons package provides access to 1,640+ beautiful, customizable Lucide icons as Blazor components.
+BlazorUI provides **three separate icon packages** to suit different design preferences and project needs. All packages offer beautiful, customizable SVG icons as Blazor components.
+
+---
+
+## Icon Library Comparison
+
+| Package | Icons | Variants | Size | License | Best For |
+|---------|-------|----------|------|---------|----------|
+| **BlazorUI.Icons.Lucide** | 1,640 | 1 (stroke) | 24x24 | ISC | Modern, clean interfaces |
+| **BlazorUI.Icons.Heroicons** | 1,288 | 4 (outline, solid, mini, micro) | 16-24px | MIT (Tailwind Labs) | Tailwind-based designs, flexible sizing |
+| **BlazorUI.Icons.Feather** | 286 | 1 (stroke) | 24x24 | MIT | Simple, lightweight projects |
 
 ---
 
 ## Installation
 
+Install one or more icon packages:
+
 ```bash
-dotnet add package BlazorUI.Icons
+# Lucide Icons (1,640 stroke-based icons)
+dotnet add package BlazorUI.Icons.Lucide
+
+# Heroicons (1,288 icons with 4 variants)
+dotnet add package BlazorUI.Icons.Heroicons
+
+# Feather Icons (286 minimalist stroke-based icons)
+dotnet add package BlazorUI.Icons.Feather
 ```
+
+---
 
 ## Setup
 
-Add to your `_Imports.razor`:
+Add the namespace for your chosen icon library to `_Imports.razor`:
 
 ```razor
-@using BlazorUI.Icons
+@* For Lucide Icons *@
+@using BlazorUI.Icons.Lucide.Components
+
+@* For Heroicons *@
+@using BlazorUI.Icons.Heroicons.Components
+
+@* For Feather Icons *@
+@using BlazorUI.Icons.Feather.Components
 ```
 
 ---
 
-## Basic Usage
+## 1. Lucide Icons
 
-Render icons using the `<LucideIcon>` component with the `Name` parameter:
-
-```razor
-<LucideIcon Name="icon-name" />
-```
-
-**Icon names use kebab-case** (e.g., `"camera"`, `"chevron-down"`, `"arrow-right"`).
-
-### Examples
+### Basic Usage
 
 ```razor
-@* Basic icons *@
-<LucideIcon Name="house" />
-<LucideIcon Name="settings" />
-<LucideIcon Name="user" />
-
-@* Icons with custom size *@
-<LucideIcon Name="search" Size="20" />
-<LucideIcon Name="bell" Size="24" />
-
-@* Icons with custom color *@
-<LucideIcon Name="heart" Color="red" />
-<LucideIcon Name="star" Color="#FFD700" />
-
-@* Icons with CSS classes (Tailwind) *@
+<LucideIcon Name="camera" />
+<LucideIcon Name="heart" Size="32" Color="red" />
 <LucideIcon Name="check" Class="text-green-500" />
-<LucideIcon Name="x" Class="text-red-500" />
 ```
 
----
-
-## API Reference
-
-### Parameters
+### API Reference
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
 | `Name` | `string` | **Required** | Icon name in kebab-case (e.g., "camera", "chevron-down") |
-| `Size` | `int` | `24` | Icon size in pixels (width and height) |
-| `Color` | `string` | `"currentColor"` | CSS color value (hex, rgb, named color, or "currentColor") |
-| `StrokeWidth` | `double` | `2.0` | SVG stroke width (line thickness) |
-| `Class` | `string` | `""` | Additional CSS classes to apply |
-| `AriaLabel` | `string` | `null` | Accessibility label for screen readers |
-| `AdditionalAttributes` | `Dictionary<string, object>` | `null` | Any additional SVG attributes |
+| `Size` | `int` | `24` | Icon size in pixels |
+| `Color` | `string` | `"currentColor"` | CSS color value |
+| `StrokeWidth` | `double` | `2.0` | SVG stroke width |
+| `Class` | `string` | `null` | Additional CSS classes |
+| `AriaLabel` | `string` | `null` | Accessibility label |
 
 ### Examples
 
 ```razor
-@* Full parameter usage *@
+@* Basic icon *@
+<LucideIcon Name="home" />
+
+@* Customized icon *@
 <LucideIcon
     Name="settings"
     Size="20"
     Color="#3B82F6"
     StrokeWidth="1.5"
-    Class="rotate-90"
-    AriaLabel="Settings icon" />
+    Class="rotate-90" />
+
+@* In a button *@
+<Button>
+    <LucideIcon Name="plus" Size="16" />
+    Add Item
+</Button>
+
+@* With loading state *@
+@if (isLoading)
+{
+    <LucideIcon Name="loader-2" Size="16" Class="animate-spin" />
+}
 ```
+
+### Popular Lucide Icon Names
+
+**Navigation:** `home`, `menu`, `x`, `chevron-down`, `chevron-up`, `arrow-left`, `arrow-right`
+**Actions:** `plus`, `minus`, `edit`, `trash`, `save`, `download`, `upload`, `search`
+**Status:** `check`, `check-circle`, `x-circle`, `alert-circle`, `alert-triangle`, `info`
+**User:** `user`, `user-plus`, `users`, `log-in`, `log-out`, `lock`, `unlock`
+**Media:** `image`, `file`, `folder`, `camera`, `video`, `music`
+
+**Browse all:** https://lucide.dev/icons
+
+---
+
+## 2. Heroicons
+
+### Basic Usage
+
+```razor
+@* Outline variant (default) *@
+<HeroIcon Name="camera" />
+
+@* Solid variant *@
+<HeroIcon Name="camera" Variant="HeroIconVariant.Solid" />
+
+@* Mini variant (20x20) *@
+<HeroIcon Name="camera" Variant="HeroIconVariant.Mini" />
+
+@* Micro variant (16x16) *@
+<HeroIcon Name="camera" Variant="HeroIconVariant.Micro" />
+```
+
+### Icon Variants
+
+Heroicons uniquely offers **4 variants** of each icon:
+
+- **Outline** (24x24) - Stroke-based, 1.5px stroke *(default)*
+- **Solid** (24x24) - Filled paths
+- **Mini** (20x20) - Filled paths, smaller details
+- **Micro** (16x16) - Filled paths, simplified
+
+### API Reference
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `Name` | `string` | **Required** | Icon name in kebab-case (e.g., "camera", "home") |
+| `Variant` | `HeroIconVariant` | `Outline` | Icon variant (Outline, Solid, Mini, Micro) |
+| `Size` | `int?` | `null` | Override default size (24, 24, 20, or 16 based on variant) |
+| `Color` | `string` | `"currentColor"` | CSS color value |
+| `StrokeWidth` | `double?` | `1.5` | SVG stroke width (outline only) |
+| `Class` | `string` | `null` | Additional CSS classes |
+| `AriaLabel` | `string` | `null` | Accessibility label |
+
+### Examples
+
+```razor
+@* Outline icon (default) *@
+<HeroIcon Name="home" />
+
+@* Solid icon for emphasis *@
+<HeroIcon Name="star" Variant="HeroIconVariant.Solid" Color="#FFD700" />
+
+@* Mini icon for compact UI *@
+<HeroIcon Name="check-circle" Variant="HeroIconVariant.Mini" Class="text-green-500" />
+
+@* Micro icon for dense layouts *@
+<HeroIcon Name="x-mark" Variant="HeroIconVariant.Micro" Size="14" />
+
+@* In a button with solid variant *@
+<Button>
+    <HeroIcon Name="heart" Variant="HeroIconVariant.Solid" Size="16" />
+    Favorite
+</Button>
+
+@* Status indicators using different variants *@
+<Badge>
+    <HeroIcon Name="check" Variant="HeroIconVariant.Micro" Size="14" />
+    Verified
+</Badge>
+```
+
+### Variant Usage Guidelines
+
+```razor
+@* Outline: General UI, navigation *@
+<nav>
+    <HeroIcon Name="home" Variant="HeroIconVariant.Outline" />
+    <span>Dashboard</span>
+</nav>
+
+@* Solid: Active states, emphasis *@
+<Button Variant="primary">
+    <HeroIcon Name="bookmark" Variant="HeroIconVariant.Solid" />
+    Saved
+</Button>
+
+@* Mini: Inline with text, badges *@
+<Badge>
+    <HeroIcon Name="bell" Variant="HeroIconVariant.Mini" />
+    Notifications
+</Badge>
+
+@* Micro: Very small UI, dense layouts *@
+<div class="text-xs">
+    <HeroIcon Name="clock" Variant="HeroIconVariant.Micro" Size="12" />
+    2m ago
+</div>
+```
+
+### Popular Heroicons Names
+
+**Navigation:** `home`, `bars-3`, `x-mark`, `chevron-down`, `arrow-left`, `arrow-right`
+**Actions:** `plus`, `minus`, `pencil`, `trash`, `archive`, `arrow-down-tray`, `arrow-up-tray`
+**Status:** `check`, `check-circle`, `x-circle`, `exclamation-circle`, `exclamation-triangle`
+**User:** `user`, `user-plus`, `user-group`, `arrow-left-on-rectangle`, `lock-closed`
+**Media:** `photo`, `document`, `folder`, `camera`, `video-camera`, `musical-note`
+
+**Browse all:** https://heroicons.com/
+
+---
+
+## 3. Feather Icons
+
+### Basic Usage
+
+```razor
+<FeatherIcon Name="camera" />
+<FeatherIcon Name="heart" Size="32" Color="red" />
+<FeatherIcon Name="check" Class="text-green-500" />
+```
+
+### API Reference
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `Name` | `string` | **Required** | Icon name in kebab-case (e.g., "camera", "chevron-down") |
+| `Size` | `int` | `24` | Icon size in pixels |
+| `Color` | `string` | `"currentColor"` | CSS color value |
+| `StrokeWidth` | `double` | `2.0` | SVG stroke width |
+| `Class` | `string` | `null` | Additional CSS classes |
+| `AriaLabel` | `string` | `null` | Accessibility label |
+
+### Examples
+
+```razor
+@* Basic icon *@
+<FeatherIcon Name="home" />
+
+@* Customized icon *@
+<FeatherIcon
+    Name="settings"
+    Size="20"
+    Color="var(--primary)"
+    StrokeWidth="1.5" />
+
+@* In a button *@
+<Button Variant="outline">
+    <FeatherIcon Name="download" Size="16" />
+    Download
+</Button>
+
+@* Status indicator *@
+<div class="flex items-center space-x-2">
+    <FeatherIcon Name="check-circle" Size="16" Class="text-green-500" />
+    <span>Completed</span>
+</div>
+```
+
+### Popular Feather Icon Names
+
+**Navigation:** `home`, `menu`, `x`, `chevron-down`, `chevron-up`, `arrow-left`, `arrow-right`
+**Actions:** `plus`, `minus`, `edit`, `trash-2`, `save`, `download`, `upload`, `search`
+**Status:** `check`, `check-circle`, `x-circle`, `alert-circle`, `alert-triangle`, `info`
+**User:** `user`, `user-plus`, `users`, `log-in`, `log-out`, `lock`, `unlock`, `eye`
+**Media:** `image`, `file`, `file-text`, `folder`, `camera`, `video`, `music`
+
+**Browse all:** https://feathericons.com/
 
 ---
 
@@ -89,19 +281,22 @@ Render icons using the `<LucideIcon>` component with the `Name` parameter:
 ```razor
 @using BlazorUI.Components
 
+@* Lucide *@
 <Button>
     <LucideIcon Name="plus" Size="16" />
     Add Item
 </Button>
 
-<Button Variant="outline">
-    <LucideIcon Name="download" Size="16" />
-    Download
+@* Heroicons (Solid for emphasis) *@
+<Button Variant="default">
+    <HeroIcon Name="plus" Variant="HeroIconVariant.Solid" Size="16" />
+    Add Item
 </Button>
 
-<Button Variant="destructive">
-    <LucideIcon Name="trash" Size="16" />
-    Delete
+@* Feather *@
+<Button>
+    <FeatherIcon Name="plus" Size="16" />
+    Add Item
 </Button>
 
 @* Icon-only button *@
@@ -114,18 +309,21 @@ Render icons using the `<LucideIcon>` component with the `Name` parameter:
 
 ```razor
 <nav class="space-y-2">
+    @* Using Lucide *@
     <a href="/" class="flex items-center space-x-2">
         <LucideIcon Name="home" Size="20" />
         <span>Dashboard</span>
     </a>
 
+    @* Using Heroicons with Mini variant for compact nav *@
     <a href="/projects" class="flex items-center space-x-2">
-        <LucideIcon Name="folder" Size="20" />
+        <HeroIcon Name="folder" Variant="HeroIconVariant.Mini" />
         <span>Projects</span>
     </a>
 
+    @* Using Feather *@
     <a href="/settings" class="flex items-center space-x-2">
-        <LucideIcon Name="settings" Size="20" />
+        <FeatherIcon Name="settings" Size="20" />
         <span>Settings</span>
     </a>
 </nav>
@@ -147,21 +345,22 @@ Render icons using the `<LucideIcon>` component with the `Name` parameter:
             Edit
         </DropdownMenuItem>
         <DropdownMenuItem>
-            <LucideIcon Name="copy" Size="16" />
+            <HeroIcon Name="document-duplicate" Variant="HeroIconVariant.Mini" />
             Duplicate
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem>
-            <LucideIcon Name="trash" Size="16" />
+            <FeatherIcon Name="trash-2" Size="16" />
             Delete
         </DropdownMenuItem>
     </DropdownMenuContent>
 </DropdownMenu>
 ```
 
-### Icons in Alerts and Messages
+### Status Messages with Icons
 
 ```razor
+@* Success with Lucide *@
 <div class="flex items-start space-x-3 p-4 bg-green-50 border border-green-200 rounded-lg">
     <LucideIcon Name="check-circle" Size="20" Class="text-green-600" />
     <div>
@@ -170,77 +369,32 @@ Render icons using the `<LucideIcon>` component with the `Name` parameter:
     </div>
 </div>
 
+@* Error with Heroicons Solid *@
 <div class="flex items-start space-x-3 p-4 bg-red-50 border border-red-200 rounded-lg">
-    <LucideIcon Name="alert-circle" Size="20" Class="text-red-600" />
+    <HeroIcon Name="x-circle" Variant="HeroIconVariant.Solid" Size="20" Class="text-red-600" />
     <div>
         <h4 class="font-medium text-red-900">Error</h4>
-        <p class="text-sm text-red-700">Something went wrong. Please try again.</p>
+        <p class="text-sm text-red-700">Something went wrong.</p>
     </div>
 </div>
 
+@* Warning with Feather *@
 <div class="flex items-start space-x-3 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-    <LucideIcon Name="alert-triangle" Size="20" Class="text-yellow-600" />
+    <FeatherIcon Name="alert-triangle" Size="20" Class="text-yellow-600" />
     <div>
         <h4 class="font-medium text-yellow-900">Warning</h4>
         <p class="text-sm text-yellow-700">This action cannot be undone.</p>
     </div>
 </div>
-
-<div class="flex items-start space-x-3 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-    <LucideIcon Name="info" Size="20" Class="text-blue-600" />
-    <div>
-        <h4 class="font-medium text-blue-900">Info</h4>
-        <p class="text-sm text-blue-700">New features are now available.</p>
-    </div>
-</div>
 ```
 
-### Icons in Form Fields
+### Loading States
 
 ```razor
-<Field>
-    <FieldLabel>
-        <LucideIcon Name="mail" Size="16" Class="inline mr-1" />
-        Email Address
-    </FieldLabel>
-    <FieldContent>
-        <InputGroup>
-            <InputGroupIcon>
-                <LucideIcon Name="mail" Size="16" />
-            </InputGroupIcon>
-            <Input Type="email" Placeholder="name@example.com" />
-        </InputGroup>
-    </FieldContent>
-</Field>
-
-<Field>
-    <FieldLabel>
-        <LucideIcon Name="lock" Size="16" Class="inline mr-1" />
-        Password
-    </FieldLabel>
-    <FieldContent>
-        <InputGroup>
-            <InputGroupIcon>
-                <LucideIcon Name="lock" Size="16" />
-            </InputGroupIcon>
-            <Input Type="password" />
-            <InputGroupButton>
-                <Button Variant="ghost" Size="icon">
-                    <LucideIcon Name="eye" Size="16" />
-                </Button>
-            </InputGroupButton>
-        </InputGroup>
-    </FieldContent>
-</Field>
-```
-
-### Loading State Icons
-
-```razor
-@* Spinner animation *@
 <Button Disabled="@isLoading">
     @if (isLoading)
     {
+        @* Lucide loader *@
         <LucideIcon Name="loader-2" Size="16" Class="animate-spin" />
     }
     else
@@ -255,127 +409,71 @@ Render icons using the `<LucideIcon>` component with the `Name` parameter:
 }
 ```
 
-### Status Indicators
-
-```razor
-<div class="flex items-center space-x-2">
-    <LucideIcon Name="circle" Size="12" Class="text-green-500 fill-green-500" />
-    <span>Online</span>
-</div>
-
-<div class="flex items-center space-x-2">
-    <LucideIcon Name="circle" Size="12" Class="text-yellow-500 fill-yellow-500" />
-    <span>Away</span>
-</div>
-
-<div class="flex items-center space-x-2">
-    <LucideIcon Name="circle" Size="12" Class="text-red-500 fill-red-500" />
-    <span>Offline</span>
-</div>
-```
-
 ### Icons in Badges
 
 ```razor
+@* Heroicons Micro variant perfect for badges *@
 <Badge>
-    <LucideIcon Name="check" Size="14" Class="mr-1" />
+    <HeroIcon Name="check" Variant="HeroIconVariant.Micro" Size="14" />
     Verified
 </Badge>
 
 <Badge Variant="destructive">
-    <LucideIcon Name="x" Size="14" Class="mr-1" />
+    <HeroIcon Name="x-mark" Variant="HeroIconVariant.Micro" Size="14" />
     Failed
 </Badge>
 
+@* Feather icons *@
 <Badge Variant="outline">
-    <LucideIcon Name="clock" Size="14" Class="mr-1" />
+    <FeatherIcon Name="clock" Size="14" />
     Pending
 </Badge>
 ```
 
 ---
 
-## Popular Icon Names
+## Choosing an Icon Library
 
-### Navigation
-- `home`, `menu`, `x`, `chevron-left`, `chevron-right`, `chevron-down`, `chevron-up`
-- `arrow-left`, `arrow-right`, `arrow-up`, `arrow-down`
-- `more-horizontal`, `more-vertical`
+### Use **Lucide** when:
+- You want a large selection (1,640 icons)
+- You prefer consistent stroke-based design
+- You're building modern, clean interfaces
+- You need a familiar icon set (similar to Feather, but more extensive)
 
-### Actions
-- `plus`, `minus`, `edit`, `trash`, `save`, `download`, `upload`
-- `copy`, `clipboard`, `scissors`, `refresh-cw`
-- `search`, `filter`, `settings`, `sliders`
+### Use **Heroicons** when:
+- You're using Tailwind CSS (designed by Tailwind Labs)
+- You need multiple variants (outline, solid, mini, micro)
+- You want flexibility in icon sizing for different contexts
+- You need both stroke and filled icon styles
 
-### Communication
-- `mail`, `message-square`, `message-circle`, `send`, `bell`, `phone`
-- `video`, `mic`, `mic-off`, `volume`, `volume-x`
+### Use **Feather** when:
+- You want a lightweight, minimal icon set
+- 286 carefully curated icons is sufficient
+- You prefer simple, minimalist stroke-based design
+- You want a smaller bundle size
 
-### Status & Alerts
-- `check`, `check-circle`, `x-circle`, `alert-circle`, `alert-triangle`, `info`
-- `help-circle`, `loader`, `loader-2` (spinner)
+### Mix and Match
 
-### Media & Files
-- `image`, `file`, `file-text`, `folder`, `folder-open`
-- `camera`, `video`, `music`, `film`, `paperclip`
-
-### User & Profile
-- `user`, `user-plus`, `user-minus`, `user-check`, `users`
-- `log-in`, `log-out`, `lock`, `unlock`, `shield`, `eye`, `eye-off`
-
-### UI Elements
-- `calendar`, `clock`, `star`, `heart`, `bookmark`, `tag`
-- `grid`, `list`, `layout`, `maximize`, `minimize`, `external-link`
-
-### Social & Sharing
-- `share`, `share-2`, `link`, `link-2`, `trending-up`, `trending-down`
-- `thumbs-up`, `thumbs-down`, `heart`, `star`
-
-### Development
-- `code`, `terminal`, `github`, `gitlab`, `git-branch`, `git-commit`
-- `database`, `server`, `cpu`, `hard-drive`
-
----
-
-## Finding Icon Names
-
-### Online Resources
-
-1. **Lucide Icon Library**: https://lucide.dev/icons
-   - Browse all 1,640+ icons
-   - Search by keyword
-   - Copy icon names directly
-
-2. **Icon Name Format**
-   - All icon names use **kebab-case**
-   - Examples: `chevron-down`, `arrow-right`, `user-plus`
-   - **NOT**: `ChevronDown`, `arrowRight`, `UserPlus`
-
-### Common Naming Patterns
+You can install multiple icon libraries and use them together:
 
 ```razor
-@* Directional icons: name-direction *@
-<LucideIcon Name="arrow-left" />
-<LucideIcon Name="arrow-right" />
-<LucideIcon Name="chevron-up" />
-<LucideIcon Name="chevron-down" />
+@using BlazorUI.Icons.Lucide.Components
+@using BlazorUI.Icons.Heroicons.Components
+@using BlazorUI.Icons.Feather.Components
 
-@* Action icons: verb or verb-noun *@
-<LucideIcon Name="edit" />
-<LucideIcon Name="save" />
-<LucideIcon Name="log-out" />
-<LucideIcon Name="user-plus" />
+@* Use Heroicons for navigation (Tailwind-designed) *@
+<nav>
+    <HeroIcon Name="home" Variant="HeroIconVariant.Outline" />
+</nav>
 
-@* Status icons: noun-state *@
-<LucideIcon Name="check-circle" />
-<LucideIcon Name="x-circle" />
-<LucideIcon Name="alert-triangle" />
+@* Use Lucide for UI actions (large selection) *@
+<Button>
+    <LucideIcon Name="sparkles" Size="16" />
+    Generate
+</Button>
 
-@* Numbered variants *@
-<LucideIcon Name="loader" />
-<LucideIcon Name="loader-2" />
-<LucideIcon Name="share" />
-<LucideIcon Name="share-2" />
+@* Use Feather for simple indicators *@
+<FeatherIcon Name="check-circle" Class="text-green-500" />
 ```
 
 ---
@@ -387,58 +485,31 @@ Render icons using the `<LucideIcon>` component with the `Name` parameter:
 ```razor
 @* Color *@
 <LucideIcon Name="heart" Class="text-red-500" />
-<LucideIcon Name="star" Class="text-yellow-400" />
-<LucideIcon Name="check" Class="text-green-600" />
+<HeroIcon Name="star" Variant="HeroIconVariant.Solid" Class="text-yellow-400" />
+<FeatherIcon Name="check" Class="text-green-600" />
 
 @* Size (alternative to Size parameter) *@
 <LucideIcon Name="home" Class="w-4 h-4" />
-<LucideIcon Name="home" Class="w-6 h-6" />
-<LucideIcon Name="home" Class="w-8 h-8" />
+<HeroIcon Name="home" Class="w-6 h-6" />
+<FeatherIcon Name="home" Class="w-8 h-8" />
 
 @* Rotation *@
 <LucideIcon Name="arrow-right" Class="rotate-45" />
-<LucideIcon Name="settings" Class="rotate-90" />
 
 @* Animation *@
 <LucideIcon Name="loader-2" Class="animate-spin" />
-<LucideIcon Name="bell" Class="animate-bounce" />
+<FeatherIcon Name="bell" Class="animate-bounce" />
 
 @* Hover effects *@
 <LucideIcon Name="heart" Class="hover:text-red-500 transition-colors" />
 ```
 
-### Using Custom CSS
-
-```css
-/* Custom icon styles */
-.icon-primary {
-    color: var(--primary);
-}
-
-.icon-destructive {
-    color: var(--destructive);
-}
-
-.icon-lg {
-    width: 32px;
-    height: 32px;
-}
-
-.icon-spin {
-    animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-}
-```
+### Using CSS Variables (Theming)
 
 ```razor
-<LucideIcon Name="settings" Class="icon-primary" />
-<LucideIcon Name="trash" Class="icon-destructive" />
-<LucideIcon Name="home" Class="icon-lg" />
-<LucideIcon Name="loader-2" Class="icon-spin" />
+<LucideIcon Name="sun" Color="var(--primary)" />
+<HeroIcon Name="moon" Color="var(--foreground)" />
+<FeatherIcon Name="star" Color="var(--accent)" />
 ```
 
 ---
@@ -450,8 +521,8 @@ Render icons using the `<LucideIcon>` component with the `Name` parameter:
 For icons that convey meaning (not just decoration), add `AriaLabel`:
 
 ```razor
-@* Button with icon only - needs aria-label *@
-<Button Size="icon" AriaLabel="Close">
+@* Icon-only button - needs aria-label *@
+<Button Size="icon">
     <LucideIcon Name="x" Size="20" AriaLabel="Close" />
 </Button>
 
@@ -467,49 +538,49 @@ For icons that convey meaning (not just decoration), add `AriaLabel`:
 ```razor
 @* Decorative (icon + text) - no aria-label needed *@
 <Button>
-    <LucideIcon Name="download" Size="16" />
+    <HeroIcon Name="arrow-down-tray" Variant="HeroIconVariant.Outline" Size="16" />
     Download
 </Button>
 
 @* Meaningful (icon only) - aria-label required *@
 <Button Size="icon">
-    <LucideIcon Name="download" Size="20" AriaLabel="Download file" />
+    <HeroIcon Name="arrow-down-tray" Size="20" AriaLabel="Download file" />
 </Button>
-
-@* Status indicator - add context *@
-<div class="flex items-center space-x-2">
-    <LucideIcon Name="check-circle" Size="16" Class="text-green-500" AriaLabel="Success" />
-    <span>Operation completed</span>
-</div>
 ```
 
 ---
 
-## Performance Tips
+## Icon Name Format
 
-1. **Icon Size**: Use appropriate sizes for context
-   - Small UI elements: 12-16px
-   - Buttons: 16-20px
-   - Headers: 20-24px
-   - Hero sections: 32px+
-
-2. **Color**: Prefer `currentColor` or CSS classes over inline colors for better themability
-
-3. **Reusability**: Create wrapper components for frequently used icon combinations
+All icon libraries use **kebab-case** for icon names:
 
 ```razor
-@* IconButton.razor - Reusable icon button component *@
-<Button Size="icon" Variant="@Variant" @onclick="OnClick">
-    <LucideIcon Name="@IconName" Size="20" AriaLabel="@AriaLabel" />
-</Button>
+@* Correct ✓ *@
+<LucideIcon Name="chevron-down" />
+<HeroIcon Name="user-plus" />
+<FeatherIcon Name="alert-triangle" />
 
-@code {
-    [Parameter] public string IconName { get; set; } = "";
-    [Parameter] public string Variant { get; set; } = "ghost";
-    [Parameter] public string AriaLabel { get; set; } = "";
-    [Parameter] public EventCallback OnClick { get; set; }
-}
+@* Wrong ✗ *@
+<LucideIcon Name="ChevronDown" />  @* PascalCase - won't work *@
+<HeroIcon Name="userPlus" />       @* camelCase - won't work *@
+<FeatherIcon Name="alertTriangle" /> @* camelCase - won't work *@
 ```
+
+---
+
+## Finding Icon Names
+
+### Lucide Icons
+https://lucide.dev/icons
+Browse all 1,640 icons, search by keyword, copy names
+
+### Heroicons
+https://heroicons.com/
+Browse all icons with live variant preview (outline, solid, mini, micro)
+
+### Feather Icons
+https://feathericons.com/
+Browse all 286 minimalist icons
 
 ---
 
@@ -520,38 +591,36 @@ For icons that convey meaning (not just decoration), add `AriaLabel`:
 **Cause:** Icon name is incorrect or not in kebab-case
 
 **Solution:**
-- Check icon name at https://lucide.dev/icons
+- Check icon name on official website (lucide.dev, heroicons.com, or feathericons.com)
 - Ensure name is kebab-case: `"chevron-down"` not `"ChevronDown"`
-- Verify BlazorUI.Icons package is installed
+- Verify the correct icon package is installed
+- Verify namespace is imported in `_Imports.razor`
 
-### Icon is too large/small
+### Wrong variant shows (Heroicons only)
 
-**Cause:** Size parameter or CSS classes affecting dimensions
+**Cause:** Not specifying variant or using wrong variant name
 
 **Solution:**
 ```razor
-@* Use Size parameter *@
-<LucideIcon Name="home" Size="20" />
-
-@* OR use Tailwind classes *@
-<LucideIcon Name="home" Class="w-5 h-5" />
-
-@* Don't mix both - choose one approach *@
+@* Specify variant explicitly *@
+<HeroIcon Name="camera" Variant="HeroIconVariant.Solid" />
+<HeroIcon Name="camera" Variant="HeroIconVariant.Mini" />
+<HeroIcon Name="camera" Variant="HeroIconVariant.Micro" />
 ```
 
 ### Icon color doesn't change
 
-**Cause:** Using `Color` parameter with CSS color classes
+**Cause:** Using both `Color` parameter and CSS color classes
 
 **Solution:**
 ```razor
+@* Choose ONE approach *@
+
 @* Option 1: Use Color parameter *@
 <LucideIcon Name="heart" Color="red" />
 
 @* Option 2: Use CSS class (preferred for theming) *@
 <LucideIcon Name="heart" Class="text-red-500" />
-
-@* Don't use both simultaneously *@
 ```
 
 ---

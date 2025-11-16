@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Components;
-using BlazorUI.Icons.Data;
+using BlazorUI.Icons.Lucide.Data;
 
-namespace BlazorUI.Icons.Components;
+namespace BlazorUI.Icons.Lucide.Components;
 
 /// <summary>
 /// Renders a Lucide icon as an inline SVG.

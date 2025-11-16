@@ -21,8 +21,10 @@ dotnet add package BlazorUI.Primitives
 # Styled components with shadcn/ui design
 dotnet add package BlazorUI.Components
 
-# Lucide icon library
-dotnet add package BlazorUI.Icons
+# Icon libraries (choose one or more)
+dotnet add package BlazorUI.Icons.Lucide      # 1,640 icons - stroke-based, consistent
+dotnet add package BlazorUI.Icons.Heroicons   # 1,288 icons - 4 variants (outline, solid, mini, micro)
+dotnet add package BlazorUI.Icons.Feather     # 286 icons - minimalist, stroke-based
 ```
 
 ### Quick Start
@@ -257,7 +259,23 @@ BlazorUI includes **24 styled components** with full shadcn/ui design compatibil
 - **Skeleton** - Loading placeholders
 
 ### Icons
-- **Lucide Icons** - 1000+ beautiful icons with search and browse interface
+
+BlazorUI offers **three icon library packages** to suit different design preferences:
+
+- **Lucide Icons** (`BlazorUI.Icons.Lucide`) - 1,640 beautiful, consistent stroke-based icons
+  - ISC licensed
+  - 24x24 viewBox, 2px stroke width
+  - Perfect for: Modern, clean interfaces
+
+- **Heroicons** (`BlazorUI.Icons.Heroicons`) - 1,288 icons across 4 variants
+  - MIT licensed by Tailwind Labs
+  - Variants: Outline (24x24), Solid (24x24), Mini (20x20), Micro (16x16)
+  - Perfect for: Tailwind-based designs, flexible sizing needs
+
+- **Feather Icons** (`BlazorUI.Icons.Feather`) - 286 minimalist stroke-based icons
+  - MIT licensed
+  - 24x24 viewBox, 2px stroke width
+  - Perfect for: Simple, lightweight projects
 
 ## Primitives
 
@@ -292,7 +310,7 @@ All primitives are fully accessible, keyboard-navigable, and provide complete co
 - **State Persistence** - Cookie-based state management for user preferences
 - **TypeScript-Inspired API** - Familiar API design for developers coming from React/shadcn/ui
 - **Pure Blazor** - No JavaScript dependencies, no Node.js required
-- **Lucide Icons Integration** - Built-in icon component with 1000+ searchable icons
+- **Icon Library Options** - 3 separate icon packages (Lucide, Heroicons, Feather) with 3,200+ total icons
 - **Form Validation Ready** - Works seamlessly with Blazor's form validation
 
 ## Architecture
@@ -338,4 +356,6 @@ BlazorUI is an independent project and is not affiliated with or endorsed by sha
 
 
 - [Tailwind CSS](https://tailwindcss.com/) - Utility-first CSS framework
-- [Lucide Icons](https://lucide.dev/) - Beautiful icon library
+- [Lucide Icons](https://lucide.dev/) - Beautiful stroke-based icon library (ISC License)
+- [Heroicons](https://heroicons.com/) - Icon library by Tailwind Labs (MIT License)
+- [Feather Icons](https://feathericons.com/) - Minimalist icon library (MIT License)

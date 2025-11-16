@@ -2,7 +2,9 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\BlazorUI.Components\BlazorUI.Components.csproj" />
-    <ProjectReference Include="..\..\src\BlazorUI.Icons\BlazorUI.Icons.csproj" />
+    <ProjectReference Include="..\..\src\BlazorUI.Icons.Lucide\BlazorUI.Icons.Lucide.csproj" />
+    <ProjectReference Include="..\..\src\BlazorUI.Icons.Heroicons\BlazorUI.Icons.Heroicons.csproj" />
+    <ProjectReference Include="..\..\src\BlazorUI.Icons.Feather\BlazorUI.Icons.Feather.csproj" />
     <ProjectReference Include="..\..\src\BlazorUI.Primitives\BlazorUI.Primitives.csproj" />
   </ItemGroup>
 
