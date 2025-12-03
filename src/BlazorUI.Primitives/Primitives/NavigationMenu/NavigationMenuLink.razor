@@ -1,0 +1,139 @@
+@namespace BlazorUI.Primitives.NavigationMenu
+@using Microsoft.AspNetCore.Components.Routing
+@inject NavigationManager NavigationManager
+@implements IDisposable
+
+@* NavigationMenuLink - a link within a navigation menu *@
+<a @attributes="GetAttributes()"
+   role="menuitem"
+   @onclick="HandleClick"
+   data-active="@IsActiveLink.ToString().ToLowerInvariant()">
+    @ChildContent
+</a>
+
+@code {
+    [CascadingParameter]
+    private NavigationMenuContext? Context { get; set; }
+
+    /// <summary>
+    /// The href for the link.
+    /// </summary>
+    [Parameter]
+    public string Href { get; set; } = "#";
+
+    /// <summary>
+    /// Whether the link is currently active.
+    /// If not set, active state will be auto-detected based on the current URL when AutoActive is true.
+    /// </summary>
+    [Parameter]
+    public bool? Active { get; set; }
+
+    /// <summary>
+    /// Whether to automatically detect active state based on the current URL.
+    /// Similar to NavLink behavior.
+    /// Default is false.
+    /// </summary>
+    [Parameter]
+    public bool AutoActive { get; set; } = false;
+
+    /// <summary>
+    /// How to match the URL when AutoActive is true.
+    /// NavLinkMatch.All requires an exact match, NavLinkMatch.Prefix requires the URL to start with Href.
+    /// Default is NavLinkMatch.Prefix.
+    /// </summary>
+    [Parameter]
+    public NavLinkMatch Match { get; set; } = NavLinkMatch.Prefix;
+
+    /// <summary>
+    /// The child content to render within the link.
+    /// </summary>
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>
+    /// Event callback invoked when the link is clicked.
+    /// </summary>
+    [Parameter]
+    public EventCallback OnClick { get; set; }
+
+    /// <summary>
+    /// Additional attributes to apply to the anchor element.
+    /// </summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    /// <summary>
+    /// Gets whether the link is currently active, considering both the Active parameter
+    /// and auto-detection based on URL when enabled.
+    /// </summary>
+    private bool IsActiveLink => Active ?? (AutoActive && IsUrlActive());
+
+    protected override void OnInitialized()
+    {
+        if (AutoActive)
+        {
+            NavigationManager.LocationChanged += HandleLocationChanged;
+        }
+    }
+
+    private void HandleLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    private bool IsUrlActive()
+    {
+        if (string.IsNullOrEmpty(Href) || Href == "#")
+        {
+            return false;
+        }
+
+        var hrefUri = new Uri(NavigationManager.ToAbsoluteUri(Href).AbsoluteUri);
+        var currentUri = new Uri(NavigationManager.Uri);
+
+        if (Match == NavLinkMatch.All)
+        {
+            return hrefUri.AbsolutePath.Equals(currentUri.AbsolutePath, StringComparison.OrdinalIgnoreCase);
+        }
+
+        // NavLinkMatch.Prefix - default
+        return currentUri.AbsolutePath.StartsWith(hrefUri.AbsolutePath, StringComparison.OrdinalIgnoreCase);
+    }
+
+    private async Task HandleClick()
+    {
+        // Close the menu when a link is clicked
+        Context?.ClearActiveItem();
+        
+        if (OnClick.HasDelegate)
+        {
+            await OnClick.InvokeAsync();
+        }
+    }
+
+    private Dictionary<string, object> GetAttributes()
+    {
+        var attributes = new Dictionary<string, object>
+        {
+            ["href"] = Href
+        };
+
+        if (AdditionalAttributes != null)
+        {
+            foreach (var kvp in AdditionalAttributes)
+            {
+                attributes[kvp.Key] = kvp.Value;
+            }
+        }
+
+        return attributes;
+    }
+
+    public void Dispose()
+    {
+        if (AutoActive)
+        {
+            NavigationManager.LocationChanged -= HandleLocationChanged;
+        }
+    }
+}

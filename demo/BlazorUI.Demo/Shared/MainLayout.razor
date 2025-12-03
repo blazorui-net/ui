@@ -2,6 +2,7 @@
 @using BlazorUI.Primitives.Services
 @using BlazorUI.Components.Collapsible
 @using BlazorUI.Components.Sidebar
+@using BlazorUI.Components.Toast
 
 <PageTitle>BlazorUI Demo</PageTitle>
 
@@ -338,6 +339,41 @@
                                             <span>Tooltip</span>
                                         </SidebarMenuSubButton>
                                     </SidebarMenuSubItem>
+                                    <SidebarMenuSubItem>
+                                        <SidebarMenuSubButton AsChild="@SidebarMenuButtonElement.Anchor" Href="components/aspectratio">
+                                            <span>Aspect Ratio</span>
+                                        </SidebarMenuSubButton>
+                                    </SidebarMenuSubItem>
+                                    <SidebarMenuSubItem>
+                                        <SidebarMenuSubButton AsChild="@SidebarMenuButtonElement.Anchor" Href="components/calendar">
+                                            <span>Calendar</span>
+                                        </SidebarMenuSubButton>
+                                    </SidebarMenuSubItem>
+                                    <SidebarMenuSubItem>
+                                        <SidebarMenuSubButton AsChild="@SidebarMenuButtonElement.Anchor" Href="components/context-menu">
+                                            <span>Context Menu</span>
+                                        </SidebarMenuSubButton>
+                                    </SidebarMenuSubItem>
+                                    <SidebarMenuSubItem>
+                                        <SidebarMenuSubButton AsChild="@SidebarMenuButtonElement.Anchor" Href="components/navigation-menu">
+                                            <span>Navigation Menu</span>
+                                        </SidebarMenuSubButton>
+                                    </SidebarMenuSubItem>
+                                    <SidebarMenuSubItem>
+                                        <SidebarMenuSubButton AsChild="@SidebarMenuButtonElement.Anchor" Href="components/resizable">
+                                            <span>Resizable</span>
+                                        </SidebarMenuSubButton>
+                                    </SidebarMenuSubItem>
+                                    <SidebarMenuSubItem>
+                                        <SidebarMenuSubButton AsChild="@SidebarMenuButtonElement.Anchor" Href="components/scroll-area">
+                                            <span>Scroll Area</span>
+                                        </SidebarMenuSubButton>
+                                    </SidebarMenuSubItem>
+                                    <SidebarMenuSubItem>
+                                        <SidebarMenuSubButton AsChild="@SidebarMenuButtonElement.Anchor" Href="components/toast">
+                                            <span>Toast</span>
+                                        </SidebarMenuSubButton>
+                                    </SidebarMenuSubItem>
                                 </SidebarMenuSub>
                             </CollapsibleContent>
                         </Collapsible>
@@ -397,4 +433,5 @@
     </SidebarInset>
 </SidebarProvider>
 
+<ToastViewport Position="ToastPosition.BottomRight" />
 <PortalHost />

@@ -1,0 +1,196 @@
+@page "/components/calendar"
+@using BlazorUI.Components.Calendar
+
+<PageTitle>Calendar Component - BlazorUI</PageTitle>
+
+<div class="space-y-8 max-w-4xl">
+    <div>
+        <div class="space-y-3">
+            <h1 class="text-4xl font-bold tracking-tight">Calendar Component</h1>
+            <p class="text-xl text-muted-foreground">
+                A date field component that allows users to enter and edit date. Supports single date selection with full keyboard navigation.
+            </p>
+        </div>
+    </div>
+
+    <div class="space-y-6">
+        <section class="space-y-4">
+            <div class="space-y-2">
+                <h2 class="text-2xl font-semibold">Default</h2>
+                <p class="text-muted-foreground">
+                    A basic calendar for date selection.
+                </p>
+            </div>
+
+            <div class="flex flex-col gap-4">
+                <div class="rounded-md border">
+                    <Calendar @bind-SelectedDate="selectedDate1" />
+                </div>
+                <p class="text-sm text-muted-foreground">
+                    Selected: @(selectedDate1?.ToString("D") ?? "None")
+                </p>
+            </div>
+        </section>
+
+        <section class="space-y-4">
+            <div class="space-y-2">
+                <h2 class="text-2xl font-semibold">With Date Constraints</h2>
+                <p class="text-muted-foreground">
+                    Limit selection to a specific date range.
+                </p>
+            </div>
+
+            <div class="flex flex-col gap-4">
+                <div class="rounded-md border">
+                    <Calendar @bind-SelectedDate="selectedDate2"
+                              MinDate="DateOnly.FromDateTime(DateTime.Today)"
+                              MaxDate="DateOnly.FromDateTime(DateTime.Today.AddMonths(3))" />
+                </div>
+                <p class="text-sm text-muted-foreground">
+                    Selected: @(selectedDate2?.ToString("D") ?? "None")
+                    <br />
+                    <span class="text-xs">Range: Today to 3 months from now</span>
+                </p>
+            </div>
+        </section>
+
+        <section class="space-y-4">
+            <div class="space-y-2">
+                <h2 class="text-2xl font-semibold">Disable Weekends</h2>
+                <p class="text-muted-foreground">
+                    Use a custom function to disable specific dates.
+                </p>
+            </div>
+
+            <div class="flex flex-col gap-4">
+                <div class="rounded-md border">
+                    <Calendar @bind-SelectedDate="selectedDate3"
+                              IsDateDisabled="IsWeekend" />
+                </div>
+                <p class="text-sm text-muted-foreground">
+                    Selected: @(selectedDate3?.ToString("D") ?? "None")
+                    <br />
+                    <span class="text-xs">Weekends are disabled</span>
+                </p>
+            </div>
+        </section>
+
+        <section class="space-y-4">
+            <div class="space-y-2">
+                <h2 class="text-2xl font-semibold">With Initial Month</h2>
+                <p class="text-muted-foreground">
+                    Start with a specific month displayed.
+                </p>
+            </div>
+
+            <div class="flex flex-col gap-4">
+                <div class="rounded-md border">
+                    <Calendar @bind-SelectedDate="selectedDate4"
+                              InitialMonth="new DateOnly(2025, 12, 1)" />
+                </div>
+                <p class="text-sm text-muted-foreground">
+                    Selected: @(selectedDate4?.ToString("D") ?? "None")
+                    <br />
+                    <span class="text-xs">Starts at December 2025</span>
+                </p>
+            </div>
+        </section>
+
+        <section class="space-y-4">
+            <div class="space-y-2">
+                <h2 class="text-2xl font-semibold">Side by Side</h2>
+                <p class="text-muted-foreground">
+                    Multiple calendars for comparison or date range selection.
+                </p>
+            </div>
+
+            <div class="flex gap-4">
+                <div class="rounded-md border">
+                    <Calendar @bind-SelectedDate="rangeStart" />
+                </div>
+                <div class="rounded-md border">
+                    <Calendar @bind-SelectedDate="rangeEnd" />
+                </div>
+            </div>
+            <p class="text-sm text-muted-foreground">
+                From: @(rangeStart?.ToString("D") ?? "None") — To: @(rangeEnd?.ToString("D") ?? "None")
+            </p>
+        </section>
+
+        <section class="space-y-4">
+            <div class="space-y-2">
+                <h2 class="text-2xl font-semibold">Features</h2>
+            </div>
+            <ul class="list-disc list-inside space-y-2 text-sm">
+                <li>Single date selection with @@bind-SelectedDate</li>
+                <li>MinDate and MaxDate constraints</li>
+                <li>Custom date disabling via IsDateDisabled function</li>
+                <li>Month navigation with previous/next buttons</li>
+                <li>Culture-aware formatting and first day of week</li>
+                <li>ARIA grid roles for accessibility</li>
+                <li>Full keyboard navigation support</li>
+            </ul>
+        </section>
+
+        <section class="space-y-4">
+            <div class="space-y-2">
+                <h2 class="text-2xl font-semibold">Keyboard Navigation</h2>
+            </div>
+            <div class="grid gap-2 text-sm">
+                <div class="flex gap-4">
+                    <kbd class="px-2 py-1 bg-muted rounded">←/→</kbd>
+                    <span>Previous/Next day</span>
+                </div>
+                <div class="flex gap-4">
+                    <kbd class="px-2 py-1 bg-muted rounded">↑/↓</kbd>
+                    <span>Previous/Next week</span>
+                </div>
+                <div class="flex gap-4">
+                    <kbd class="px-2 py-1 bg-muted rounded">Enter/Space</kbd>
+                    <span>Select date</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="space-y-4">
+            <div class="space-y-2">
+                <h2 class="text-2xl font-semibold">Installation</h2>
+            </div>
+
+            <div class="bg-muted p-4 rounded-md">
+                <code class="text-sm">@@using BlazorUI.Components.Calendar</code>
+            </div>
+        </section>
+
+        <section class="space-y-4">
+            <div class="space-y-2">
+                <h2 class="text-2xl font-semibold">Usage</h2>
+            </div>
+
+            <div class="bg-muted p-4 rounded-md">
+                <pre class="text-sm overflow-x-auto"><code>&lt;Calendar @@bind-SelectedDate="selectedDate"
+          MinDate="DateOnly.FromDateTime(DateTime.Today)"
+          MaxDate="DateOnly.FromDateTime(DateTime.Today.AddMonths(3))" /&gt;
+
+@@code {
+    private DateOnly? selectedDate;
+}</code></pre>
+            </div>
+        </section>
+    </div>
+</div>
+
+@code {
+    private DateOnly? selectedDate1;
+    private DateOnly? selectedDate2;
+    private DateOnly? selectedDate3;
+    private DateOnly? selectedDate4;
+    private DateOnly? rangeStart;
+    private DateOnly? rangeEnd;
+
+    private bool IsWeekend(DateOnly date)
+    {
+        return date.DayOfWeek == DayOfWeek.Saturday || 
+               date.DayOfWeek == DayOfWeek.Sunday;
+    }
+}

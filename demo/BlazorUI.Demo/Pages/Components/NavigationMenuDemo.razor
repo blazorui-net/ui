@@ -1,0 +1,219 @@
+@page "/components/navigation-menu"
+@using NavMenu = BlazorUI.Components.NavigationMenu
+
+<PageTitle>Navigation Menu Component - BlazorUI</PageTitle>
+
+<div class="space-y-8 max-w-4xl">
+    <div>
+        <div class="space-y-3">
+            <h1 class="text-4xl font-bold tracking-tight">Navigation Menu Component</h1>
+            <p class="text-xl text-muted-foreground">
+                A collection of links for navigating websites. Supports dropdown panels with rich content.
+            </p>
+        </div>
+    </div>
+
+    <div class="space-y-6">
+        <section class="space-y-4">
+            <div class="space-y-2">
+                <h2 class="text-2xl font-semibold">Default</h2>
+                <p class="text-muted-foreground">
+                    A basic navigation menu with dropdown items.
+                </p>
+            </div>
+
+            <NavMenu.NavigationMenu>
+                <NavMenu.NavigationMenuList>
+                    <NavMenu.NavigationMenuItem Value="getting-started">
+                        <NavMenu.NavigationMenuTrigger>Getting Started</NavMenu.NavigationMenuTrigger>
+                        <NavMenu.NavigationMenuContent>
+                            <ul class="grid gap-3 p-4 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
+                                <li class="row-span-3">
+                                    <NavMenu.NavigationMenuLink Href="/" Class="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md">
+                                        <div class="mb-2 mt-4 text-lg font-medium">
+                                            BlazorUI
+                                        </div>
+                                        <p class="text-sm leading-tight text-muted-foreground">
+                                            Beautifully designed components built with Tailwind CSS.
+                                        </p>
+                                    </NavMenu.NavigationMenuLink>
+                                </li>
+                                <li>
+                                    <NavMenu.NavigationMenuLink Href="/architecture">
+                                        <div class="text-sm font-medium leading-none">Architecture</div>
+                                        <p class="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                                            Learn about our two-tier primitives architecture.
+                                        </p>
+                                    </NavMenu.NavigationMenuLink>
+                                </li>
+                                <li>
+                                    <NavMenu.NavigationMenuLink Href="/getting-started">
+                                        <div class="text-sm font-medium leading-none">Installation</div>
+                                        <p class="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                                            How to install and configure BlazorUI.
+                                        </p>
+                                    </NavMenu.NavigationMenuLink>
+                                </li>
+                            </ul>
+                        </NavMenu.NavigationMenuContent>
+                    </NavMenu.NavigationMenuItem>
+
+                    <NavMenu.NavigationMenuItem Value="components">
+                        <NavMenu.NavigationMenuTrigger>Components</NavMenu.NavigationMenuTrigger>
+                        <NavMenu.NavigationMenuContent>
+                            <ul class="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
+                                <li>
+                                    <NavMenu.NavigationMenuLink Href="/components/button">
+                                        <div class="text-sm font-medium leading-none">Button</div>
+                                        <p class="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                                            Interactive buttons with multiple variants.
+                                        </p>
+                                    </NavMenu.NavigationMenuLink>
+                                </li>
+                                <li>
+                                    <NavMenu.NavigationMenuLink Href="/components/dialog">
+                                        <div class="text-sm font-medium leading-none">Dialog</div>
+                                        <p class="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                                            Modal dialogs with backdrop and focus management.
+                                        </p>
+                                    </NavMenu.NavigationMenuLink>
+                                </li>
+                                <li>
+                                    <NavMenu.NavigationMenuLink Href="/components/dropdown-menu">
+                                        <div class="text-sm font-medium leading-none">Dropdown Menu</div>
+                                        <p class="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                                            Menus with items, separators, and shortcuts.
+                                        </p>
+                                    </NavMenu.NavigationMenuLink>
+                                </li>
+                                <li>
+                                    <NavMenu.NavigationMenuLink Href="/components/tabs">
+                                        <div class="text-sm font-medium leading-none">Tabs</div>
+                                        <p class="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                                            Tabbed interface for organizing content.
+                                        </p>
+                                    </NavMenu.NavigationMenuLink>
+                                </li>
+                            </ul>
+                        </NavMenu.NavigationMenuContent>
+                    </NavMenu.NavigationMenuItem>
+
+                    <NavMenu.NavigationMenuItem>
+                        <NavMenu.NavigationMenuLink Href="/components" Class="group inline-flex h-10 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none">
+                            Documentation
+                        </NavMenu.NavigationMenuLink>
+                    </NavMenu.NavigationMenuItem>
+                </NavMenu.NavigationMenuList>
+            </NavMenu.NavigationMenu>
+        </section>
+
+        <section class="space-y-4">
+            <div class="space-y-2">
+                <h2 class="text-2xl font-semibold">Simple Navigation</h2>
+                <p class="text-muted-foreground">
+                    Navigation without dropdown panels.
+                </p>
+            </div>
+
+            <NavMenu.NavigationMenu>
+                <NavMenu.NavigationMenuList>
+                    <NavMenu.NavigationMenuItem>
+                        <NavMenu.NavigationMenuLink Href="/" Class="group inline-flex h-10 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none">
+                            Home
+                        </NavMenu.NavigationMenuLink>
+                    </NavMenu.NavigationMenuItem>
+                    <NavMenu.NavigationMenuItem>
+                        <NavMenu.NavigationMenuLink Href="/components" Class="group inline-flex h-10 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none">
+                            Components
+                        </NavMenu.NavigationMenuLink>
+                    </NavMenu.NavigationMenuItem>
+                    <NavMenu.NavigationMenuItem>
+                        <NavMenu.NavigationMenuLink Href="/primitives" Class="group inline-flex h-10 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none">
+                            Primitives
+                        </NavMenu.NavigationMenuLink>
+                    </NavMenu.NavigationMenuItem>
+                    <NavMenu.NavigationMenuItem>
+                        <NavMenu.NavigationMenuLink Href="/icons" Class="group inline-flex h-10 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none">
+                            Icons
+                        </NavMenu.NavigationMenuLink>
+                    </NavMenu.NavigationMenuItem>
+                </NavMenu.NavigationMenuList>
+            </NavMenu.NavigationMenu>
+        </section>
+
+        <section class="space-y-4">
+            <div class="space-y-2">
+                <h2 class="text-2xl font-semibold">Features</h2>
+            </div>
+            <ul class="list-disc list-inside space-y-2 text-sm">
+                <li>Dropdown panels with rich content on hover/click</li>
+                <li>Full keyboard navigation (←/→ between items, ↓ to open, Esc to close)</li>
+                <li>ARIA menubar roles for accessibility</li>
+                <li>Flexible content - supports any layout in panels</li>
+                <li>Active link highlighting</li>
+            </ul>
+        </section>
+
+        <section class="space-y-4">
+            <div class="space-y-2">
+                <h2 class="text-2xl font-semibold">Keyboard Navigation</h2>
+            </div>
+            <div class="grid gap-2 text-sm">
+                <div class="flex gap-4">
+                    <kbd class="px-2 py-1 bg-muted rounded">←/→</kbd>
+                    <span>Navigate between menu items</span>
+                </div>
+                <div class="flex gap-4">
+                    <kbd class="px-2 py-1 bg-muted rounded">↓</kbd>
+                    <span>Open dropdown panel</span>
+                </div>
+                <div class="flex gap-4">
+                    <kbd class="px-2 py-1 bg-muted rounded">Enter/Space</kbd>
+                    <span>Toggle dropdown</span>
+                </div>
+                <div class="flex gap-4">
+                    <kbd class="px-2 py-1 bg-muted rounded">Escape</kbd>
+                    <span>Close dropdown</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="space-y-4">
+            <div class="space-y-2">
+                <h2 class="text-2xl font-semibold">Installation</h2>
+            </div>
+
+            <div class="bg-muted p-4 rounded-md">
+                <code class="text-sm">@@using BlazorUI.Components.NavigationMenu</code>
+            </div>
+        </section>
+
+        <section class="space-y-4">
+            <div class="space-y-2">
+                <h2 class="text-2xl font-semibold">Usage</h2>
+            </div>
+
+            <div class="bg-muted p-4 rounded-md">
+                <pre class="text-sm overflow-x-auto"><code>&lt;NavigationMenu&gt;
+    &lt;NavigationMenuList&gt;
+        &lt;NavigationMenuItem Value="products"&gt;
+            &lt;NavigationMenuTrigger&gt;Products&lt;/NavigationMenuTrigger&gt;
+            &lt;NavigationMenuContent&gt;
+                &lt;ul class="grid gap-3 p-4 w-[400px]"&gt;
+                    &lt;li&gt;
+                        &lt;NavigationMenuLink Href="/products"&gt;
+                            All Products
+                        &lt;/NavigationMenuLink&gt;
+                    &lt;/li&gt;
+                &lt;/ul&gt;
+            &lt;/NavigationMenuContent&gt;
+        &lt;/NavigationMenuItem&gt;
+    &lt;/NavigationMenuList&gt;
+&lt;/NavigationMenu&gt;</code></pre>
+            </div>
+        </section>
+    </div>
+</div>
+
+@code {
+}

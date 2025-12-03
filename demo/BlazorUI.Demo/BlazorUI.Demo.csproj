@@ -16,8 +16,8 @@
     <AssemblyName>BlazorUI.Demo</AssemblyName>
   </PropertyGroup>
 
-  <!-- Build Tailwind CSS -->
-  <Target Name="BuildTailwindCSS" BeforeTargets="BeforeBuild">
+  <!-- Build Tailwind CSS (skipped in CI if tailwindcss.exe not available) -->
+  <Target Name="BuildTailwindCSS" BeforeTargets="BeforeBuild" Condition="Exists('$(MSBuildProjectDirectory)\..\..\tools\tailwindcss.exe')">
     <Message Text="Building Tailwind CSS..." Importance="high" />
     <Exec Command="$(MSBuildProjectDirectory)\..\..\tools\tailwindcss.exe -i wwwroot/css/app-input.css -o wwwroot/css/app.css" />
   </Target>

@@ -1,0 +1,290 @@
+@page "/components/toast"
+@using BlazorUI.Components.Toast
+@inject IToastService ToastService
+
+<PageTitle>Toast Component - BlazorUI</PageTitle>
+
+<div class="space-y-8 max-w-4xl">
+    <div>
+        <div class="space-y-3">
+            <h1 class="text-4xl font-bold tracking-tight">Toast Component</h1>
+            <p class="text-xl text-muted-foreground">
+                A succinct message that is displayed temporarily. Also known as notifications or snackbars.
+            </p>
+        </div>
+    </div>
+
+    <div class="space-y-6">
+        <section class="space-y-4">
+            <div class="space-y-2">
+                <h2 class="text-2xl font-semibold">Default Toast</h2>
+                <p class="text-muted-foreground">
+                    Show a simple toast notification.
+                </p>
+            </div>
+
+            <Button @onclick="ShowDefaultToast">Show Toast</Button>
+        </section>
+
+        <section class="space-y-4">
+            <div class="space-y-2">
+                <h2 class="text-2xl font-semibold">Success Toast</h2>
+                <p class="text-muted-foreground">
+                    Indicate a successful operation.
+                </p>
+            </div>
+
+            <Button Variant="ButtonVariant.Outline" @onclick="ShowSuccessToast" Class="bg-green-600 text-white hover:bg-green-700">
+                Show Success
+            </Button>
+        </section>
+
+        <section class="space-y-4">
+            <div class="space-y-2">
+                <h2 class="text-2xl font-semibold">Error Toast</h2>
+                <p class="text-muted-foreground">
+                    Alert the user to an error.
+                </p>
+            </div>
+
+            <Button Variant="ButtonVariant.Destructive" @onclick="ShowErrorToast">
+                Show Error
+            </Button>
+        </section>
+
+        <section class="space-y-4">
+            <div class="space-y-2">
+                <h2 class="text-2xl font-semibold">Warning Toast</h2>
+                <p class="text-muted-foreground">
+                    Warn the user about something.
+                </p>
+            </div>
+
+            <Button Variant="ButtonVariant.Outline" @onclick="ShowWarningToast" Class="bg-yellow-500 text-white hover:bg-yellow-600">
+                Show Warning
+            </Button>
+        </section>
+
+        <section class="space-y-4">
+            <div class="space-y-2">
+                <h2 class="text-2xl font-semibold">Info Toast</h2>
+                <p class="text-muted-foreground">
+                    Provide informational message.
+                </p>
+            </div>
+
+            <Button Variant="ButtonVariant.Outline" @onclick="ShowInfoToast" Class="bg-blue-500 text-white hover:bg-blue-600">
+                Show Info
+            </Button>
+        </section>
+
+        <section class="space-y-4">
+            <div class="space-y-2">
+                <h2 class="text-2xl font-semibold">Toast with Action</h2>
+                <p class="text-muted-foreground">
+                    Include an action button in the toast.
+                </p>
+            </div>
+
+            <Button Variant="ButtonVariant.Outline" @onclick="ShowToastWithAction">
+                Show with Action
+            </Button>
+        </section>
+
+        <section class="space-y-4">
+            <div class="space-y-2">
+                <h2 class="text-2xl font-semibold">Custom Duration</h2>
+                <p class="text-muted-foreground">
+                    Control how long the toast stays visible.
+                </p>
+            </div>
+
+            <div class="flex gap-2">
+                <Button Variant="ButtonVariant.Outline" @onclick="ShowShortToast">
+                    Short (2s)
+                </Button>
+                <Button Variant="ButtonVariant.Outline" @onclick="ShowLongToast">
+                    Long (10s)
+                </Button>
+            </div>
+        </section>
+
+        <section class="space-y-4">
+            <div class="space-y-2">
+                <h2 class="text-2xl font-semibold">Multiple Toasts</h2>
+                <p class="text-muted-foreground">
+                    Toasts stack automatically.
+                </p>
+            </div>
+
+            <Button Variant="ButtonVariant.Outline" @onclick="ShowMultipleToasts">
+                Show Multiple Toasts
+            </Button>
+        </section>
+
+        <section class="space-y-4">
+            <div class="space-y-2">
+                <h2 class="text-2xl font-semibold">Dismiss All</h2>
+                <p class="text-muted-foreground">
+                    Clear all active toasts.
+                </p>
+            </div>
+
+            <Button Variant="ButtonVariant.Outline" @onclick="DismissAllToasts">
+                Dismiss All
+            </Button>
+        </section>
+
+        <section class="space-y-4">
+            <div class="space-y-2">
+                <h2 class="text-2xl font-semibold">Toast Variants</h2>
+            </div>
+            <div class="grid gap-4 p-4 border rounded-lg">
+                <div class="flex gap-2 flex-wrap">
+                    <Button Size="ButtonSize.Small" @onclick="ShowDefaultToast">Default</Button>
+                    <Button Size="ButtonSize.Small" Class="bg-green-600 hover:bg-green-700" @onclick="ShowSuccessToast">Success</Button>
+                    <Button Size="ButtonSize.Small" Variant="ButtonVariant.Destructive" @onclick="ShowErrorToast">Error</Button>
+                    <Button Size="ButtonSize.Small" Class="bg-yellow-500 hover:bg-yellow-600" @onclick="ShowWarningToast">Warning</Button>
+                    <Button Size="ButtonSize.Small" Class="bg-blue-500 hover:bg-blue-600" @onclick="ShowInfoToast">Info</Button>
+                </div>
+            </div>
+        </section>
+
+        <section class="space-y-4">
+            <div class="space-y-2">
+                <h2 class="text-2xl font-semibold">Features</h2>
+            </div>
+            <ul class="list-disc list-inside space-y-2 text-sm">
+                <li>Multiple variants: Default, Success, Warning, Error, Info</li>
+                <li>Programmatic API via IToastService</li>
+                <li>Auto-dismiss with configurable duration</li>
+                <li>Optional action buttons</li>
+                <li>Toast stacking with MaxToasts limit</li>
+                <li>Configurable viewport position</li>
+                <li>Accessible with ARIA live regions</li>
+            </ul>
+        </section>
+
+        <section class="space-y-4">
+            <div class="space-y-2">
+                <h2 class="text-2xl font-semibold">Setup</h2>
+            </div>
+
+            <div class="space-y-4">
+                <p class="text-sm text-muted-foreground">1. Register the service in Program.cs:</p>
+                <div class="bg-muted p-4 rounded-md">
+                    <code class="text-sm">builder.Services.AddSingleton&lt;IToastService, ToastService&gt;();</code>
+                </div>
+
+                <p class="text-sm text-muted-foreground">2. Add ToastProvider to your layout:</p>
+                <div class="bg-muted p-4 rounded-md">
+                    <pre class="text-sm overflow-x-auto"><code>&lt;ToastProvider Position="ToastPosition.BottomRight"&gt;
+    @@Body
+&lt;/ToastProvider&gt;</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <section class="space-y-4">
+            <div class="space-y-2">
+                <h2 class="text-2xl font-semibold">Installation</h2>
+            </div>
+
+            <div class="bg-muted p-4 rounded-md">
+                <code class="text-sm">@@using BlazorUI.Components.Toast</code>
+            </div>
+        </section>
+
+        <section class="space-y-4">
+            <div class="space-y-2">
+                <h2 class="text-2xl font-semibold">Usage</h2>
+            </div>
+
+            <div class="bg-muted p-4 rounded-md">
+                <pre class="text-sm overflow-x-auto"><code>@@inject IToastService Toasts
+
+&lt;Button @@onclick="ShowToast"&gt;Show Toast&lt;/Button&gt;
+
+@@code {
+    private void ShowToast()
+    {
+        Toasts.Success("Saved!", "Your changes have been saved.");
+    }
+
+    private void ShowWithAction()
+    {
+        Toasts.Show(new ToastOptions
+        {
+            Title = "Event scheduled",
+            Description = "Your meeting has been scheduled.",
+            ActionLabel = "Undo",
+            OnAction = () => Console.WriteLine("Undo clicked!")
+        });
+    }
+}</code></pre>
+            </div>
+        </section>
+    </div>
+</div>
+
+@code {
+    private void ShowDefaultToast()
+    {
+        ToastService.Show("Notification", "This is a default toast message.");
+    }
+
+    private void ShowSuccessToast()
+    {
+        ToastService.Success("Success!", "Your changes have been saved successfully.");
+    }
+
+    private void ShowErrorToast()
+    {
+        ToastService.Error("Error", "Something went wrong. Please try again.");
+    }
+
+    private void ShowWarningToast()
+    {
+        ToastService.Warning("Warning", "This action cannot be undone.");
+    }
+
+    private void ShowInfoToast()
+    {
+        ToastService.Info("Did you know?", "You can customize the toast duration.");
+    }
+
+    private void ShowToastWithAction()
+    {
+        ToastService.Show(new ToastOptions
+        {
+            Title = "Event scheduled",
+            Description = "Your meeting has been scheduled for tomorrow at 10 AM.",
+            Variant = ToastVariant.Default,
+            ActionLabel = "Undo",
+            OnAction = () => ToastService.Info("Undone", "The event has been cancelled."),
+            Duration = TimeSpan.FromSeconds(8)
+        });
+    }
+
+    private void ShowShortToast()
+    {
+        ToastService.Show("Quick message", "This disappears in 2 seconds.", ToastVariant.Default, TimeSpan.FromSeconds(2));
+    }
+
+    private void ShowLongToast()
+    {
+        ToastService.Show("Long message", "This stays for 10 seconds.", ToastVariant.Default, TimeSpan.FromSeconds(10));
+    }
+
+    private void ShowMultipleToasts()
+    {
+        ToastService.Info("First", "This is the first toast.");
+        ToastService.Success("Second", "This is the second toast.");
+        ToastService.Warning("Third", "This is the third toast.");
+    }
+
+    private void DismissAllToasts()
+    {
+        ToastService.DismissAll();
+    }
+}

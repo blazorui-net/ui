@@ -1,0 +1,149 @@
+@page "/components/aspectratio"
+@using BlazorUI.Components.AspectRatio
+
+<PageTitle>Aspect Ratio Component - BlazorUI</PageTitle>
+
+<div class="space-y-8 max-w-4xl">
+    <div>
+        <div class="space-y-3">
+            <h1 class="text-4xl font-bold tracking-tight">Aspect Ratio Component</h1>
+            <p class="text-xl text-muted-foreground">
+                Displays content within a desired ratio. Commonly used for images, videos, and cards.
+            </p>
+        </div>
+    </div>
+
+    <div class="space-y-6">
+        <section class="space-y-4">
+            <div class="space-y-2">
+                <h2 class="text-2xl font-semibold">16:9 Ratio (Video)</h2>
+                <p class="text-muted-foreground">
+                    Standard widescreen video aspect ratio.
+                </p>
+            </div>
+
+            <div class="w-[450px]">
+                <AspectRatio Ratio="16.0/9.0" Class="bg-muted rounded-md overflow-hidden">
+                    <img src="https://images.unsplash.com/photo-1588345921523-c2dcdb7f1dcd?w=800&dpr=2&q=80"
+                         alt="Photo by Drew Beamer"
+                         class="w-full h-full object-cover" />
+                </AspectRatio>
+            </div>
+        </section>
+
+        <section class="space-y-4">
+            <div class="space-y-2">
+                <h2 class="text-2xl font-semibold">1:1 Ratio (Square)</h2>
+                <p class="text-muted-foreground">
+                    Perfect for profile pictures and avatars.
+                </p>
+            </div>
+
+            <div class="w-[200px]">
+                <AspectRatio Ratio="1" Class="bg-muted rounded-full overflow-hidden">
+                    <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=400&dpr=2&q=80"
+                         alt="Avatar"
+                         class="w-full h-full object-cover" />
+                </AspectRatio>
+            </div>
+        </section>
+
+        <section class="space-y-4">
+            <div class="space-y-2">
+                <h2 class="text-2xl font-semibold">4:3 Ratio (Classic)</h2>
+                <p class="text-muted-foreground">
+                    Traditional photography aspect ratio.
+                </p>
+            </div>
+
+            <div class="w-[400px]">
+                <AspectRatio Ratio="4.0/3.0" Class="bg-muted rounded-md overflow-hidden">
+                    <img src="https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=800&dpr=2&q=80"
+                         alt="Photo by David Marcu"
+                         class="w-full h-full object-cover" />
+                </AspectRatio>
+            </div>
+        </section>
+
+        <section class="space-y-4">
+            <div class="space-y-2">
+                <h2 class="text-2xl font-semibold">21:9 Ultra Wide</h2>
+                <p class="text-muted-foreground">
+                    Cinematic ultra-wide ratio for hero banners.
+                </p>
+            </div>
+
+            <div class="w-full">
+                <AspectRatio Ratio="21.0/9.0" Class="bg-muted rounded-lg overflow-hidden">
+                    <div class="absolute inset-0 flex items-center justify-center bg-gradient-to-r from-primary/20 to-primary/40">
+                        <span class="text-2xl font-bold">21:9 Ultra Wide Banner</span>
+                    </div>
+                </AspectRatio>
+            </div>
+        </section>
+
+        <section class="space-y-4">
+            <div class="space-y-2">
+                <h2 class="text-2xl font-semibold">With Placeholder Content</h2>
+                <p class="text-muted-foreground">
+                    Use with any content, not just images.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-3 gap-4 w-full">
+                <AspectRatio Ratio="1" Class="bg-muted rounded-md">
+                    <div class="absolute inset-0 flex items-center justify-center">
+                        <span class="text-sm text-muted-foreground">1:1</span>
+                    </div>
+                </AspectRatio>
+                <AspectRatio Ratio="4.0/3.0" Class="bg-muted rounded-md">
+                    <div class="absolute inset-0 flex items-center justify-center">
+                        <span class="text-sm text-muted-foreground">4:3</span>
+                    </div>
+                </AspectRatio>
+                <AspectRatio Ratio="16.0/9.0" Class="bg-muted rounded-md">
+                    <div class="absolute inset-0 flex items-center justify-center">
+                        <span class="text-sm text-muted-foreground">16:9</span>
+                    </div>
+                </AspectRatio>
+            </div>
+        </section>
+
+        <section class="space-y-4">
+            <div class="space-y-2">
+                <h2 class="text-2xl font-semibold">Features</h2>
+            </div>
+            <ul class="list-disc list-inside space-y-2 text-sm">
+                <li>Uses native CSS aspect-ratio property</li>
+                <li>Accepts any numeric ratio as double (width / height)</li>
+                <li>Content is positioned absolutely within the container</li>
+                <li>Works with any child content (images, videos, placeholders)</li>
+            </ul>
+        </section>
+
+        <section class="space-y-4">
+            <div class="space-y-2">
+                <h2 class="text-2xl font-semibold">Installation</h2>
+            </div>
+
+            <div class="bg-muted p-4 rounded-md">
+                <code class="text-sm">@@using BlazorUI.Components.AspectRatio</code>
+            </div>
+        </section>
+
+        <section class="space-y-4">
+            <div class="space-y-2">
+                <h2 class="text-2xl font-semibold">Usage</h2>
+            </div>
+
+            <div class="bg-muted p-4 rounded-md">
+                <pre class="text-sm overflow-x-auto"><code>&lt;AspectRatio Ratio="16.0/9.0"&gt;
+    &lt;img src="image.jpg" class="w-full h-full object-cover" /&gt;
+&lt;/AspectRatio&gt;</code></pre>
+            </div>
+        </section>
+    </div>
+</div>
+
+@code {
+}

@@ -1,6 +1,7 @@
 using BlazorUI.Demo;
 using BlazorUI.Demo.Services;
 using BlazorUI.Primitives.Extensions;
+using BlazorUI.Components.Toast;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,6 +20,9 @@ builder.Services.AddScoped<CollapsibleStateService>();
 
 // Add mock data service for generating demo data
 builder.Services.AddSingleton<MockDataService>();
+
+// Add toast service for notifications
+builder.Services.AddSingleton<IToastService, ToastService>();
 
 var app = builder.Build();
 

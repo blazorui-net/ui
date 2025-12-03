@@ -1,0 +1,257 @@
+@page "/components/scroll-area"
+@using BlazorUI.Components.ScrollArea
+
+<PageTitle>Scroll Area Component - BlazorUI</PageTitle>
+
+<div class="space-y-8 max-w-4xl">
+    <div>
+        <div class="space-y-3">
+            <h1 class="text-4xl font-bold tracking-tight">Scroll Area Component</h1>
+            <p class="text-xl text-muted-foreground">
+                Augments native scroll functionality for custom, cross-browser styling.
+            </p>
+        </div>
+    </div>
+
+    <div class="space-y-6">
+        <section class="space-y-4">
+            <div class="space-y-2">
+                <h2 class="text-2xl font-semibold">Default (Vertical)</h2>
+                <p class="text-muted-foreground">
+                    A scrollable area with custom styled scrollbar.
+                </p>
+            </div>
+
+            <ScrollArea Class="h-72 w-48 rounded-md border">
+                <div class="p-4">
+                    <h4 class="mb-4 text-sm font-medium leading-none">Tags</h4>
+                    @foreach (var tag in tags)
+                    {
+                        <div class="text-sm" key="@tag">
+                            @tag
+                        </div>
+                        <BlazorUI.Components.Separator.Separator Class="my-2" />
+                    }
+                </div>
+            </ScrollArea>
+        </section>
+
+        <section class="space-y-4">
+            <div class="space-y-2">
+                <h2 class="text-2xl font-semibold">Horizontal Scroll</h2>
+                <p class="text-muted-foreground">
+                    Scroll horizontally through content.
+                </p>
+            </div>
+
+            <ScrollArea Class="w-96 whitespace-nowrap rounded-md border" ShowHorizontalScrollbar="true" ShowVerticalScrollbar="false">
+                <div class="flex w-max space-x-4 p-4">
+                    @foreach (var artwork in artworks)
+                    {
+                        <figure class="shrink-0">
+                            <div class="overflow-hidden rounded-md">
+                                <img src="@artwork.Url"
+                                     alt="@artwork.Title"
+                                     class="aspect-[3/4] h-fit w-[150px] object-cover" />
+                            </div>
+                            <figcaption class="pt-2 text-xs text-muted-foreground">
+                                <span class="font-semibold text-foreground">@artwork.Artist</span>
+                                <span> - @artwork.Title</span>
+                            </figcaption>
+                        </figure>
+                    }
+                </div>
+            </ScrollArea>
+        </section>
+
+        <section class="space-y-4">
+            <div class="space-y-2">
+                <h2 class="text-2xl font-semibold">Both Scrollbars</h2>
+                <p class="text-muted-foreground">
+                    Scroll in both directions.
+                </p>
+            </div>
+
+            <ScrollArea Class="h-72 w-72 rounded-md border" ShowHorizontalScrollbar="true" ShowVerticalScrollbar="true">
+                <div class="p-4 w-[500px]">
+                    <h4 class="mb-4 text-sm font-medium leading-none">Large Content Area</h4>
+                    @for (int i = 0; i < 20; i++)
+                    {
+                        <p class="text-sm mb-2 whitespace-nowrap">
+                            Row @(i + 1): Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore.
+                        </p>
+                    }
+                </div>
+            </ScrollArea>
+        </section>
+
+        <section class="space-y-4">
+            <div class="space-y-2">
+                <h2 class="text-2xl font-semibold">Card List</h2>
+                <p class="text-muted-foreground">
+                    Scrollable list of cards.
+                </p>
+            </div>
+
+            <ScrollArea Class="h-80 w-full max-w-md rounded-md border">
+                <div class="p-4 space-y-4">
+                    @for (int i = 1; i <= 10; i++)
+                    {
+                        var itemIndex = i;
+                        <div class="rounded-lg border p-4 space-y-2">
+                            <div class="flex items-center justify-between">
+                                <h5 class="font-medium">Item @itemIndex</h5>
+                                <span class="text-xs text-muted-foreground">@(itemIndex * 2) min ago</span>
+                            </div>
+                            <p class="text-sm text-muted-foreground">
+                                This is the description for item @itemIndex. It contains some sample text to demonstrate scrolling.
+                            </p>
+                        </div>
+                    }
+                </div>
+            </ScrollArea>
+        </section>
+
+        <section class="space-y-4">
+            <div class="space-y-2">
+                <h2 class="text-2xl font-semibold">Chat Messages</h2>
+                <p class="text-muted-foreground">
+                    Common chat/messaging interface pattern.
+                </p>
+            </div>
+
+            <div class="w-full max-w-md border rounded-lg">
+                <div class="p-3 border-b font-medium text-sm">Chat</div>
+                <ScrollArea Class="h-64">
+                    <div class="p-4 space-y-4">
+                        @foreach (var msg in messages)
+                        {
+                            <div class="@(msg.IsMe ? "flex justify-end" : "flex")">
+                                <div class="@(msg.IsMe ? "bg-primary text-primary-foreground" : "bg-muted") rounded-lg px-3 py-2 max-w-[80%]">
+                                    <p class="text-sm">@msg.Text</p>
+                                    <span class="text-xs opacity-70">@msg.Time</span>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </ScrollArea>
+                <div class="p-3 border-t">
+                    <input type="text" placeholder="Type a message..." class="w-full px-3 py-2 border rounded-md text-sm" />
+                </div>
+            </div>
+        </section>
+
+        <section class="space-y-4">
+            <div class="space-y-2">
+                <h2 class="text-2xl font-semibold">Scroll Types</h2>
+                <p class="text-muted-foreground">
+                    Different scrollbar visibility behaviors.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <p class="text-sm font-medium mb-2">Auto (default)</p>
+                    <ScrollArea Class="h-32 rounded-md border" Type="ScrollAreaType.Auto">
+                        <div class="p-4">
+                            @for (int i = 1; i <= 8; i++)
+                            {
+                                <p class="text-sm">Line @i</p>
+                            }
+                        </div>
+                    </ScrollArea>
+                </div>
+                <div>
+                    <p class="text-sm font-medium mb-2">Always Visible</p>
+                    <ScrollArea Class="h-32 rounded-md border" Type="ScrollAreaType.Always">
+                        <div class="p-4">
+                            @for (int i = 1; i <= 8; i++)
+                            {
+                                <p class="text-sm">Line @i</p>
+                            }
+                        </div>
+                    </ScrollArea>
+                </div>
+            </div>
+        </section>
+
+        <section class="space-y-4">
+            <div class="space-y-2">
+                <h2 class="text-2xl font-semibold">Features</h2>
+            </div>
+            <ul class="list-disc list-inside space-y-2 text-sm">
+                <li>Custom styled scrollbars consistent across browsers</li>
+                <li>Vertical and horizontal scroll support</li>
+                <li>Multiple scroll types: Auto, Always, Scroll, Hover</li>
+                <li>Works with any content</li>
+                <li>Tailwind CSS styling integration</li>
+            </ul>
+        </section>
+
+        <section class="space-y-4">
+            <div class="space-y-2">
+                <h2 class="text-2xl font-semibold">Installation</h2>
+            </div>
+
+            <div class="bg-muted p-4 rounded-md">
+                <code class="text-sm">@@using BlazorUI.Components.ScrollArea</code>
+            </div>
+        </section>
+
+        <section class="space-y-4">
+            <div class="space-y-2">
+                <h2 class="text-2xl font-semibold">Usage</h2>
+            </div>
+
+            <div class="bg-muted p-4 rounded-md">
+                <pre class="text-sm overflow-x-auto"><code>&lt;ScrollArea Class="h-72 w-48 rounded-md border"&gt;
+    &lt;div class="p-4"&gt;
+        &lt;!-- Your scrollable content --&gt;
+    &lt;/div&gt;
+&lt;/ScrollArea&gt;</code></pre>
+            </div>
+        </section>
+    </div>
+</div>
+
+@code {
+    private string[] tags = new[]
+    {
+        "v1.2.0-beta.1",
+        "v1.1.4",
+        "v1.1.3",
+        "v1.1.2",
+        "v1.1.1",
+        "v1.1.0",
+        "v1.0.9",
+        "v1.0.8",
+        "v1.0.7",
+        "v1.0.6",
+        "v1.0.5",
+        "v1.0.4",
+        "v1.0.3",
+        "v1.0.2",
+        "v1.0.1",
+        "v1.0.0"
+    };
+
+    private List<(string Title, string Artist, string Url)> artworks = new()
+    {
+        ("Sunset", "John Doe", "https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=300&dpr=2&q=80"),
+        ("Mountains", "Jane Smith", "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=300&dpr=2&q=80"),
+        ("Ocean", "Bob Wilson", "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&dpr=2&q=80"),
+        ("Forest", "Alice Brown", "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=300&dpr=2&q=80"),
+        ("City", "Charlie Davis", "https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=300&dpr=2&q=80")
+    };
+
+    private List<(string Text, string Time, bool IsMe)> messages = new()
+    {
+        ("Hey! How are you?", "10:00 AM", false),
+        ("I'm good, thanks! How about you?", "10:02 AM", true),
+        ("Doing great! Did you see the new component library?", "10:03 AM", false),
+        ("Yes! It looks amazing. I love the scroll area component.", "10:05 AM", true),
+        ("The styling is really clean and consistent.", "10:06 AM", false),
+        ("Agreed! And the keyboard navigation works great too.", "10:08 AM", true),
+        ("Can't wait to use it in our project!", "10:10 AM", false)
+    };
+}

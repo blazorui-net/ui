@@ -1,0 +1,262 @@
+@page "/components/context-menu"
+@using BlazorUI.Components.ContextMenu
+
+<PageTitle>Context Menu Component - BlazorUI</PageTitle>
+
+<div class="space-y-8 max-w-4xl">
+    <div>
+        <div class="space-y-3">
+            <h1 class="text-4xl font-bold tracking-tight">Context Menu Component</h1>
+            <p class="text-xl text-muted-foreground">
+                Displays a menu to the user — such as a set of actions or functions — triggered by right-clicking.
+            </p>
+        </div>
+    </div>
+
+    <div class="space-y-6">
+        <section class="space-y-4">
+            <div class="space-y-2">
+                <h2 class="text-2xl font-semibold">Default</h2>
+                <p class="text-muted-foreground">
+                    Right-click the area below to open the context menu.
+                </p>
+            </div>
+
+            <ContextMenu>
+                <ContextMenuTrigger>
+                    <div class="flex h-[150px] w-[300px] items-center justify-center rounded-md border border-dashed text-sm">
+                        Right click here
+                    </div>
+                </ContextMenuTrigger>
+                <ContextMenuContent>
+                    <ContextMenuItem OnClick="@(() => Console.WriteLine("Back"))">
+                        Back
+                        <ContextMenuShortcut>⌘[</ContextMenuShortcut>
+                    </ContextMenuItem>
+                    <ContextMenuItem Disabled="true">
+                        Forward
+                        <ContextMenuShortcut>⌘]</ContextMenuShortcut>
+                    </ContextMenuItem>
+                    <ContextMenuItem>
+                        Reload
+                        <ContextMenuShortcut>⌘R</ContextMenuShortcut>
+                    </ContextMenuItem>
+                    <ContextMenuSeparator />
+                    <ContextMenuItem>
+                        Save As...
+                        <ContextMenuShortcut>⇧⌘S</ContextMenuShortcut>
+                    </ContextMenuItem>
+                    <ContextMenuItem>Print...</ContextMenuItem>
+                </ContextMenuContent>
+            </ContextMenu>
+        </section>
+
+        <section class="space-y-4">
+            <div class="space-y-2">
+                <h2 class="text-2xl font-semibold">With Labels and Groups</h2>
+                <p class="text-muted-foreground">
+                    Organize menu items into groups with labels.
+                </p>
+            </div>
+
+            <ContextMenu>
+                <ContextMenuTrigger>
+                    <div class="flex h-[150px] w-[300px] items-center justify-center rounded-md border border-dashed text-sm">
+                        Right click for file actions
+                    </div>
+                </ContextMenuTrigger>
+                <ContextMenuContent Class="w-64">
+                    <ContextMenuLabel>File Actions</ContextMenuLabel>
+                    <ContextMenuSeparator />
+                    <ContextMenuItem>
+                        New File
+                        <ContextMenuShortcut>⌘N</ContextMenuShortcut>
+                    </ContextMenuItem>
+                    <ContextMenuItem>
+                        Open
+                        <ContextMenuShortcut>⌘O</ContextMenuShortcut>
+                    </ContextMenuItem>
+                    <ContextMenuSeparator />
+                    <ContextMenuLabel>Edit</ContextMenuLabel>
+                    <ContextMenuSeparator />
+                    <ContextMenuItem>
+                        Cut
+                        <ContextMenuShortcut>⌘X</ContextMenuShortcut>
+                    </ContextMenuItem>
+                    <ContextMenuItem>
+                        Copy
+                        <ContextMenuShortcut>⌘C</ContextMenuShortcut>
+                    </ContextMenuItem>
+                    <ContextMenuItem>
+                        Paste
+                        <ContextMenuShortcut>⌘V</ContextMenuShortcut>
+                    </ContextMenuItem>
+                </ContextMenuContent>
+            </ContextMenu>
+        </section>
+
+        <section class="space-y-4">
+            <div class="space-y-2">
+                <h2 class="text-2xl font-semibold">With Destructive Item</h2>
+                <p class="text-muted-foreground">
+                    Highlight dangerous actions with custom styling.
+                </p>
+            </div>
+
+            <ContextMenu>
+                <ContextMenuTrigger>
+                    <div class="flex h-[150px] w-[300px] items-center justify-center rounded-md border border-dashed text-sm bg-muted/50">
+                        Right click on this card
+                    </div>
+                </ContextMenuTrigger>
+                <ContextMenuContent>
+                    <ContextMenuItem>
+                        Edit
+                        <ContextMenuShortcut>⌘E</ContextMenuShortcut>
+                    </ContextMenuItem>
+                    <ContextMenuItem>
+                        Duplicate
+                        <ContextMenuShortcut>⌘D</ContextMenuShortcut>
+                    </ContextMenuItem>
+                    <ContextMenuSeparator />
+                    <ContextMenuItem>Archive</ContextMenuItem>
+                    <ContextMenuSeparator />
+                    <ContextMenuItem Class="text-red-600 focus:text-red-600 focus:bg-red-50 dark:focus:bg-red-950">
+                        Delete
+                        <ContextMenuShortcut>⌫</ContextMenuShortcut>
+                    </ContextMenuItem>
+                </ContextMenuContent>
+            </ContextMenu>
+        </section>
+
+        <section class="space-y-4">
+            <div class="space-y-2">
+                <h2 class="text-2xl font-semibold">With Inset Items</h2>
+                <p class="text-muted-foreground">
+                    Use inset for items without icons to align with other items.
+                </p>
+            </div>
+
+            <ContextMenu>
+                <ContextMenuTrigger>
+                    <div class="flex h-[150px] w-[300px] items-center justify-center rounded-md border border-dashed text-sm">
+                        Right click here
+                    </div>
+                </ContextMenuTrigger>
+                <ContextMenuContent>
+                    <ContextMenuItem Inset="true">
+                        Profile
+                        <ContextMenuShortcut>⇧⌘P</ContextMenuShortcut>
+                    </ContextMenuItem>
+                    <ContextMenuItem Inset="true">
+                        Billing
+                        <ContextMenuShortcut>⌘B</ContextMenuShortcut>
+                    </ContextMenuItem>
+                    <ContextMenuItem Inset="true">
+                        Settings
+                        <ContextMenuShortcut>⌘S</ContextMenuShortcut>
+                    </ContextMenuItem>
+                    <ContextMenuSeparator />
+                    <ContextMenuItem Inset="true">
+                        Log out
+                        <ContextMenuShortcut>⇧⌘Q</ContextMenuShortcut>
+                    </ContextMenuItem>
+                </ContextMenuContent>
+            </ContextMenu>
+        </section>
+
+        <section class="space-y-4">
+            <div class="space-y-2">
+                <h2 class="text-2xl font-semibold">On Image</h2>
+                <p class="text-muted-foreground">
+                    Context menu on an image element.
+                </p>
+            </div>
+
+            <ContextMenu>
+                <ContextMenuTrigger>
+                    <img src="https://images.unsplash.com/photo-1588345921523-c2dcdb7f1dcd?w=400&dpr=2&q=80"
+                         alt="Photo"
+                         class="w-[300px] h-[200px] object-cover rounded-md cursor-default" />
+                </ContextMenuTrigger>
+                <ContextMenuContent>
+                    <ContextMenuItem>Save Image As...</ContextMenuItem>
+                    <ContextMenuItem>Copy Image</ContextMenuItem>
+                    <ContextMenuItem>Copy Image Address</ContextMenuItem>
+                    <ContextMenuSeparator />
+                    <ContextMenuItem>Open Image in New Tab</ContextMenuItem>
+                </ContextMenuContent>
+            </ContextMenu>
+        </section>
+
+        <section class="space-y-4">
+            <div class="space-y-2">
+                <h2 class="text-2xl font-semibold">Features</h2>
+            </div>
+            <ul class="list-disc list-inside space-y-2 text-sm">
+                <li>Opens on right-click (contextmenu event)</li>
+                <li>Positioned at mouse cursor location</li>
+                <li>Closes on outside click or Escape key</li>
+                <li>Full keyboard navigation (↑/↓, Enter, Escape)</li>
+                <li>Support for disabled items</li>
+                <li>Keyboard shortcut hints</li>
+                <li>Separator and label components</li>
+            </ul>
+        </section>
+
+        <section class="space-y-4">
+            <div class="space-y-2">
+                <h2 class="text-2xl font-semibold">Keyboard Navigation</h2>
+            </div>
+            <div class="grid gap-2 text-sm">
+                <div class="flex gap-4">
+                    <kbd class="px-2 py-1 bg-muted rounded">↑/↓</kbd>
+                    <span>Navigate items</span>
+                </div>
+                <div class="flex gap-4">
+                    <kbd class="px-2 py-1 bg-muted rounded">Enter/Space</kbd>
+                    <span>Select item</span>
+                </div>
+                <div class="flex gap-4">
+                    <kbd class="px-2 py-1 bg-muted rounded">Escape</kbd>
+                    <span>Close menu</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="space-y-4">
+            <div class="space-y-2">
+                <h2 class="text-2xl font-semibold">Installation</h2>
+            </div>
+
+            <div class="bg-muted p-4 rounded-md">
+                <code class="text-sm">@@using BlazorUI.Components.ContextMenu</code>
+            </div>
+        </section>
+
+        <section class="space-y-4">
+            <div class="space-y-2">
+                <h2 class="text-2xl font-semibold">Usage</h2>
+            </div>
+
+            <div class="bg-muted p-4 rounded-md">
+                <pre class="text-sm overflow-x-auto"><code>&lt;ContextMenu&gt;
+    &lt;ContextMenuTrigger&gt;
+        &lt;div&gt;Right click here&lt;/div&gt;
+    &lt;/ContextMenuTrigger&gt;
+    &lt;ContextMenuContent&gt;
+        &lt;ContextMenuItem OnClick="HandleCopy"&gt;
+            Copy
+            &lt;ContextMenuShortcut&gt;⌘C&lt;/ContextMenuShortcut&gt;
+        &lt;/ContextMenuItem&gt;
+        &lt;ContextMenuSeparator /&gt;
+        &lt;ContextMenuItem&gt;Delete&lt;/ContextMenuItem&gt;
+    &lt;/ContextMenuContent&gt;
+&lt;/ContextMenu&gt;</code></pre>
+            </div>
+        </section>
+    </div>
+</div>
+
+@code {
+}
