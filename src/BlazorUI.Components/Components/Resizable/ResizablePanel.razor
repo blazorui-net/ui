@@ -98,12 +98,9 @@
 
         if (AdditionalAttributes != null)
         {
-            foreach (var kvp in AdditionalAttributes)
+            foreach (var kvp in AdditionalAttributes.Where(kvp => kvp.Key != "style"))
             {
-                if (kvp.Key != "style")
-                {
-                    attributes[kvp.Key] = kvp.Value;
-                }
+                attributes[kvp.Key] = kvp.Value;
             }
         }
 

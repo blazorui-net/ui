@@ -42,6 +42,7 @@ public enum NavigationMenuOrientation
 public class NavigationMenuContext : PrimitiveContextWithEvents<NavigationMenuState>
 {
     private readonly List<string> _items = new();
+    private readonly object _lock = new();
 
     /// <summary>
     /// Initializes a new instance of the NavigationMenuContext.
@@ -73,7 +74,16 @@ public class NavigationMenuContext : PrimitiveContextWithEvents<NavigationMenuSt
     /// <summary>
     /// Gets the registered items.
     /// </summary>
-    public IReadOnlyList<string> Items => _items.AsReadOnly();
+    public IReadOnlyList<string> Items
+    {
+        get
+        {
+            lock (_lock)
+            {
+                return _items.ToList().AsReadOnly();
+            }
+        }
+    }
 
     /// <summary>
     /// Registers a navigation item.
@@ -81,9 +91,12 @@ public class NavigationMenuContext : PrimitiveContextWithEvents<NavigationMenuSt
     /// <param name="value">The item value.</param>
     public void RegisterItem(string value)
     {
-        if (!_items.Contains(value))
+        lock (_lock)
         {
-            _items.Add(value);
+            if (!_items.Contains(value))
+            {
+                _items.Add(value);
+            }
         }
     }
 
@@ -93,7 +106,10 @@ public class NavigationMenuContext : PrimitiveContextWithEvents<NavigationMenuSt
     /// <param name="value">The item value.</param>
     public void UnregisterItem(string value)
     {
-        _items.Remove(value);
+        lock (_lock)
+        {
+            _items.Remove(value);
+        }
     }
 
     /// <summary>
@@ -133,14 +149,23 @@ public class NavigationMenuContext : PrimitiveContextWithEvents<NavigationMenuSt
     /// </summary>
     public void NavigateNext()
     {
-        if (_items.Count == 0) return;
+        string? nextItem = null;
+        lock (_lock)
+        {
+            if (_items.Count == 0) return;
 
-        var currentIndex = string.IsNullOrEmpty(State.ActiveValue) 
-            ? -1 
-            : _items.IndexOf(State.ActiveValue);
+            var currentIndex = string.IsNullOrEmpty(State.ActiveValue) 
+                ? -1 
+                : _items.IndexOf(State.ActiveValue);
+            
+            var nextIndex = (currentIndex + 1) % _items.Count;
+            nextItem = _items[nextIndex];
+        }
         
-        var nextIndex = (currentIndex + 1) % _items.Count;
-        SetActiveItem(_items[nextIndex]);
+        if (nextItem != null)
+        {
+            SetActiveItem(nextItem);
+        }
     }
 
     /// <summary>
@@ -148,14 +173,23 @@ public class NavigationMenuContext : PrimitiveContextWithEvents<NavigationMenuSt
     /// </summary>
     public void NavigatePrevious()
     {
-        if (_items.Count == 0) return;
+        string? prevItem = null;
+        lock (_lock)
+        {
+            if (_items.Count == 0) return;
 
-        var currentIndex = string.IsNullOrEmpty(State.ActiveValue) 
-            ? 0 
-            : _items.IndexOf(State.ActiveValue);
+            var currentIndex = string.IsNullOrEmpty(State.ActiveValue) 
+                ? 0 
+                : _items.IndexOf(State.ActiveValue);
+            
+            var prevIndex = currentIndex <= 0 ? _items.Count - 1 : currentIndex - 1;
+            prevItem = _items[prevIndex];
+        }
         
-        var prevIndex = currentIndex <= 0 ? _items.Count - 1 : currentIndex - 1;
-        SetActiveItem(_items[prevIndex]);
+        if (prevItem != null)
+        {
+            SetActiveItem(prevItem);
+        }
     }
 }
 

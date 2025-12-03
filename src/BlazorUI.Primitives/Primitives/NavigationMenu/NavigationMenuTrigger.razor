@@ -1,4 +1,5 @@
 @namespace BlazorUI.Primitives.NavigationMenu
+@implements IDisposable
 
 @* NavigationMenuTrigger - button that opens the content panel *@
 <button type="button"
@@ -90,6 +91,14 @@
         else if (args.Key == "ArrowDown" && !IsActive)
         {
             Context.SetActiveItem(ItemContext.Value);
+        }
+    }
+
+    public void Dispose()
+    {
+        if (Context != null)
+        {
+            Context.OnStateChanged -= HandleContextStateChanged;
         }
     }
 }

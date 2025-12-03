@@ -41,12 +41,9 @@
 
     protected override void OnInitialized()
     {
-        if (Open.HasValue)
+        if (Open.HasValue && Open.Value)
         {
-            if (Open.Value)
-            {
-                _context.Open(0, 0);
-            }
+            _context.Open(0, 0);
         }
 
         _context.OnStateChanged += HandleContextStateChanged;

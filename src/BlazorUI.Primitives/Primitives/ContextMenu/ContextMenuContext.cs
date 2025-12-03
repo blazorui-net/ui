@@ -30,6 +30,7 @@ public class ContextMenuState
 public class ContextMenuContext : PrimitiveContextWithEvents<ContextMenuState>
 {
     private readonly List<IContextMenuItem> _items = new();
+    private readonly object _lock = new();
     private int _focusedItemIndex = -1;
 
     /// <summary>
@@ -67,7 +68,16 @@ public class ContextMenuContext : PrimitiveContextWithEvents<ContextMenuState>
     /// <summary>
     /// Gets the registered menu items.
     /// </summary>
-    public IReadOnlyList<IContextMenuItem> Items => _items.AsReadOnly();
+    public IReadOnlyList<IContextMenuItem> Items
+    {
+        get
+        {
+            lock (_lock)
+            {
+                return _items.ToList().AsReadOnly();
+            }
+        }
+    }
 
     /// <summary>
     /// Gets the currently focused item index.
@@ -108,9 +118,12 @@ public class ContextMenuContext : PrimitiveContextWithEvents<ContextMenuState>
     /// <param name="item">The menu item.</param>
     public void RegisterItem(IContextMenuItem item)
     {
-        if (!_items.Contains(item))
+        lock (_lock)
         {
-            _items.Add(item);
+            if (!_items.Contains(item))
+            {
+                _items.Add(item);
+            }
         }
     }
 
@@ -120,7 +133,10 @@ public class ContextMenuContext : PrimitiveContextWithEvents<ContextMenuState>
     /// <param name="item">The menu item.</param>
     public void UnregisterItem(IContextMenuItem item)
     {
-        _items.Remove(item);
+        lock (_lock)
+        {
+            _items.Remove(item);
+        }
     }
 
     /// <summary>
@@ -128,17 +144,20 @@ public class ContextMenuContext : PrimitiveContextWithEvents<ContextMenuState>
     /// </summary>
     public void FocusNext()
     {
-        if (_items.Count == 0) return;
-
-        var startIndex = _focusedItemIndex == -1 ? 0 : _focusedItemIndex + 1;
-
-        for (int i = 0; i < _items.Count; i++)
+        lock (_lock)
         {
-            var index = (startIndex + i) % _items.Count;
-            if (!_items[index].Disabled)
+            if (_items.Count == 0) return;
+
+            var startIndex = _focusedItemIndex == -1 ? 0 : _focusedItemIndex + 1;
+
+            for (int i = 0; i < _items.Count; i++)
             {
-                _focusedItemIndex = index;
-                return;
+                var index = (startIndex + i) % _items.Count;
+                if (!_items[index].Disabled)
+                {
+                    _focusedItemIndex = index;
+                    return;
+                }
             }
         }
     }
@@ -148,19 +167,22 @@ public class ContextMenuContext : PrimitiveContextWithEvents<ContextMenuState>
     /// </summary>
     public void FocusPrevious()
     {
-        if (_items.Count == 0) return;
-
-        var startIndex = _focusedItemIndex <= 0 ? _items.Count - 1 : _focusedItemIndex - 1;
-
-        for (int i = 0; i < _items.Count; i++)
+        lock (_lock)
         {
-            var index = startIndex - i;
-            if (index < 0) index = _items.Count + index;
+            if (_items.Count == 0) return;
 
-            if (!_items[index].Disabled)
+            var startIndex = _focusedItemIndex <= 0 ? _items.Count - 1 : _focusedItemIndex - 1;
+
+            for (int i = 0; i < _items.Count; i++)
             {
-                _focusedItemIndex = index;
-                return;
+                // Use proper modulo formula to avoid negative index issues
+                var index = (startIndex - i + _items.Count) % _items.Count;
+
+                if (!_items[index].Disabled)
+                {
+                    _focusedItemIndex = index;
+                    return;
+                }
             }
         }
     }
@@ -170,12 +192,15 @@ public class ContextMenuContext : PrimitiveContextWithEvents<ContextMenuState>
     /// </summary>
     public void FocusFirst()
     {
-        for (int i = 0; i < _items.Count; i++)
+        lock (_lock)
         {
-            if (!_items[i].Disabled)
+            for (int i = 0; i < _items.Count; i++)
             {
-                _focusedItemIndex = i;
-                return;
+                if (!_items[i].Disabled)
+                {
+                    _focusedItemIndex = i;
+                    return;
+                }
             }
         }
     }
@@ -185,12 +210,15 @@ public class ContextMenuContext : PrimitiveContextWithEvents<ContextMenuState>
     /// </summary>
     public void FocusLast()
     {
-        for (int i = _items.Count - 1; i >= 0; i--)
+        lock (_lock)
         {
-            if (!_items[i].Disabled)
+            for (int i = _items.Count - 1; i >= 0; i--)
             {
-                _focusedItemIndex = i;
-                return;
+                if (!_items[i].Disabled)
+                {
+                    _focusedItemIndex = i;
+                    return;
+                }
             }
         }
     }

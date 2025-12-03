@@ -1,4 +1,5 @@
 @namespace BlazorUI.Primitives.NavigationMenu
+@implements IDisposable
 
 @* NavigationMenuContent - dropdown content panel *@
 @if (IsActive)
@@ -59,5 +60,13 @@
     private void HandleMouseLeave()
     {
         Context.ClearActiveItem();
+    }
+
+    public void Dispose()
+    {
+        if (Context != null)
+        {
+            Context.OnStateChanged -= HandleContextStateChanged;
+        }
     }
 }

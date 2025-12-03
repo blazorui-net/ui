@@ -37,7 +37,8 @@
         
         if (AdditionalAttributes?.TryGetValue("style", out var userStyle) == true)
         {
-            return $"{userStyle}; {ratioStyle}";
+            // User style comes last to allow overriding default aspect-ratio if needed
+            return $"{ratioStyle} {userStyle}";
         }
         
         return ratioStyle;
@@ -53,12 +54,9 @@
 
         if (AdditionalAttributes != null)
         {
-            foreach (var kvp in AdditionalAttributes)
+            foreach (var kvp in AdditionalAttributes.Where(kvp => kvp.Key != "style" && kvp.Key != "class"))
             {
-                if (kvp.Key != "style" && kvp.Key != "class")
-                {
-                    attributes[kvp.Key] = kvp.Value;
-                }
+                attributes[kvp.Key] = kvp.Value;
             }
         }
 

@@ -1,8 +1,11 @@
 @namespace BlazorUI.Components.NavigationMenu
+@using Microsoft.AspNetCore.Components.Routing
 
 @* NavigationMenuLink - styled navigation link *@
 <BlazorUI.Primitives.NavigationMenu.NavigationMenuLink Href="@Href"
                     Active="@Active"
+                    AutoActive="@AutoActive"
+                    Match="@Match"
                     OnClick="OnClick"
                     class="@GetClass()"
                     @attributes="AdditionalAttributes">
@@ -18,9 +21,26 @@
 
     /// <summary>
     /// Whether the link is currently active.
+    /// If not set, active state will be auto-detected based on the current URL when AutoActive is true.
     /// </summary>
     [Parameter]
-    public bool Active { get; set; } = false;
+    public bool? Active { get; set; }
+
+    /// <summary>
+    /// Whether to automatically detect active state based on the current URL.
+    /// Similar to NavLink behavior.
+    /// Default is false.
+    /// </summary>
+    [Parameter]
+    public bool AutoActive { get; set; } = false;
+
+    /// <summary>
+    /// How to match the URL when AutoActive is true.
+    /// NavLinkMatch.All requires an exact match, NavLinkMatch.Prefix requires the URL to start with Href.
+    /// Default is NavLinkMatch.Prefix.
+    /// </summary>
+    [Parameter]
+    public NavLinkMatch Match { get; set; } = NavLinkMatch.Prefix;
 
     /// <summary>
     /// The child content to render within the link.
@@ -51,7 +71,7 @@
         var baseClass = "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors " +
                        "hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground";
         
-        if (Active)
+        if (Active == true)
         {
             baseClass += " bg-accent text-accent-foreground";
         }

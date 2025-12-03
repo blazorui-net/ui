@@ -11,7 +11,7 @@
                 <button type="button"
                         @onclick="PreviousMonth"
                         disabled="@(!CanNavigatePrevious)"
-                        class="@GetNavButtonClass()"
+                        class="@GetPrevNavButtonClass()"
                         aria-label="Go to previous month">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="m15 18-6-6 6-6"/>
@@ -23,7 +23,7 @@
                 <button type="button"
                         @onclick="NextMonth"
                         disabled="@(!CanNavigateNext)"
-                        class="@GetNavButtonClass()"
+                        class="@GetNextNavButtonClass()"
                         aria-label="Go to next month">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="m9 18 6-6-6-6"/>
@@ -254,12 +254,20 @@
         return weeks;
     }
 
-    private string GetNavButtonClass()
+    private string GetPrevNavButtonClass()
     {
         return "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors " +
                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 " +
                "disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground " +
                "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100 absolute left-1";
+    }
+
+    private string GetNextNavButtonClass()
+    {
+        return "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors " +
+               "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 " +
+               "disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground " +
+               "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100 absolute right-1";
     }
 
     private string GetDayClass(DateOnly date)
@@ -304,12 +312,9 @@
 
         if (AdditionalAttributes != null)
         {
-            foreach (var kvp in AdditionalAttributes)
+            foreach (var kvp in AdditionalAttributes.Where(kvp => kvp.Key != "class"))
             {
-                if (kvp.Key != "class")
-                {
-                    attributes[kvp.Key] = kvp.Value;
-                }
+                attributes[kvp.Key] = kvp.Value;
             }
         }
 

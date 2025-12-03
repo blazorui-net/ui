@@ -221,7 +221,14 @@
                 await _clickOutsideCleanup.InvokeVoidAsync("cleanup");
                 await _clickOutsideCleanup.DisposeAsync();
             }
-            catch { }
+            catch (JSDisconnectedException)
+            {
+                // Expected during circuit disconnection, ignore
+            }
+            catch (ObjectDisposedException)
+            {
+                // Already disposed, ignore
+            }
             _clickOutsideCleanup = null;
         }
 
@@ -231,7 +238,14 @@
             {
                 await _clickOutsideModule.DisposeAsync();
             }
-            catch { }
+            catch (JSDisconnectedException)
+            {
+                // Expected during circuit disconnection, ignore
+            }
+            catch (ObjectDisposedException)
+            {
+                // Already disposed, ignore
+            }
             _clickOutsideModule = null;
         }
 

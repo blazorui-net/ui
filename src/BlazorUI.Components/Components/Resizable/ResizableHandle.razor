@@ -51,10 +51,6 @@
     [Parameter(CaptureUnmatchedValues = true)]
     public Dictionary<string, object>? AdditionalAttributes { get; set; }
 
-    // Note: _isDragging and _startPosition are used for drag operations
-    // Full drag implementation would require JS interop for mouse move events
-    private bool _isDragging = false;
-
     private string GetGripIconClass()
     {
         if (Group?.GetDirection() == ResizableDirection.Vertical)
@@ -91,12 +87,9 @@
 
         if (AdditionalAttributes != null)
         {
-            foreach (var kvp in AdditionalAttributes)
+            foreach (var kvp in AdditionalAttributes.Where(kvp => kvp.Key != "class" && kvp.Key != "style"))
             {
-                if (kvp.Key != "class" && kvp.Key != "style")
-                {
-                    attributes[kvp.Key] = kvp.Value;
-                }
+                attributes[kvp.Key] = kvp.Value;
             }
         }
 
@@ -105,8 +98,8 @@
 
     private void HandleMouseDown(MouseEventArgs e)
     {
-        _isDragging = true;
-        // Full drag implementation would require JS interop for mouse move/up events
+        // Note: Full drag implementation requires JS interop for mouse move/up events
         // to track the delta and call Group?.ResizePanels()
+        // This is a placeholder for the mousedown event handler
     }
 }
