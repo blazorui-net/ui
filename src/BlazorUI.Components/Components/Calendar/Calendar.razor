@@ -209,7 +209,8 @@
         for (int i = 0; i < 7; i++)
         {
             var index = ((int)firstDayOfWeek + i) % 7;
-            yield return dayNames[index].Substring(0, 2);
+            var dayName = dayNames[index];
+            yield return dayName.Substring(0, Math.Min(dayName.Length, 2));
         }
     }
 

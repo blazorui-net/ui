@@ -3,7 +3,7 @@
 
 @* ToastViewport - container that displays active toasts *@
 <div @attributes="GetAttributes()">
-    @foreach (var toast in ToastService.Toasts)
+    @foreach (var toast in GetVisibleToasts())
     {
         <Toast 
             Id="@toast.Id"
@@ -28,6 +28,13 @@
     public ToastPosition Position { get; set; } = ToastPosition.BottomRight;
 
     /// <summary>
+    /// Maximum number of toasts to display at once.
+    /// Default is 5.
+    /// </summary>
+    [Parameter]
+    public int MaxToasts { get; set; } = 5;
+
+    /// <summary>
     /// Additional CSS classes to apply to the viewport.
     /// </summary>
     [Parameter]
@@ -47,6 +54,11 @@
     private void HandleToastChange()
     {
         InvokeAsync(StateHasChanged);
+    }
+
+    private IEnumerable<ToastOptions> GetVisibleToasts()
+    {
+        return ToastService.Toasts.Take(MaxToasts);
     }
 
     private string GetPositionClass()

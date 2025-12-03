@@ -6,6 +6,7 @@
         @onclick="HandleClick"
         @onmouseenter="HandleMouseEnter"
         @onkeydown="HandleKeyDown"
+        @onkeydown:preventDefault="@_shouldPreventDefault"
         @attributes="AdditionalAttributes"
         role="menuitem"
         aria-haspopup="true"
@@ -75,8 +76,13 @@
         Context.SetActiveItem(ItemContext.Value);
     }
 
+    private bool _shouldPreventDefault = false;
+
     private void HandleKeyDown(KeyboardEventArgs args)
     {
+        // Prevent default for space key to avoid page scrolling
+        _shouldPreventDefault = args.Key == " ";
+        
         if (args.Key == "Enter" || args.Key == " ")
         {
             HandleClick();

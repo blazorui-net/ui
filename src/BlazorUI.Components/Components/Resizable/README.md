@@ -5,10 +5,12 @@ Split layout components with draggable handles for horizontal/vertical split lay
 ## Features
 
 - **Flexible Layout**: Horizontal or vertical panel arrangements
-- **Drag to Resize**: Handles between panels for resizing
+- **Drag to Resize**: Handles between panels for resizing (requires JS interop for full functionality)
 - **Min/Max Constraints**: Optional size limits per panel
 - **Collapsible Panels**: Optional collapse functionality
 - **Layout Events**: Callbacks when sizes change
+
+> **Note**: Full drag-to-resize functionality requires JavaScript interop for mouse move/up events tracking. The current implementation provides the component structure and styling; complete drag behavior would need additional JS interop.
 
 ## Usage
 
