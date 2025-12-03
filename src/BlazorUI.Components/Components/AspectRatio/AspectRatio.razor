@@ -37,7 +37,7 @@
         
         if (AdditionalAttributes?.TryGetValue("style", out var userStyle) == true)
         {
-            // User style comes last to allow overriding default aspect-ratio if needed
+            // Default aspect-ratio comes first, user style appended last allows CSS cascade override
             return $"{ratioStyle} {userStyle}";
         }
         
