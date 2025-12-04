@@ -1,4 +1,5 @@
 using BlazorUI.Primitives.Contexts;
+using Microsoft.AspNetCore.Components;
 
 namespace BlazorUI.Primitives.Menubar;
 
@@ -206,6 +207,11 @@ public class MenubarMenuContext
     public MenubarContext MenubarContext { get; }
 
     /// <summary>
+    /// Gets or sets the trigger element reference for positioning.
+    /// </summary>
+    public ElementReference? TriggerElement { get; set; }
+
+    /// <summary>
     /// Initializes a new instance of the MenubarMenuContext.
     /// </summary>
     /// <param name="menubarContext">The parent menubar context.</param>
@@ -234,8 +240,13 @@ public class MenubarMenuContext
     /// <summary>
     /// Opens this menu.
     /// </summary>
-    public void Open()
+    /// <param name="triggerElement">Optional trigger element reference for positioning.</param>
+    public void Open(ElementReference? triggerElement = null)
     {
+        if (triggerElement.HasValue)
+        {
+            TriggerElement = triggerElement;
+        }
         MenubarContext.OpenMenu(Index);
     }
 
@@ -250,8 +261,13 @@ public class MenubarMenuContext
     /// <summary>
     /// Toggles this menu.
     /// </summary>
-    public void Toggle()
+    /// <param name="triggerElement">Optional trigger element reference for positioning.</param>
+    public void Toggle(ElementReference? triggerElement = null)
     {
+        if (triggerElement.HasValue)
+        {
+            TriggerElement = triggerElement;
+        }
         MenubarContext.ToggleMenu(Index);
     }
 }

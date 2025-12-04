@@ -95,6 +95,8 @@
     private ElementReference _contentRef;
     private IJSObjectReference? _clickOutsideModule;
     private IJSObjectReference? _clickOutsideCleanup;
+    private IJSObjectReference? _keyboardNavModule;
+    private IJSObjectReference? _keyboardNavCleanup;
     private DotNetObjectReference<MenubarContent>? _dotNetRef;
     private IAsyncDisposable? _positioningCleanup;
     private bool _isInitialized = false;
@@ -127,11 +129,17 @@
         {
             _isInitialized = true;
 
+            // Set up positioning
+            await SetupPositioningAsync();
+
             // Set up click-outside detection
             if (CloseOnClickOutside)
             {
                 await SetupClickOutsideAsync();
             }
+
+            // Set up keyboard navigation (prevents scroll on arrow keys)
+            await SetupKeyboardNavAsync();
 
             // Focus the content container for keyboard navigation
             try
@@ -149,6 +157,48 @@
         }
     }
 
+    private async Task SetupPositioningAsync()
+    {
+        if (MenuContext.TriggerElement == null)
+        {
+            Console.WriteLine("Warning: MenubarContent - TriggerElement is null, positioning may not work correctly");
+            return;
+        }
+
+        try
+        {
+            // Construct placement string from Side and Align
+            var placement = Align == PopoverAlign.Center ? Side.ToValue() : $"{Side.ToValue()}-{Align.ToValue()}";
+
+            var options = new PositioningOptions
+            {
+                Placement = placement,
+                Offset = Offset,
+                Strategy = "absolute"
+            };
+
+            // Compute and apply position
+            var position = await PositioningService.ComputePositionAsync(
+                MenuContext.TriggerElement.Value,
+                _contentRef,
+                options);
+
+            // Apply position and make visible (enables pointer-events)
+            // CSS animations handle the fade-in via animate-in classes
+            await PositioningService.ApplyPositionAsync(_contentRef, position, makeVisible: true);
+
+            // Set up auto-update for dynamic positioning
+            _positioningCleanup = await PositioningService.AutoUpdateAsync(
+                MenuContext.TriggerElement.Value,
+                _contentRef,
+                options);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Failed to set up positioning: {ex.Message}");
+        }
+    }
+
     private async Task SetupClickOutsideAsync()
     {
         try
@@ -158,12 +208,31 @@
 
             _dotNetRef = DotNetObjectReference.Create(this);
 
+            // Pass trigger element to exclude it from click-outside detection
             _clickOutsideCleanup = await _clickOutsideModule.InvokeAsync<IJSObjectReference>(
-                "onClickOutside", _contentRef, _dotNetRef, "HandleClickOutside");
+                "onClickOutside", _contentRef, _dotNetRef, "HandleClickOutside", MenuContext.TriggerElement);
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Failed to set up click-outside: {ex.Message}");
+        }
+    }
+
+    private async Task SetupKeyboardNavAsync()
+    {
+        try
+        {
+            _keyboardNavModule = await JSRuntime.InvokeAsync<IJSObjectReference>(
+                "import", "./_content/BlazorUI.Primitives/js/primitives/keyboard-nav.js");
+
+            _dotNetRef ??= DotNetObjectReference.Create(this);
+
+            _keyboardNavCleanup = await _keyboardNavModule.InvokeAsync<IJSObjectReference>(
+                "setupKeyboardNav", _contentRef, _dotNetRef);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Failed to set up keyboard navigation: {ex.Message}");
         }
     }
 
@@ -182,7 +251,12 @@
 
     private string GetInitialStyle()
     {
-        var baseStyle = $"z-index: {ZIndex}; position: absolute;";
+        var baseStyle = $"z-index: {ZIndex};";
+
+        // Position offscreen initially - JavaScript will reposition
+        // Don't set opacity here - let CSS animations handle fade-in via animate-in classes
+        baseStyle += " position: absolute; top: -9999px; left: -9999px; pointer-events: none;";
+
         return baseStyle;
     }
 
@@ -256,15 +330,8 @@
                 await FocusLastEnabled();
                 break;
 
-            case "ArrowRight":
-                // Move to next menu in menubar
-                Context.FocusNextTrigger();
-                break;
-
-            case "ArrowLeft":
-                // Move to previous menu in menubar
-                Context.FocusPreviousTrigger();
-                break;
+            // Note: ArrowRight/ArrowLeft are handled by MenubarRoot
+            // to avoid double-handling due to event bubbling
         }
     }
 
@@ -370,6 +437,20 @@
             _clickOutsideCleanup = null;
         }
 
+        if (_keyboardNavCleanup != null)
+        {
+            try
+            {
+                await _keyboardNavCleanup.InvokeVoidAsync("dispose");
+                await _keyboardNavCleanup.DisposeAsync();
+            }
+            catch
+            {
+                // Cleanup may already be disposed
+            }
+            _keyboardNavCleanup = null;
+        }
+
         _isInitialized = false;
         _focusedItemIndex = -1;
     }
@@ -381,6 +462,11 @@
         if (_clickOutsideModule != null)
         {
             await _clickOutsideModule.DisposeAsync();
+        }
+
+        if (_keyboardNavModule != null)
+        {
+            await _keyboardNavModule.DisposeAsync();
         }
 
         _dotNetRef?.Dispose();

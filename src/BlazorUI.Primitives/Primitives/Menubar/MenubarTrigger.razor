@@ -7,6 +7,7 @@
         @onclick="HandleClick"
         @onkeydown="HandleKeyDown"
         @onfocus="HandleFocus"
+        @onmouseenter="HandleMouseEnter"
         @attributes="AdditionalAttributes"
         role="menuitem"
         aria-haspopup="menu"
@@ -69,10 +70,16 @@
         }
     }
 
+    protected override void OnAfterRender(bool firstRender)
+    {
+        // Always update the trigger element reference so keyboard navigation can position correctly
+        MenuContext.TriggerElement = _triggerRef;
+    }
+
     private void HandleClick(MouseEventArgs args)
     {
         if (Disabled) return;
-        MenuContext.Toggle();
+        MenuContext.Toggle(_triggerRef);
     }
 
     private void HandleKeyDown(KeyboardEventArgs args)
@@ -83,12 +90,12 @@
         {
             case "Enter":
             case " ":
-                MenuContext.Toggle();
+                MenuContext.Toggle(_triggerRef);
                 break;
             case "ArrowDown":
                 if (!MenuContext.IsOpen)
                 {
-                    MenuContext.Open();
+                    MenuContext.Open(_triggerRef);
                 }
                 break;
         }
@@ -97,5 +104,16 @@
     private void HandleFocus()
     {
         Context.SetFocusedTriggerIndex(MenuContext.Index);
+    }
+
+    private void HandleMouseEnter()
+    {
+        if (Disabled) return;
+        
+        // If any menu in the menubar is already open, open this one on hover
+        if (Context.ActiveIndex >= 0 && Context.ActiveIndex != MenuContext.Index)
+        {
+            MenuContext.Open(_triggerRef);
+        }
     }
 }
