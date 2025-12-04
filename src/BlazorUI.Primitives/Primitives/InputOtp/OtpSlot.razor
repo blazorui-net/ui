@@ -112,8 +112,11 @@
             // Validate character if pattern is set
             if (Root != null && !Root.IsValidChar(lastChar))
             {
-                // Invalid character, don't accept
-                Context.SetSlotValue(Index, '\0');
+                // Invalid character, don't accept - force re-render to clear the displayed value
+                // Setting to current value triggers StateHasChanged to reset the display
+                var currentValue = Context.GetSlotValue(Index);
+                Context.SetSlotValue(Index, '\0'); // Clear first
+                Context.SetSlotValue(Index, currentValue); // Restore to trigger update
                 return;
             }
 
