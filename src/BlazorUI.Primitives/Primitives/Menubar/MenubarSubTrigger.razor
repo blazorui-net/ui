@@ -1,0 +1,132 @@
+@namespace BlazorUI.Primitives.Menubar
+@implements IMenubarItem
+@implements IDisposable
+
+@* MenubarSubTrigger - triggers opening of a submenu *@
+<div @ref="_triggerRef"
+     role="menuitem"
+     tabindex="-1"
+     aria-haspopup="menu"
+     aria-expanded="@SubContext.IsOpen.ToString().ToLower()"
+     aria-disabled="@Disabled.ToString().ToLower()"
+     @onclick="HandleClick"
+     @onkeydown="HandleKeyDown"
+     @onmouseenter="HandleMouseEnter"
+     @onmouseleave="HandleMouseLeave"
+     data-state="@(SubContext.IsOpen ? "open" : "closed")"
+     data-disabled="@(Disabled ? "true" : null)"
+     @attributes="AdditionalAttributes">
+    @ChildContent
+</div>
+
+@code {
+    [CascadingParameter]
+    private MenubarContext? MenuContext { get; set; }
+
+    [CascadingParameter]
+    private MenubarSubContext SubContext { get; set; } = null!;
+
+    [CascadingParameter]
+    private MenubarContent? ContentContext { get; set; }
+
+    private ElementReference _triggerRef;
+
+    /// <summary>
+    /// The content to display inside the trigger.
+    /// </summary>
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>
+    /// Additional attributes to apply to the trigger element.
+    /// </summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    /// <summary>
+    /// Whether the trigger is disabled.
+    /// </summary>
+    [Parameter]
+    public bool Disabled { get; set; } = false;
+
+    protected override void OnInitialized()
+    {
+        if (SubContext == null)
+        {
+            throw new InvalidOperationException(
+                "MenubarSubTrigger must be used within a MenubarSub component.");
+        }
+
+        // Register this item with the content for keyboard navigation
+        ContentContext?.RegisterMenuItem(this);
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        // Always update the trigger element reference
+        SubContext.TriggerElement = _triggerRef;
+    }
+
+    private void HandleClick(MouseEventArgs args)
+    {
+        if (Disabled) return;
+
+        if (SubContext.IsOpen)
+        {
+            SubContext.Close();
+        }
+        else
+        {
+            SubContext.Open(_triggerRef);
+        }
+    }
+
+    private void HandleKeyDown(KeyboardEventArgs args)
+    {
+        if (Disabled) return;
+
+        // Arrow Right or Enter opens submenu
+        if (args.Key == "ArrowRight" || args.Key == "Enter")
+        {
+            SubContext.Open(_triggerRef);
+        }
+    }
+
+    private void HandleMouseEnter(MouseEventArgs args)
+    {
+        if (Disabled) return;
+
+        // Open submenu on hover
+        SubContext.Open(_triggerRef);
+    }
+
+    private void HandleMouseLeave(MouseEventArgs args)
+    {
+        // Don't close on mouse leave - let the content handle that
+    }
+
+    // IMenubarItem implementation
+    public async Task FocusAsync()
+    {
+        try
+        {
+            await _triggerRef.FocusAsync();
+        }
+        catch
+        {
+            // Ignore focus errors
+        }
+    }
+
+    public async Task ClickAsync()
+    {
+        if (Disabled) return;
+        HandleClick(new MouseEventArgs());
+        await Task.CompletedTask;
+    }
+
+    public void Dispose()
+    {
+        ContentContext?.UnregisterMenuItem(this);
+    }
+}

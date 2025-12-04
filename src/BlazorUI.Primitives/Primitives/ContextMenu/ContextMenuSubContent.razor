@@ -1,0 +1,242 @@
+@namespace BlazorUI.Primitives.ContextMenu
+@using BlazorUI.Primitives.Services
+@inject IPositioningService PositioningService
+@inject IJSRuntime JSRuntime
+@implements IAsyncDisposable
+
+@* ContextMenuSubContent - the content panel for a submenu *@
+
+@if (SubContext.IsOpen)
+{
+    <div @ref="_contentRef"
+         role="menu"
+         tabindex="-1"
+         @onkeydown="HandleKeyDown"
+         @onmouseleave="HandleMouseLeave"
+         @attributes="GetAttributesWithoutStyle()"
+         data-state="open"
+         style="@GetMergedStyle()">
+        <CascadingValue Value="@_subMenuContent" IsFixed="false">
+            @ChildContent
+        </CascadingValue>
+    </div>
+}
+
+@code {
+    [CascadingParameter]
+    private ContextMenuContext? MenuContext { get; set; }
+
+    [CascadingParameter]
+    private ContextMenuSubContext SubContext { get; set; } = null!;
+
+    private ContextMenuSubContent _subMenuContent = null!;
+    private ElementReference _contentRef;
+    private IAsyncDisposable? _positioningCleanup;
+    private bool _isInitialized = false;
+
+    // Track menu items for keyboard navigation
+    private readonly List<IContextMenuItem> _menuItems = new();
+
+    /// <summary>
+    /// The content to render inside the submenu.
+    /// </summary>
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>
+    /// Additional attributes to apply to the content container.
+    /// </summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    /// <summary>
+    /// Whether pressing Escape should close the submenu.
+    /// Default is true.
+    /// </summary>
+    [Parameter]
+    public bool CloseOnEscape { get; set; } = true;
+
+    /// <summary>
+    /// Offset distance from the trigger element in pixels.
+    /// Default is -4 (slight overlap with parent).
+    /// </summary>
+    [Parameter]
+    public int Offset { get; set; } = -4;
+
+    /// <summary>
+    /// Z-index value for the submenu content.
+    /// Default is 50.
+    /// </summary>
+    [Parameter]
+    public int ZIndex { get; set; } = 50;
+
+    protected override void OnInitialized()
+    {
+        if (SubContext == null)
+        {
+            throw new InvalidOperationException(
+                "ContextMenuSubContent must be used within a ContextMenuSub component.");
+        }
+
+        _subMenuContent = this;
+        SubContext.OnStateChanged += HandleContextStateChanged;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (SubContext.IsOpen && !_isInitialized)
+        {
+            _isInitialized = true;
+
+            // Set up positioning
+            await SetupPositioningAsync();
+
+            // Focus the content container
+            try
+            {
+                await _contentRef.FocusAsync();
+            }
+            catch
+            {
+                // Focus may fail
+            }
+        }
+        else if (!SubContext.IsOpen && _isInitialized)
+        {
+            await CleanupAsync();
+        }
+    }
+
+    private async Task SetupPositioningAsync()
+    {
+        if (SubContext.TriggerElement == null) return;
+
+        try
+        {
+            var options = new PositioningOptions
+            {
+                Placement = "right-start",
+                Offset = Offset,
+                Strategy = "fixed"
+            };
+
+            var position = await PositioningService.ComputePositionAsync(
+                SubContext.TriggerElement.Value,
+                _contentRef,
+                options);
+
+            await PositioningService.ApplyPositionAsync(_contentRef, position, makeVisible: true);
+
+            _positioningCleanup = await PositioningService.AutoUpdateAsync(
+                SubContext.TriggerElement.Value,
+                _contentRef,
+                options);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Failed to set up submenu positioning: {ex.Message}");
+        }
+    }
+
+    private void HandleContextStateChanged()
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void HandleKeyDown(KeyboardEventArgs args)
+    {
+        switch (args.Key)
+        {
+            case "Escape":
+                if (CloseOnEscape)
+                {
+                    SubContext.Close();
+                }
+                break;
+
+            case "ArrowLeft":
+                // Close submenu and return focus to parent
+                SubContext.Close();
+                break;
+
+            case "ArrowDown":
+                // Navigate to next item
+                break;
+
+            case "ArrowUp":
+                // Navigate to previous item
+                break;
+        }
+    }
+
+    private void HandleMouseLeave(MouseEventArgs args)
+    {
+        // Close submenu when mouse leaves
+        SubContext.Close();
+    }
+
+    private string GetInitialStyle()
+    {
+        var baseStyle = $"z-index: {ZIndex};";
+        baseStyle += " position: fixed; top: -9999px; left: -9999px; pointer-events: none;";
+        return baseStyle;
+    }
+
+    private string GetMergedStyle()
+    {
+        var baseStyle = GetInitialStyle();
+
+        if (AdditionalAttributes != null && AdditionalAttributes.TryGetValue("style", out var userStyle))
+        {
+            return $"{userStyle}; {baseStyle}";
+        }
+
+        return baseStyle;
+    }
+
+    private Dictionary<string, object>? GetAttributesWithoutStyle()
+    {
+        if (AdditionalAttributes == null) return null;
+
+        var attributes = new Dictionary<string, object>(AdditionalAttributes);
+        attributes.Remove("style");
+
+        return attributes.Count > 0 ? attributes : null;
+    }
+
+    private async Task CleanupAsync()
+    {
+        if (_positioningCleanup != null)
+        {
+            await _positioningCleanup.DisposeAsync();
+            _positioningCleanup = null;
+        }
+
+        _isInitialized = false;
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        await CleanupAsync();
+        SubContext.OnStateChanged -= HandleContextStateChanged;
+    }
+
+    /// <summary>
+    /// Registers a menu item for keyboard navigation.
+    /// </summary>
+    internal void RegisterItem(IContextMenuItem item)
+    {
+        if (!_menuItems.Contains(item))
+        {
+            _menuItems.Add(item);
+        }
+    }
+
+    /// <summary>
+    /// Unregisters a menu item.
+    /// </summary>
+    internal void UnregisterItem(IContextMenuItem item)
+    {
+        _menuItems.Remove(item);
+    }
+}
