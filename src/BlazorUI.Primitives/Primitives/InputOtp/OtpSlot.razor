@@ -95,7 +95,7 @@
         if (Context.IsDisabled) return;
 
         var input = args.Value?.ToString() ?? "";
-        
+
         // Handle paste (multiple characters)
         if (input.Length > 1 && Index == 0)
         {
@@ -108,18 +108,19 @@
         if (input.Length > 0)
         {
             var lastChar = input[^1]; // Take the last character
-            
+
             // Validate character if pattern is set
             if (Root != null && !Root.IsValidChar(lastChar))
             {
                 // Invalid character, don't accept
+                Context.SetSlotValue(Index, '\0');
                 return;
             }
 
             Context.SetSlotValue(Index, lastChar);
-            
-            // Move to next slot if not at the end
-            if (Index < Context.Length - 1)
+
+            // Move to next slot only if next slot is empty
+            if (Index < Context.Length - 1 && Context.GetSlotValue(Index + 1) == '\0')
             {
                 Context.FocusNext();
                 await FocusSlot(Index + 1);
@@ -128,7 +129,7 @@
         else
         {
             // Input was cleared
-            Context.SetSlotValue(Index, '\0');
+            // Context.SetSlotValue(Index, '\0'); // Already handled in key down
         }
     }
 
@@ -142,7 +143,7 @@
                 if (Context.GetSlotValue(Index) == '\0')
                 {
                     // Slot is empty, move to previous and clear it
-                    if (Index > 0)
+                    if (Index == Context.Value.Length)
                     {
                         Context.SetSlotValue(Index - 1, '\0');
                         Context.FocusPrevious();
@@ -153,7 +154,17 @@
                 {
                     // Clear current slot
                     Context.SetSlotValue(Index, '\0');
+
+                    if (Index < Context.Length - 1)
+                    {
+                        if (Context.GetSlotValue(Index + 1) != '\0')
+                        {
+                            Context.FocusNext();
+                            await FocusSlot(Context.Value.Length - 1);
+                        }
+                    }
                 }
+
                 break;
 
             case "Delete":
@@ -170,7 +181,7 @@
                 break;
 
             case "ArrowRight":
-                if (Index < Context.Length - 1)
+                if (Index < Context.Value.Length)
                 {
                     Context.SetKeyboardNavigation(true);
                     Context.FocusNext();
