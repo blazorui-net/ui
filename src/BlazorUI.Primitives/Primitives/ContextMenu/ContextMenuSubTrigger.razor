@@ -31,6 +31,9 @@
     
     [CascadingParameter(Name = "ParentSubContext")]
     private ContextMenuSubContext? ParentSubContext { get; set; }
+    
+    [CascadingParameter]
+    private ContextMenuSubContent? SubContentContext { get; set; }
 
     private ElementReference _triggerRef;
 
@@ -60,9 +63,18 @@
                 "ContextMenuSubTrigger must be used within a ContextMenuSub component.");
         }
 
-        // Register this item with the content for keyboard navigation
-        ContentContainer?.RegisterItem(this);
-        MenuContext?.RegisterItem(this);
+        // Register this item with the appropriate content for keyboard navigation
+        // If we're inside a submenu, register with the submenu content
+        // Otherwise, register with the root menu content
+        if (SubContentContext != null)
+        {
+            SubContentContext.RegisterItem(this);
+        }
+        else
+        {
+            ContentContainer?.RegisterItem(this);
+            MenuContext?.RegisterItem(this);
+        }
         
         // Subscribe to state changes to update aria-expanded when submenu is closed externally
         SubContext.OnStateChanged += HandleStateChanged;
@@ -158,8 +170,16 @@
 
     public void Dispose()
     {
-        ContentContainer?.UnregisterItem(this);
-        MenuContext?.UnregisterItem(this);
+        // Unregister this item when disposed
+        if (SubContentContext != null)
+        {
+            SubContentContext.UnregisterItem(this);
+        }
+        else
+        {
+            ContentContainer?.UnregisterItem(this);
+            MenuContext?.UnregisterItem(this);
+        }
         SubContext.OnStateChanged -= HandleStateChanged;
     }
 }
