@@ -187,10 +187,9 @@
         {
             if (value != _displayedMonth.Month)
             {
-                var newMonth = new DateOnly(_displayedMonth.Year, value, 1);
                 var daysInNewMonth = DateTime.DaysInMonth(_displayedMonth.Year, value);
                 var preservedDay = Math.Min(_focusedDate.Day, daysInNewMonth);
-                _displayedMonth = newMonth;
+                _displayedMonth = new DateOnly(_displayedMonth.Year, value, 1);
                 _focusedDate = new DateOnly(_displayedMonth.Year, value, preservedDay);
             }
         }
@@ -274,8 +273,9 @@
     private async Task HandleKeyDown(KeyboardEventArgs e)
     {
         // Don't handle keyboard events when dropdown selects have focus
-        _shouldPreventDefault = false;
         if (_isDropdownFocused) return;
+        
+        _shouldPreventDefault = false;
         
         switch (e.Key)
         {
