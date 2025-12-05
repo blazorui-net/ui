@@ -11,6 +11,7 @@
      aria-disabled="@Disabled.ToString().ToLowerInvariant()"
      @onclick="HandleClick"
      @onkeydown="HandleKeyDown"
+     @onmouseenter="HandleMouseEnter"
      data-state="@(IsSelected ? "checked" : "unchecked")"
      data-disabled="@(Disabled ? "true" : null)"
      @attributes="AdditionalAttributes">
@@ -26,6 +27,12 @@
 
     [CascadingParameter]
     private ContextMenuContent? ContentContainer { get; set; }
+    
+    [CascadingParameter(Name = "ParentSubContext")]
+    private ContextMenuSubContext? ParentSubContext { get; set; }
+    
+    [CascadingParameter]
+    private ContextMenuSubContent? SubContentContext { get; set; }
 
     private ElementReference _itemRef;
 
@@ -77,8 +84,15 @@
                 "ContextMenuRadioItem must be used within a ContextMenuRadioGroup component.");
         }
 
-        ContentContainer?.RegisterItem(this);
-        MenuContext.RegisterItem(this);
+        // Register with appropriate content for keyboard navigation
+        if (SubContentContext != null)
+        {
+            SubContentContext.RegisterItem(this);
+        }
+        else
+        {
+            ContentContainer?.RegisterItem(this);
+        }
     }
 
     private async Task HandleClick()
@@ -108,6 +122,34 @@
         }
     }
 
+    private async void HandleMouseEnter(MouseEventArgs args)
+    {
+        bool hadActiveSubmenu = false;
+        
+        if (ParentSubContext != null)
+        {
+            hadActiveSubmenu = ParentSubContext.ActiveSubMenu != null;
+            ParentSubContext.CloseActiveSubMenu();
+        }
+        else
+        {
+            hadActiveSubmenu = MenuContext?.ActiveSubMenu != null;
+            MenuContext?.CloseActiveSubMenu();
+        }
+        
+        if (hadActiveSubmenu)
+        {
+            if (SubContentContext != null)
+            {
+                await SubContentContext.FocusContainerAsync();
+            }
+            else if (ContentContainer != null)
+            {
+                await ContentContainer.FocusContainerAsync();
+            }
+        }
+    }
+
     public async Task FocusAsync()
     {
         try
@@ -122,7 +164,13 @@
 
     public void Dispose()
     {
-        ContentContainer?.UnregisterItem(this);
-        MenuContext.UnregisterItem(this);
+        if (SubContentContext != null)
+        {
+            SubContentContext.UnregisterItem(this);
+        }
+        else
+        {
+            ContentContainer?.UnregisterItem(this);
+        }
     }
 }

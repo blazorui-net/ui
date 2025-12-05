@@ -30,6 +30,10 @@
     private DotNetObjectReference<ContextMenuContent>? _dotNetRef;
     private bool _isInitialized = false;
 
+    // Track menu items for keyboard navigation (consistent with DropdownMenu/Menubar pattern)
+    private readonly List<IContextMenuItem> _menuItems = new();
+    private int _focusedItemIndex = -1;
+
     /// <summary>
     /// The content to render inside the menu.
     /// </summary>
@@ -60,8 +64,12 @@
     [Parameter]
     public int ZIndex { get; set; } = 50;
 
-    // Track menu items for keyboard navigation
-    private readonly List<IContextMenuItem> _menuItems = new();
+    /// <summary>
+    /// Whether to enable keyboard loop navigation.
+    /// Default is true.
+    /// </summary>
+    [Parameter]
+    public bool Loop { get; set; } = true;
 
     protected override void OnInitialized()
     {
@@ -147,32 +155,112 @@
         }
     }
 
-    private void HandleKeyDown(KeyboardEventArgs args)
+    private async Task HandleKeyDown(KeyboardEventArgs args)
     {
+        if (args.Key == "Escape")
+        {
+            if (CloseOnEscape)
+            {
+                Context.Close();
+            }
+            return;
+        }
+
+        // Handle navigation keys only if we have items
+        if (_menuItems.Count == 0) return;
+
         switch (args.Key)
         {
-            case "Escape":
-                if (CloseOnEscape)
-                {
-                    Context.Close();
-                }
-                break;
-
             case "ArrowDown":
-                Context.FocusNext();
+                await NavigateNext();
                 break;
 
             case "ArrowUp":
-                Context.FocusPrevious();
+                await NavigatePrevious();
                 break;
 
             case "Home":
-                Context.FocusFirst();
+                await FocusFirstEnabled();
                 break;
 
             case "End":
-                Context.FocusLast();
+                await FocusLastEnabled();
                 break;
+        }
+    }
+
+    private async Task NavigateNext()
+    {
+        var startIndex = _focusedItemIndex == -1 ? 0 : _focusedItemIndex + 1;
+        
+        // Search forward for next enabled item
+        for (int i = 0; i < _menuItems.Count; i++)
+        {
+            var index = (startIndex + i) % _menuItems.Count;
+            if (!_menuItems[index].Disabled)
+            {
+                _focusedItemIndex = index;
+                await _menuItems[index].FocusAsync();
+                return;
+            }
+            
+            // Wrap-around detection: if loop is disabled and we've wrapped
+            if (!Loop && i > 0 && index <= startIndex) break;
+        }
+    }
+
+    private async Task NavigatePrevious()
+    {
+        var startIndex = _focusedItemIndex == -1 ? _menuItems.Count - 1 : _focusedItemIndex - 1;
+        if (startIndex < 0) startIndex = _menuItems.Count - 1;
+        
+        // Search backward for previous enabled item
+        for (int i = 0; i < _menuItems.Count; i++)
+        {
+            var index = startIndex - i;
+            if (index < 0) index = _menuItems.Count + index;
+            
+            if (!_menuItems[index].Disabled)
+            {
+                _focusedItemIndex = index;
+                await _menuItems[index].FocusAsync();
+                return;
+            }
+            
+            // Wrap-around detection: if loop is disabled and we've wrapped
+            if (!Loop && index > startIndex) break;
+        }
+        
+        // Fallback: keep focus on current item if valid and enabled
+        if (_focusedItemIndex >= 0 && _focusedItemIndex < _menuItems.Count && !_menuItems[_focusedItemIndex].Disabled)
+        {
+            await _menuItems[_focusedItemIndex].FocusAsync();
+        }
+    }
+
+    private async Task FocusFirstEnabled()
+    {
+        for (int i = 0; i < _menuItems.Count; i++)
+        {
+            if (!_menuItems[i].Disabled)
+            {
+                _focusedItemIndex = i;
+                await _menuItems[i].FocusAsync();
+                return;
+            }
+        }
+    }
+
+    private async Task FocusLastEnabled()
+    {
+        for (int i = _menuItems.Count - 1; i >= 0; i--)
+        {
+            if (!_menuItems[i].Disabled)
+            {
+                _focusedItemIndex = i;
+                await _menuItems[i].FocusAsync();
+                return;
+            }
         }
     }
 
@@ -194,7 +282,7 @@
     /// <summary>
     /// Registers a menu item for keyboard navigation.
     /// </summary>
-    public void RegisterItem(IContextMenuItem item)
+    internal void RegisterItem(IContextMenuItem item)
     {
         if (!_menuItems.Contains(item))
         {
@@ -205,7 +293,7 @@
     /// <summary>
     /// Unregisters a menu item.
     /// </summary>
-    public void UnregisterItem(IContextMenuItem item)
+    internal void UnregisterItem(IContextMenuItem item)
     {
         _menuItems.Remove(item);
     }
@@ -213,12 +301,12 @@
     /// <summary>
     /// Focuses the content container for keyboard navigation.
     /// </summary>
-    public async Task FocusContainerAsync()
+    internal async Task FocusContainerAsync()
     {
         try
         {
             await _contentRef.FocusAsync();
-            Context.SetFocusedIndex(-1);
+            _focusedItemIndex = -1;
         }
         catch
         {
@@ -229,6 +317,7 @@
     private async Task CleanupAsync()
     {
         _isInitialized = false;
+        _focusedItemIndex = -1;
 
         if (_clickOutsideCleanup != null)
         {

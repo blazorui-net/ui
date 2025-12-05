@@ -25,14 +25,10 @@ public class ContextMenuState
 
 /// <summary>
 /// Context for ContextMenu primitive component and its children.
-/// Manages open state and position.
+/// Manages open state and position. Navigation is handled by ContextMenuContent.
 /// </summary>
 public class ContextMenuContext : PrimitiveContextWithEvents<ContextMenuState>
 {
-    private readonly List<IContextMenuItem> _items = new();
-    private readonly object _lock = new();
-    private int _focusedItemIndex = -1;
-
     /// <summary>
     /// Initializes a new instance of the ContextMenuContext.
     /// </summary>
@@ -72,25 +68,6 @@ public class ContextMenuContext : PrimitiveContextWithEvents<ContextMenuState>
     public ContextMenuSubContext? ActiveSubMenu { get; set; }
 
     /// <summary>
-    /// Gets the registered menu items.
-    /// </summary>
-    public IReadOnlyList<IContextMenuItem> Items
-    {
-        get
-        {
-            lock (_lock)
-            {
-                return _items.ToList().AsReadOnly();
-            }
-        }
-    }
-
-    /// <summary>
-    /// Gets the currently focused item index.
-    /// </summary>
-    public int FocusedItemIndex => _focusedItemIndex;
-
-    /// <summary>
     /// Opens the context menu at the specified position.
     /// </summary>
     /// <param name="x">X coordinate.</param>
@@ -103,7 +80,6 @@ public class ContextMenuContext : PrimitiveContextWithEvents<ContextMenuState>
             state.X = x;
             state.Y = y;
         });
-        _focusedItemIndex = -1;
     }
 
     /// <summary>
@@ -119,34 +95,6 @@ public class ContextMenuContext : PrimitiveContextWithEvents<ContextMenuState>
         {
             state.IsOpen = false;
         });
-        _focusedItemIndex = -1;
-    }
-
-    /// <summary>
-    /// Registers a menu item for keyboard navigation.
-    /// </summary>
-    /// <param name="item">The menu item.</param>
-    public void RegisterItem(IContextMenuItem item)
-    {
-        lock (_lock)
-        {
-            if (!_items.Contains(item))
-            {
-                _items.Add(item);
-            }
-        }
-    }
-
-    /// <summary>
-    /// Unregisters a menu item.
-    /// </summary>
-    /// <param name="item">The menu item.</param>
-    public void UnregisterItem(IContextMenuItem item)
-    {
-        lock (_lock)
-        {
-            _items.Remove(item);
-        }
     }
 
     /// <summary>
@@ -158,98 +106,6 @@ public class ContextMenuContext : PrimitiveContextWithEvents<ContextMenuState>
         {
             ActiveSubMenu.Close();
             ActiveSubMenu = null;
-        }
-    }
-
-    /// <summary>
-    /// Sets the focused item index.
-    /// </summary>
-    public void SetFocusedIndex(int index)
-    {
-        _focusedItemIndex = index;
-    }
-
-    /// <summary>
-    /// Focuses the next enabled item.
-    /// </summary>
-    public void FocusNext()
-    {
-        lock (_lock)
-        {
-            if (_items.Count == 0) return;
-
-            var startIndex = _focusedItemIndex == -1 ? 0 : _focusedItemIndex + 1;
-
-            for (int i = 0; i < _items.Count; i++)
-            {
-                var index = (startIndex + i) % _items.Count;
-                if (!_items[index].Disabled)
-                {
-                    _focusedItemIndex = index;
-                    return;
-                }
-            }
-        }
-    }
-
-    /// <summary>
-    /// Focuses the previous enabled item.
-    /// </summary>
-    public void FocusPrevious()
-    {
-        lock (_lock)
-        {
-            if (_items.Count == 0) return;
-
-            var startIndex = _focusedItemIndex <= 0 ? _items.Count - 1 : _focusedItemIndex - 1;
-
-            for (int i = 0; i < _items.Count; i++)
-            {
-                // Use proper modulo formula to avoid negative index issues
-                var index = (startIndex - i + _items.Count) % _items.Count;
-
-                if (!_items[index].Disabled)
-                {
-                    _focusedItemIndex = index;
-                    return;
-                }
-            }
-        }
-    }
-
-    /// <summary>
-    /// Focuses the first enabled item.
-    /// </summary>
-    public void FocusFirst()
-    {
-        lock (_lock)
-        {
-            for (int i = 0; i < _items.Count; i++)
-            {
-                if (!_items[i].Disabled)
-                {
-                    _focusedItemIndex = i;
-                    return;
-                }
-            }
-        }
-    }
-
-    /// <summary>
-    /// Focuses the last enabled item.
-    /// </summary>
-    public void FocusLast()
-    {
-        lock (_lock)
-        {
-            for (int i = _items.Count - 1; i >= 0; i--)
-            {
-                if (!_items[i].Disabled)
-                {
-                    _focusedItemIndex = i;
-                    return;
-                }
-            }
         }
     }
 }
