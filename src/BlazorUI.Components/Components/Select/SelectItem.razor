@@ -10,13 +10,13 @@
                                            class="@CssClass">
     @if (IsSelected)
     {
-        <span class="absolute inset-y-0 start-0 flex items-center ps-2">
+        <span class="absolute inset-y-0 right-0 flex items-center pr-3">
             <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <polyline points="20 6 9 17 4 12"></polyline>
             </svg>
         </span>
     }
-    <span class="@(IsSelected ? "ps-6" : "")">
+    <span class="@(IsSelected ? "pr-6" : "")">
         @ChildContent
     </span>
 </BlazorUI.Primitives.Select.SelectItem>
