@@ -28,6 +28,9 @@
 
     [CascadingParameter]
     private DropdownMenuContent? ContentContext { get; set; }
+    
+    [CascadingParameter(Name = "ParentSubContext")]
+    private DropdownMenuSubContext? ParentSubContext { get; set; }
 
     private ElementReference _triggerRef;
 
@@ -96,13 +99,19 @@
     {
         if (Disabled) return;
 
-        // Close any other active submenu first
-        MenuContext?.CloseActiveSubMenu();
-        
-        // Register this submenu as the active one
-        if (MenuContext != null)
+        // Close any other active submenu first (either from root menu or parent submenu)
+        if (ParentSubContext != null)
         {
-            MenuContext.ActiveSubMenu = SubContext;
+            ParentSubContext.CloseActiveSubMenu();
+            ParentSubContext.ActiveSubMenu = SubContext;
+        }
+        else
+        {
+            MenuContext?.CloseActiveSubMenu();
+            if (MenuContext != null)
+            {
+                MenuContext.ActiveSubMenu = SubContext;
+            }
         }
 
         // Open submenu on hover

@@ -37,13 +37,34 @@ public class MenubarSubContext
     }
 
     /// <summary>
-    /// Closes the submenu.
+    /// Gets or sets the nested submenu context (for recursive closing).
+    /// </summary>
+    public MenubarSubContext? ActiveSubMenu { get; set; }
+
+    /// <summary>
+    /// Closes the submenu and any nested submenus.
     /// </summary>
     public void Close()
     {
+        // Close any nested submenu first (recursive)
+        ActiveSubMenu?.Close();
+        ActiveSubMenu = null;
+        
         IsOpen = false;
         OnOpenChange?.Invoke(false);
         NotifyStateChanged();
+    }
+
+    /// <summary>
+    /// Closes the active nested submenu.
+    /// </summary>
+    public void CloseActiveSubMenu()
+    {
+        if (ActiveSubMenu != null)
+        {
+            ActiveSubMenu.Close();
+            ActiveSubMenu = null;
+        }
     }
 
     /// <summary>

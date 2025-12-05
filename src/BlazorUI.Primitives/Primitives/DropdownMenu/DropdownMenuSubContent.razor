@@ -18,7 +18,9 @@
          data-state="open"
          style="@GetMergedStyle()">
         <CascadingValue Value="@_subMenuContent" IsFixed="false">
-            @ChildContent
+            <CascadingValue Value="@SubContext" Name="ParentSubContext" IsFixed="false">
+                @ChildContent
+            </CascadingValue>
         </CascadingValue>
     </div>
 }
