@@ -546,7 +546,8 @@
     private Dictionary<string, object> GetAttributes()
     {
         // Apply border, shadow, default cursor, and intrinsic width at container level
-        var baseClass = "p-3 rounded-md border shadow-sm cursor-default w-fit";
+        // Using inline-block for intrinsic width since w-fit may not be in Tailwind build
+        var baseClass = "inline-block p-3 rounded-md border shadow-sm cursor-default";
         var classValue = string.IsNullOrEmpty(Class) ? baseClass : $"{baseClass} {Class}";
 
         var attributes = new Dictionary<string, object>
