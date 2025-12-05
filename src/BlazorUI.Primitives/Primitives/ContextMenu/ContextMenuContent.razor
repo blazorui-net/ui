@@ -5,6 +5,13 @@
 @* ContextMenuContent - the dropdown content for the context menu *@
 @if (Context.IsOpen)
 {
+    @* Transparent overlay to capture clicks outside the menu *@
+    <div @ref="_overlayRef"
+         class="@OverlayClass"
+         style="@GetOverlayStyle()"
+         data-state="open">
+    </div>
+    
     <div @ref="_contentRef"
          id="@Context.ContentId"
          role="menu"
@@ -25,10 +32,13 @@
     private ContextMenuContext Context { get; set; } = null!;
 
     private ElementReference _contentRef;
+    private ElementReference _overlayRef;
     private IJSObjectReference? _clickOutsideModule;
     private IJSObjectReference? _clickOutsideCleanup;
     private IJSObjectReference? _keyboardNavModule;
     private IJSObjectReference? _keyboardNavCleanup;
+    private IJSObjectReference? _portalModule;
+    private IJSObjectReference? _scrollLockCleanup;
     private DotNetObjectReference<ContextMenuContent>? _dotNetRef;
     private bool _isInitialized = false;
 
@@ -73,6 +83,19 @@
     [Parameter]
     public bool Loop { get; set; } = true;
 
+    /// <summary>
+    /// CSS class for the overlay element.
+    /// </summary>
+    [Parameter]
+    public string? OverlayClass { get; set; }
+
+    /// <summary>
+    /// Whether to lock body scroll when menu is open.
+    /// Default is true (industry standard for context menus).
+    /// </summary>
+    [Parameter]
+    public bool LockScroll { get; set; } = true;
+
     protected override void OnInitialized()
     {
         if (Context == null)
@@ -97,6 +120,12 @@
 
             // Set up keyboard navigation (prevents scroll on arrow keys)
             await SetupKeyboardNavAsync();
+
+            // Lock body scroll when menu is open
+            if (LockScroll)
+            {
+                await SetupScrollLockAsync();
+            }
 
             try
             {
@@ -146,6 +175,22 @@
         catch (Exception ex)
         {
             Console.WriteLine($"Failed to set up keyboard navigation: {ex.Message}");
+        }
+    }
+
+    private async Task SetupScrollLockAsync()
+    {
+        try
+        {
+            _portalModule = await JSRuntime.InvokeAsync<IJSObjectReference>(
+                "import", "./_content/BlazorUI.Primitives/js/primitives/portal.js");
+
+            _scrollLockCleanup = await _portalModule.InvokeAsync<IJSObjectReference>(
+                "lockBodyScroll");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Failed to set up scroll lock: {ex.Message}");
         }
     }
 
@@ -287,6 +332,11 @@
         }
     }
 
+    private string GetOverlayStyle()
+    {
+        return $"position: fixed; inset: 0; z-index: {ZIndex - 1};";
+    }
+
     private string GetStyle()
     {
         return $"position: fixed; left: {Context.X}px; top: {Context.Y}px; z-index: {ZIndex};";
@@ -378,6 +428,25 @@
             _keyboardNavCleanup = null;
         }
 
+        // Unlock body scroll
+        if (_scrollLockCleanup != null)
+        {
+            try
+            {
+                await _scrollLockCleanup.InvokeVoidAsync("apply");
+                await _scrollLockCleanup.DisposeAsync();
+            }
+            catch (JSDisconnectedException)
+            {
+                // Expected during circuit disconnection, ignore
+            }
+            catch (ObjectDisposedException)
+            {
+                // Already disposed, ignore
+            }
+            _scrollLockCleanup = null;
+        }
+
         if (_clickOutsideModule != null)
         {
             try
@@ -410,6 +479,23 @@
                 // Already disposed, ignore
             }
             _keyboardNavModule = null;
+        }
+
+        if (_portalModule != null)
+        {
+            try
+            {
+                await _portalModule.DisposeAsync();
+            }
+            catch (JSDisconnectedException)
+            {
+                // Expected during circuit disconnection, ignore
+            }
+            catch (ObjectDisposedException)
+            {
+                // Already disposed, ignore
+            }
+            _portalModule = null;
         }
 
         _dotNetRef?.Dispose();
