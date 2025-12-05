@@ -8,6 +8,7 @@
      tabindex="-1"
      @onclick="HandleClick"
      @onkeydown="HandleKeyDown"
+     @onmouseenter="HandleMouseEnter"
      @attributes="AdditionalAttributes"
      aria-disabled="@Disabled.ToString().ToLowerInvariant()"
      data-disabled="@(Disabled ? "true" : null)">
@@ -79,6 +80,12 @@
         {
             await HandleClick();
         }
+    }
+
+    private void HandleMouseEnter(MouseEventArgs args)
+    {
+        // Close any active submenu when hovering over this item
+        Context?.CloseActiveSubMenu();
     }
 
     public async Task FocusAsync()

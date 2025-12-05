@@ -9,6 +9,7 @@
      aria-disabled="@Disabled.ToString().ToLower()"
      @onclick="HandleClick"
      @onkeydown="HandleKeyDown"
+     @onmouseenter="HandleMouseEnter"
      data-disabled="@Disabled.ToString().ToLower()"
      @attributes="AdditionalAttributes">
     @ChildContent
@@ -94,6 +95,12 @@
         {
             _ = ClickAsync();
         }
+    }
+
+    private void HandleMouseEnter(MouseEventArgs args)
+    {
+        // Close any active submenu when hovering over this item
+        Context?.CloseActiveSubMenu();
     }
 
     // IMenubarItem implementation

@@ -96,6 +96,15 @@
     {
         if (Disabled) return;
 
+        // Close any other active submenu first
+        MenuContext?.CloseActiveSubMenu();
+        
+        // Register this submenu as the active one
+        if (MenuContext != null)
+        {
+            MenuContext.ActiveSubMenu = SubContext;
+        }
+
         // Open submenu on hover
         SubContext.Open(_triggerRef);
     }

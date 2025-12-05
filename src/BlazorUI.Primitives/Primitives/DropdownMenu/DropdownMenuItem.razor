@@ -9,6 +9,7 @@
      aria-disabled="@Disabled.ToString().ToLower()"
      @onclick="HandleClick"
      @onkeydown="HandleKeyDown"
+     @onmouseenter="HandleMouseEnter"
      @attributes="AdditionalAttributes">
     @ChildContent
 </div>
@@ -93,6 +94,12 @@
         {
             _ = ClickAsync();
         }
+    }
+
+    private void HandleMouseEnter(MouseEventArgs args)
+    {
+        // Close any active submenu when hovering over this item
+        Context?.CloseActiveSubMenu();
     }
 
     // IDropdownMenuItem implementation

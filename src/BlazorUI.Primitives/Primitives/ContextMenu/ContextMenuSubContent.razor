@@ -12,6 +12,7 @@
          role="menu"
          tabindex="-1"
          @onkeydown="HandleKeyDown"
+         @onkeydown:stopPropagation="true"
          @onmouseleave="HandleMouseLeave"
          @attributes="GetAttributesWithoutStyle()"
          data-state="open"
@@ -143,7 +144,7 @@
         InvokeAsync(StateHasChanged);
     }
 
-    private void HandleKeyDown(KeyboardEventArgs args)
+    private async void HandleKeyDown(KeyboardEventArgs args)
     {
         switch (args.Key)
         {
@@ -151,12 +152,25 @@
                 if (CloseOnEscape)
                 {
                     SubContext.Close();
+                    // Focus will be handled by parent menu
                 }
                 break;
 
             case "ArrowLeft":
-                // Close submenu and return focus to parent
+                // Close submenu and return focus to trigger
                 SubContext.Close();
+                // Restore focus to the trigger element
+                if (SubContext.TriggerElement.HasValue)
+                {
+                    try
+                    {
+                        await SubContext.TriggerElement.Value.FocusAsync();
+                    }
+                    catch
+                    {
+                        // Focus may fail
+                    }
+                }
                 break;
 
             case "ArrowDown":
