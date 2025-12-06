@@ -108,6 +108,7 @@
     private bool _shouldPreventDefault;
     private bool _isDropdownFocused;
     private bool _hasFocus;
+    private bool _needsRefocus;
     
     /// <summary>
     /// The currently selected date.
@@ -239,6 +240,22 @@
         _previousSelectedDate = SelectedDate;
     }
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        // Refocus the calendar container after month changes due to keyboard navigation
+        // This is needed because @key="_displayedMonth" on tbody recreates the DOM,
+        // which causes the browser to lose focus on the calendar container
+        if (_needsRefocus)
+        {
+            _needsRefocus = false;
+            await _calendarRef.FocusAsync();
+            // Trigger re-render to update focus ring visibility after focus is restored
+            // The FocusAsync() call triggers OnFocus which sets _hasFocus = true,
+            // but we need StateHasChanged to re-render and show the focus ring
+            StateHasChanged();
+        }
+    }
+
     /// <summary>
     /// Gets the list of months for dropdown selection.
     /// </summary>
@@ -366,6 +383,7 @@
 
     /// <summary>
     /// Ensures the focused date's month is visible.
+    /// Sets _needsRefocus flag when month changes to restore focus after DOM recreation.
     /// </summary>
     private void EnsureVisibleMonth()
     {
@@ -373,6 +391,9 @@
         if (focusedMonth != _displayedMonth)
         {
             _displayedMonth = focusedMonth;
+            // Month changed - the @key directive will recreate the tbody,
+            // so we need to refocus the calendar container after render
+            _needsRefocus = true;
         }
     }
 
