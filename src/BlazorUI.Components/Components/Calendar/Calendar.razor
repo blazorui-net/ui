@@ -67,7 +67,7 @@
                         }
                     </tr>
                 </thead>
-                <tbody>
+                <tbody @key="_displayedMonth">
                     @foreach (var week in GetWeeks())
                     {
                         <tr class="flex w-full mt-2">
@@ -502,8 +502,10 @@
 
     private string GetDayClass(DateOnly date)
     {
+        // Note: We don't use focus-visible:ring styles here because we manage focus rings programmatically
+        // via IsFocused() to prevent duplicate focus rings when Blazor reuses DOM elements during month changes
         var baseClass = "inline-flex h-9 w-9 items-center justify-center whitespace-nowrap rounded-md text-sm font-normal ring-offset-background transition-colors " +
-                       "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 " +
+                       "focus-visible:outline-none " +
                        "disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground";
 
         var classes = new List<string> { baseClass };
