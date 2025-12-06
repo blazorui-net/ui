@@ -23,11 +23,29 @@
             </div>
 
             <div class="flex flex-col gap-4">
-                <div class="rounded-md border">
+                <div>
                     <Calendar @bind-SelectedDate="selectedDate1" />
                 </div>
                 <p class="text-sm text-muted-foreground">
                     Selected: @(selectedDate1?.ToString("D") ?? "None")
+                </p>
+            </div>
+        </section>
+
+        <section class="space-y-4">
+            <div class="space-y-2">
+                <h2 class="text-2xl font-semibold">Dropdown Mode</h2>
+                <p class="text-muted-foreground">
+                    Use dropdown selects for quick month and year navigation.
+                </p>
+            </div>
+
+            <div class="flex flex-col gap-4">
+                <div>
+                    <Calendar @bind-SelectedDate="selectedDate5" CaptionLayout="CalendarCaptionLayout.Dropdown" />
+                </div>
+                <p class="text-sm text-muted-foreground">
+                    Selected: @(selectedDate5?.ToString("D") ?? "None")
                 </p>
             </div>
         </section>
@@ -41,7 +59,7 @@
             </div>
 
             <div class="flex flex-col gap-4">
-                <div class="rounded-md border">
+                <div>
                     <Calendar @bind-SelectedDate="selectedDate2"
                               MinDate="DateOnly.FromDateTime(DateTime.Today)"
                               MaxDate="DateOnly.FromDateTime(DateTime.Today.AddMonths(3))" />
@@ -63,7 +81,7 @@
             </div>
 
             <div class="flex flex-col gap-4">
-                <div class="rounded-md border">
+                <div>
                     <Calendar @bind-SelectedDate="selectedDate3"
                               IsDateDisabled="IsWeekend" />
                 </div>
@@ -84,7 +102,7 @@
             </div>
 
             <div class="flex flex-col gap-4">
-                <div class="rounded-md border">
+                <div>
                     <Calendar @bind-SelectedDate="selectedDate4"
                               InitialMonth="new DateOnly(2025, 12, 1)" />
                 </div>
@@ -105,10 +123,10 @@
             </div>
 
             <div class="flex gap-4">
-                <div class="rounded-md border">
+                <div>
                     <Calendar @bind-SelectedDate="rangeStart" />
                 </div>
-                <div class="rounded-md border">
+                <div>
                     <Calendar @bind-SelectedDate="rangeEnd" />
                 </div>
             </div>
@@ -126,6 +144,7 @@
                 <li>MinDate and MaxDate constraints</li>
                 <li>Custom date disabling via IsDateDisabled function</li>
                 <li>Month navigation with previous/next buttons</li>
+                <li>Dropdown mode for quick month/year selection</li>
                 <li>Culture-aware formatting and first day of week</li>
                 <li>ARIA grid roles for accessibility</li>
                 <li>Full keyboard navigation support</li>
@@ -144,6 +163,18 @@
                 <div class="flex gap-4">
                     <kbd class="px-2 py-1 bg-muted rounded">↑/↓</kbd>
                     <span>Previous/Next week</span>
+                </div>
+                <div class="flex gap-4">
+                    <kbd class="px-2 py-1 bg-muted rounded">Home/End</kbd>
+                    <span>First/Last day of month</span>
+                </div>
+                <div class="flex gap-4">
+                    <kbd class="px-2 py-1 bg-muted rounded">PageUp/PageDown</kbd>
+                    <span>Previous/Next month</span>
+                </div>
+                <div class="flex gap-4">
+                    <kbd class="px-2 py-1 bg-muted rounded">Shift+PageUp/PageDown</kbd>
+                    <span>Previous/Next year</span>
                 </div>
                 <div class="flex gap-4">
                     <kbd class="px-2 py-1 bg-muted rounded">Enter/Space</kbd>
@@ -185,6 +216,7 @@
     private DateOnly? selectedDate2;
     private DateOnly? selectedDate3;
     private DateOnly? selectedDate4;
+    private DateOnly? selectedDate5;
     private DateOnly? rangeStart;
     private DateOnly? rangeEnd;
 
