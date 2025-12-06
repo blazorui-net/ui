@@ -80,6 +80,7 @@
                                                 @onclick="@(() => SelectDate(day.Value))"
                                                 disabled="@(!IsDateEnabled(day.Value))"
                                                 class="@GetDayClass(day.Value)"
+                                                data-focused="@IsFocused(day.Value)"
                                                 aria-label="@day.Value.ToString("D", Culture)"
                                                 aria-selected="@IsSelected(day.Value)">
                                             @day.Value.Day
@@ -378,8 +379,20 @@
     /// <summary>
     /// Checks if the date is the currently focused date (for keyboard navigation).
     /// Only shows focus ring when the calendar container has focus.
+    /// The logic is straightforward: only the exact _focusedDate gets the focus ring,
+    /// and only if the calendar has focus. This prevents any stale focus rings because
+    /// each date is checked against the current _focusedDate value.
     /// </summary>
-    private bool IsFocused(DateOnly date) => _hasFocus && date == _focusedDate;
+    private bool IsFocused(DateOnly date)
+    {
+        // Must have focus on the calendar container
+        if (!_hasFocus) return false;
+        
+        // Only the exact focused date gets the ring
+        // This comparison is by value (year, month, day), not by DOM position,
+        // so there's no possibility of the "wrong" date getting the focus ring
+        return date == _focusedDate;
+    }
 
     private void OnFocus() => _hasFocus = true;
     private void OnBlur() => _hasFocus = false;
