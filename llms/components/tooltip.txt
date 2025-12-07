@@ -56,6 +56,27 @@ The Tooltip component displays brief information on hover or focus. Features del
 
 ---
 
+## AsChild Pattern
+
+Use `AsChild` on `TooltipTrigger` to use your own element as the trigger instead of the default `<span>`:
+
+```razor
+<Tooltip>
+    <TooltipTrigger AsChild>
+        <Button Variant="ButtonVariant.Ghost" Size="ButtonSize.Icon">
+            <LucideIcon Name="info" Size="16" />
+        </Button>
+    </TooltipTrigger>
+    <TooltipContent>
+        Additional information
+    </TooltipContent>
+</Tooltip>
+```
+
+**Note:** When `AsChild` is true, the child component (Button) automatically receives trigger behavior via `TriggerContext` including hover/focus event handling for showing/hiding the tooltip.
+
+---
+
 ## Examples
 
 ### Icon with Tooltip

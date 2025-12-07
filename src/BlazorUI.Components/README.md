@@ -76,6 +76,11 @@ BlazorUI Components come with pre-built CSS - no Tailwind setup required!
                 Beautiful Blazor components with zero configuration
             </DialogDescription>
         </DialogHeader>
+        <DialogFooter>
+            <DialogClose AsChild>
+                <Button Variant="ButtonVariant.Outline">Close</Button>
+            </DialogClose>
+        </DialogFooter>
     </DialogContent>
 </Dialog>
 ```
@@ -161,7 +166,9 @@ Dark mode automatically activates when you add the `.dark` class to the `<html>`
 @using BlazorUI.Components.Dialog
 
 <Dialog>
-    <DialogTrigger>Open Dialog</DialogTrigger>
+    <DialogTrigger AsChild>
+        <Button>Open Dialog</Button>
+    </DialogTrigger>
     <DialogContent>
         <DialogHeader>
             <DialogTitle>Confirm Action</DialogTitle>
@@ -171,12 +178,35 @@ Dark mode automatically activates when you add the `.dark` class to the `<html>`
         </DialogHeader>
         <p>This action cannot be undone.</p>
         <DialogFooter>
-            <DialogClose>Cancel</DialogClose>
-            <Button Variant="default">Confirm</Button>
+            <DialogClose AsChild>
+                <Button Variant="ButtonVariant.Outline">Cancel</Button>
+            </DialogClose>
+            <Button Variant="ButtonVariant.Default">Confirm</Button>
         </DialogFooter>
     </DialogContent>
 </Dialog>
 ```
+
+### AsChild Pattern
+
+Use `AsChild` on trigger components to use your own styled elements instead of the default button:
+
+```razor
+<DropdownMenu>
+    <DropdownMenuTrigger AsChild>
+        <Button Variant="ButtonVariant.Outline">
+            Actions
+            <LucideIcon Name="chevron-down" Size="16" />
+        </Button>
+    </DropdownMenuTrigger>
+    <DropdownMenuContent>
+        <DropdownMenuItem>Edit</DropdownMenuItem>
+        <DropdownMenuItem>Delete</DropdownMenuItem>
+    </DropdownMenuContent>
+</DropdownMenu>
+```
+
+This is the industry-standard pattern from Radix UI/shadcn/ui. When `AsChild` is true, the child component (e.g., Button) automatically receives trigger behavior via `TriggerContext`.
 
 ## Button Variants
 

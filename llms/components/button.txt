@@ -296,6 +296,71 @@ Add to `_Imports.razor`:
 
 ---
 
+## AsChild Support (TriggerContext)
+
+Button automatically integrates with trigger components when used with `AsChild`. The Button receives a cascading `TriggerContext` that provides:
+
+- **Click handling**: Automatically toggles/opens/closes the parent component
+- **ARIA attributes**: aria-haspopup, aria-expanded, aria-controls
+- **Keyboard navigation**: Arrow keys for dropdown menus, Enter/Space for all triggers
+- **Hover/Focus events**: For Tooltip and HoverCard components
+
+### Button as Dialog Trigger
+
+```razor
+<Dialog>
+    <DialogTrigger AsChild>
+        <Button Variant="ButtonVariant.Destructive">Delete Account</Button>
+    </DialogTrigger>
+    <DialogContent>
+        <DialogHeader>
+            <DialogTitle>Delete Account</DialogTitle>
+            <DialogDescription>This action cannot be undone.</DialogDescription>
+        </DialogHeader>
+        <DialogFooter>
+            <DialogClose AsChild>
+                <Button Variant="ButtonVariant.Outline">Cancel</Button>
+            </DialogClose>
+            <Button Variant="ButtonVariant.Destructive">Delete</Button>
+        </DialogFooter>
+    </DialogContent>
+</Dialog>
+```
+
+### Button as Dropdown Menu Trigger
+
+```razor
+<DropdownMenu>
+    <DropdownMenuTrigger AsChild>
+        <Button Variant="ButtonVariant.Outline">
+            Actions
+            <LucideIcon Name="chevron-down" Size="16" />
+        </Button>
+    </DropdownMenuTrigger>
+    <DropdownMenuContent>
+        <DropdownMenuItem>Edit</DropdownMenuItem>
+        <DropdownMenuItem>Delete</DropdownMenuItem>
+    </DropdownMenuContent>
+</DropdownMenu>
+```
+
+### Button as Tooltip Trigger
+
+```razor
+<Tooltip>
+    <TooltipTrigger AsChild>
+        <Button Size="ButtonSize.Icon" Variant="ButtonVariant.Ghost">
+            <LucideIcon Name="info" Size="16" />
+        </Button>
+    </TooltipTrigger>
+    <TooltipContent>
+        Additional information
+    </TooltipContent>
+</Tooltip>
+```
+
+---
+
 ## Composition Patterns
 
 ### Button Group

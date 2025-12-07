@@ -1,17 +1,28 @@
 @namespace BlazorUI.Primitives.HoverCard
 @using System.Timers
+@using BlazorUI.Primitives.Utilities
 @implements IDisposable
 
 @* HoverCardTrigger primitive - trigger element that opens on hover *@
-<div id="@Context.TriggerId"
-     @ref="_triggerRef"
-     @onmouseenter="HandleMouseEnter"
-     @onmouseleave="HandleMouseLeave"
-     @onfocus="HandleFocus"
-     @onblur="HandleBlur"
-     @attributes="AdditionalAttributes">
-    @ChildContent
-</div>
+@if (AsChild)
+{
+    @* When AsChild is true, pass trigger context to child for it to handle *@
+    <CascadingValue Value="TriggerContext" Name="TriggerContext">
+        @ChildContent
+    </CascadingValue>
+}
+else
+{
+    <div id="@Context.TriggerId"
+         @ref="_triggerRef"
+         @onmouseenter="HandleMouseEnter"
+         @onmouseleave="HandleMouseLeave"
+         @onfocus="HandleFocus"
+         @onblur="HandleBlur"
+         @attributes="AdditionalAttributes">
+        @ChildContent
+    </div>
+}
 
 @code {
     private ElementReference _triggerRef;
@@ -31,10 +42,88 @@
     public RenderFragment? ChildContent { get; set; }
 
     /// <summary>
+    /// When true, the trigger does not render its own div element.
+    /// Instead, it passes trigger behavior via TriggerContext to child components.
+    /// The child component must consume TriggerContext and apply hover/focus behavior.
+    /// </summary>
+    [Parameter]
+    public bool AsChild { get; set; } = false;
+
+    /// <summary>
     /// Additional attributes to apply to the trigger element.
     /// </summary>
     [Parameter(CaptureUnmatchedValues = true)]
     public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    /// <summary>
+    /// Stores the trigger element reference when using AsChild pattern.
+    /// </summary>
+    private ElementReference? _asChildTriggerRef;
+
+    /// <summary>
+    /// Context passed to child components when AsChild is true.
+    /// </summary>
+    private TriggerContext TriggerContext => new()
+    {
+        TriggerId = Context.TriggerId,
+        IsOpen = Context.IsOpen,
+        Open = () => Context.Open(_asChildTriggerRef),
+        Close = () => Context.Close(),
+        OnMouseEnter = HandleMouseEnterForContext,
+        OnMouseLeave = HandleMouseLeaveForContext,
+        OnFocus = HandleFocusForContext,
+        OnBlur = HandleBlurForContext,
+        SetTriggerElement = (ElementReference el) => _asChildTriggerRef = el
+    };
+
+    private void HandleMouseEnterForContext()
+    {
+        CancelCloseTimer();
+        if (!Context.IsOpen)
+        {
+            _openTimer?.Dispose();
+            _openTimer = new System.Timers.Timer(Context.OpenDelay);
+            _openTimer.Elapsed += OnOpenTimerElapsedForContext;
+            _openTimer.AutoReset = false;
+            _openTimer.Start();
+        }
+    }
+
+    private void HandleMouseLeaveForContext()
+    {
+        CancelOpenTimer();
+        if (Context.IsOpen)
+        {
+            _closeTimer?.Dispose();
+            _closeTimer = new System.Timers.Timer(Context.CloseDelay);
+            _closeTimer.Elapsed += OnCloseTimerElapsed;
+            _closeTimer.AutoReset = false;
+            _closeTimer.Start();
+        }
+    }
+
+    private void HandleFocusForContext()
+    {
+        CancelCloseTimer();
+        if (!Context.IsOpen)
+        {
+            Context.Open(_asChildTriggerRef);
+            InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private void HandleBlurForContext()
+    {
+        CancelOpenTimer();
+        if (Context.IsOpen)
+        {
+            _closeTimer?.Dispose();
+            _closeTimer = new System.Timers.Timer(Context.CloseDelay);
+            _closeTimer.Elapsed += OnCloseTimerElapsed;
+            _closeTimer.AutoReset = false;
+            _closeTimer.Start();
+        }
+    }
 
     protected override void OnInitialized()
     {
@@ -104,6 +193,15 @@
         InvokeAsync(() =>
         {
             Context.Open(_triggerRef);
+            StateHasChanged();
+        });
+    }
+
+    private void OnOpenTimerElapsedForContext(object? sender, ElapsedEventArgs e)
+    {
+        InvokeAsync(() =>
+        {
+            Context.Open(_asChildTriggerRef);
             StateHasChanged();
         });
     }

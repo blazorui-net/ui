@@ -1,4 +1,5 @@
 using BlazorUI.Components.Utilities;
+using BlazorUI.Primitives.Utilities;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 
@@ -139,6 +140,22 @@ public partial class Button : ComponentBase
     public IconPosition IconPosition { get; set; } = IconPosition.Start;
 
     /// <summary>
+    /// Gets the trigger context from a parent trigger component when using AsChild pattern.
+    /// </summary>
+    /// <remarks>
+    /// When a Button is used as a child of a trigger component with AsChild=true,
+    /// it automatically receives this context to handle trigger behavior (click to toggle,
+    /// aria attributes, etc.).
+    /// </remarks>
+    [CascadingParameter(Name = "TriggerContext")]
+    public TriggerContext? TriggerContext { get; set; }
+
+    /// <summary>
+    /// Reference to the button element for positioning support when used with AsChild.
+    /// </summary>
+    private ElementReference _buttonRef;
+
+    /// <summary>
     /// Gets the computed CSS classes for the button element.
     /// </summary>
     /// <remarks>
@@ -198,13 +215,88 @@ public partial class Button : ComponentBase
     /// <param name="args">The mouse event arguments.</param>
     /// <remarks>
     /// This method is invoked when the button is clicked and not disabled.
-    /// It triggers the OnClick callback if one is registered.
+    /// If a TriggerContext is present (from AsChild pattern), it invokes Toggle or Close.
+    /// It also triggers the OnClick callback if one is registered.
     /// </remarks>
     private async Task HandleClick(MouseEventArgs args)
     {
-        if (!Disabled && OnClick.HasDelegate)
+        if (Disabled) return;
+
+        // Handle trigger context behavior (from AsChild pattern)
+        if (TriggerContext != null)
+        {
+            // For close buttons (no Toggle, only Close)
+            if (TriggerContext.Toggle == null && TriggerContext.Close != null)
+            {
+                TriggerContext.Close.Invoke();
+            }
+            // For trigger buttons (have Toggle)
+            else if (TriggerContext.Toggle != null)
+            {
+                TriggerContext.Toggle.Invoke();
+            }
+        }
+
+        // Invoke the OnClick callback
+        if (OnClick.HasDelegate)
         {
             await OnClick.InvokeAsync(args);
+        }
+    }
+
+    /// <summary>
+    /// Handles keyboard events for trigger context (dropdown menu arrow keys, etc.).
+    /// </summary>
+    private async Task HandleKeyDown(KeyboardEventArgs args)
+    {
+        if (Disabled) return;
+
+        if (TriggerContext?.OnKeyDown != null)
+        {
+            await TriggerContext.OnKeyDown.Invoke(args);
+        }
+    }
+
+    /// <summary>
+    /// Handles mouse enter events for hover-triggered components (Tooltip, HoverCard).
+    /// </summary>
+    private void HandleMouseEnter()
+    {
+        TriggerContext?.OnMouseEnter?.Invoke();
+    }
+
+    /// <summary>
+    /// Handles mouse leave events for hover-triggered components.
+    /// </summary>
+    private void HandleMouseLeave()
+    {
+        TriggerContext?.OnMouseLeave?.Invoke();
+    }
+
+    /// <summary>
+    /// Handles focus events for focus-triggered components.
+    /// </summary>
+    private void HandleFocus()
+    {
+        TriggerContext?.OnFocus?.Invoke();
+    }
+
+    /// <summary>
+    /// Handles blur events for focus-triggered components.
+    /// </summary>
+    private void HandleBlur()
+    {
+        TriggerContext?.OnBlur?.Invoke();
+    }
+
+    /// <summary>
+    /// Registers the button element reference with the trigger context for positioning.
+    /// </summary>
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender && TriggerContext?.SetTriggerElement != null)
+        {
+            TriggerContext.SetTriggerElement.Invoke(_buttonRef);
         }
     }
 }

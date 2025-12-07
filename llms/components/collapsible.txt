@@ -47,9 +47,11 @@ The Collapsible component provides an expandable/collapsible content area with s
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
-| `AsChild` | `bool` | `false` | Whether to use child as trigger |
+| `AsChild` | `bool` | `false` | When true, uses child component as trigger via TriggerContext |
 | `Class` | `string?` | `null` | Additional CSS classes (use for chevron animation) |
 | `ChildContent` | `RenderFragment?` | `null` | Trigger content |
+
+**Note:** When `AsChild` is true, the child component (e.g., Button) automatically receives trigger behavior via `TriggerContext` including click handling and keyboard navigation (Enter/Space).
 
 ### `<CollapsibleContent>`
 

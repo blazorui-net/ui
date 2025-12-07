@@ -356,9 +356,7 @@ After setup, verify everything works by creating a test page:
     <Button Variant="outline">Outline Button</Button>
 
     <Dialog>
-        <DialogTrigger AsChild>
-            <Button>Open Dialog</Button>
-        </DialogTrigger>
+        <DialogTrigger>Open Dialog</DialogTrigger>
         <DialogContent>
             <DialogHeader>
                 <DialogTitle>Test Dialog</DialogTitle>

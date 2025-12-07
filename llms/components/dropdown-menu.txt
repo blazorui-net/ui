@@ -77,6 +77,28 @@ The DropdownMenu component displays context menus with items, separators, keyboa
 
 ---
 
+## AsChild Pattern
+
+Use `AsChild` on `DropdownMenuTrigger` to use your own element (like a styled Button) as the trigger instead of the default `<button>`:
+
+```razor
+<DropdownMenu>
+    <DropdownMenuTrigger AsChild>
+        <Button Variant="ButtonVariant.Ghost" Size="ButtonSize.Icon">
+            <LucideIcon Name="more-vertical" Size="16" />
+        </Button>
+    </DropdownMenuTrigger>
+    <DropdownMenuContent>
+        <DropdownMenuItem>Edit</DropdownMenuItem>
+        <DropdownMenuItem>Delete</DropdownMenuItem>
+    </DropdownMenuContent>
+</DropdownMenu>
+```
+
+**Note:** When `AsChild` is true, the child component (Button) automatically receives trigger behavior via `TriggerContext` including click handling, aria-haspopup, aria-expanded, and keyboard navigation.
+
+---
+
 ## Examples
 
 See **llms/patterns.txt** - Data Table with Sorting and Pagination for complete examples.

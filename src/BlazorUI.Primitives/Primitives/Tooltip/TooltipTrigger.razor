@@ -1,17 +1,28 @@
 @namespace BlazorUI.Primitives.Tooltip
+@using BlazorUI.Primitives.Utilities
 
 @* Tooltip trigger - shows tooltip on hover/focus *@
-<span @ref="@_triggerRef"
-      id="@Context.TriggerId"
-      @onmouseenter="HandleMouseEnter"
-      @onmouseleave="HandleMouseLeave"
-      @onfocus="HandleFocus"
-      @onblur="HandleBlur"
-      @attributes="AdditionalAttributes"
-      tabindex="@(Focusable ? "0" : null)"
-      aria-describedby="@(Context.IsOpen ? Context.TooltipId : null)">
-    @ChildContent
-</span>
+@if (AsChild)
+{
+    @* When AsChild is true, pass trigger context to child for it to handle *@
+    <CascadingValue Value="TriggerContext" Name="TriggerContext">
+        @ChildContent
+    </CascadingValue>
+}
+else
+{
+    <span @ref="@_triggerRef"
+          id="@Context.TriggerId"
+          @onmouseenter="HandleMouseEnter"
+          @onmouseleave="HandleMouseLeave"
+          @onfocus="HandleFocus"
+          @onblur="HandleBlur"
+          @attributes="AdditionalAttributes"
+          tabindex="@(Focusable ? "0" : null)"
+          aria-describedby="@(Context.IsOpen ? Context.TooltipId : null)">
+        @ChildContent
+    </span>
+}
 
 @code {
     [CascadingParameter]
@@ -24,6 +35,14 @@
     /// </summary>
     [Parameter]
     public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>
+    /// When true, the trigger does not render its own span element.
+    /// Instead, it passes trigger behavior via TriggerContext to child components.
+    /// The child component must consume TriggerContext and apply hover/focus behavior.
+    /// </summary>
+    [Parameter]
+    public bool AsChild { get; set; } = false;
 
     /// <summary>
     /// Additional attributes to apply to the trigger element.
@@ -49,6 +68,27 @@
     /// </summary>
     [Parameter]
     public EventCallback<MouseEventArgs> OnMouseLeave { get; set; }
+
+    /// <summary>
+    /// Stores the trigger element reference when using AsChild pattern.
+    /// </summary>
+    private ElementReference? _asChildTriggerRef;
+
+    /// <summary>
+    /// Context passed to child components when AsChild is true.
+    /// </summary>
+    private TriggerContext TriggerContext => new()
+    {
+        TriggerId = Context.TriggerId,
+        IsOpen = Context.IsOpen,
+        Open = () => Context.Open(_asChildTriggerRef),
+        Close = () => Context.Close(),
+        OnMouseEnter = () => Context.Open(_asChildTriggerRef),
+        OnMouseLeave = () => Context.Close(),
+        OnFocus = () => Context.Open(_asChildTriggerRef),
+        OnBlur = () => Context.Close(),
+        SetTriggerElement = (ElementReference el) => _asChildTriggerRef = el
+    };
 
     private async Task HandleMouseEnter(MouseEventArgs args)
     {

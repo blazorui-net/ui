@@ -11,6 +11,56 @@
     </div>
 
     <div class="space-y-6">
+        <!-- AsChild Pattern -->
+        <section class="space-y-4">
+            <div class="space-y-2">
+                <h2 class="text-2xl font-semibold">AsChild Pattern</h2>
+                <p class="text-muted-foreground">
+                    Use AsChild to compose triggers with your own styled elements.
+                </p>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-6">
+                <!-- Without AsChild -->
+                <div class="space-y-3 p-4 border rounded-lg">
+                    <h3 class="text-lg font-medium">Without AsChild</h3>
+                    <p class="text-sm text-muted-foreground">
+                        HoverCardTrigger renders its own div element.
+                    </p>
+                    <HoverCard>
+                        <HoverCardTrigger class="px-4 py-2 border rounded cursor-pointer">
+                            Hover me
+                        </HoverCardTrigger>
+                        <HoverCardContent class="bg-popover text-popover-foreground border border-border rounded-lg p-4 shadow-lg w-[250px]">
+                            <p class="text-sm">Without AsChild hover card</p>
+                        </HoverCardContent>
+                    </HoverCard>
+                </div>
+
+                <!-- With AsChild -->
+                <div class="space-y-3 p-4 border rounded-lg">
+                    <h3 class="text-lg font-medium">With AsChild</h3>
+                    <p class="text-sm text-muted-foreground">
+                        Button receives hover/focus behavior via TriggerContext.
+                    </p>
+                    <HoverCard>
+                        <HoverCardTrigger AsChild>
+                            <Button Variant="ButtonVariant.Link">@@johndoe</Button>
+                        </HoverCardTrigger>
+                        <HoverCardContent class="bg-popover text-popover-foreground border border-border rounded-lg p-4 shadow-lg w-[250px]">
+                            <div class="flex gap-3">
+                                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-purple-700"></div>
+                                <div>
+                                    <div class="font-semibold">John Doe</div>
+                                    <p class="text-xs text-muted-foreground">Software Developer</p>
+                                </div>
+                            </div>
+                        </HoverCardContent>
+                    </HoverCard>
+                </div>
+            </div>
+        </section>
+
         <h2 class="text-2xl font-semibold">Basic Usage</h2>
         <p class="text-sm text-muted-foreground">
             Hover over the trigger to show the hover card. Content appears after a delay.

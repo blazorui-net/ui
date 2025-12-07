@@ -50,9 +50,7 @@ The Dialog component provides accessible modal dialogs with backdrop overlay, fo
 
 ```razor
 <Dialog>
-    <DialogTrigger AsChild>
-        <Button>Open Dialog</Button>
-    </DialogTrigger>
+    <DialogTrigger>Open Dialog</DialogTrigger>
     <DialogContent>
         <DialogHeader>
             <DialogTitle>Dialog Title</DialogTitle>
@@ -60,9 +58,7 @@ The Dialog component provides accessible modal dialogs with backdrop overlay, fo
         </DialogHeader>
         <p>Dialog content goes here</p>
         <DialogFooter>
-            <DialogClose AsChild>
-                <Button Variant="ButtonVariant.Outline">Cancel</Button>
-            </DialogClose>
+            <DialogClose>Cancel</DialogClose>
             <Button>Confirm</Button>
         </DialogFooter>
     </DialogContent>
@@ -71,11 +67,52 @@ The Dialog component provides accessible modal dialogs with backdrop overlay, fo
 
 ---
 
+## AsChild Pattern
+
+Use `AsChild` to render your own element as the trigger or close button instead of the default `<button>`.
+
+### DialogTrigger with AsChild
+
+```razor
+<Dialog>
+    <DialogTrigger AsChild>
+        <Button Variant="ButtonVariant.Destructive">Delete Account</Button>
+    </DialogTrigger>
+    <DialogContent>
+        <DialogHeader>
+            <DialogTitle>Delete Account</DialogTitle>
+            <DialogDescription>This action cannot be undone.</DialogDescription>
+        </DialogHeader>
+        <DialogFooter>
+            <DialogClose AsChild>
+                <Button Variant="ButtonVariant.Outline">Cancel</Button>
+            </DialogClose>
+            <Button Variant="ButtonVariant.Destructive">Delete</Button>
+        </DialogFooter>
+    </DialogContent>
+</Dialog>
+```
+
+### DialogClose with AsChild
+
+```razor
+<DialogClose AsChild>
+    <Button Variant="ButtonVariant.Ghost" Size="ButtonSize.Icon">
+        <LucideIcon Name="x" Size="16" />
+    </Button>
+</DialogClose>
+```
+
+**Note:** When `AsChild` is true, the child component (Button) automatically receives trigger behavior via `TriggerContext` and handles click events, aria attributes, etc.
+
+---
+
 ## Examples
 
 See **llms/patterns.txt** for complete examples:
 - Dialog with Form
 - Confirmation Dialog
+- AsChild Pattern Examples
 
 ---
 

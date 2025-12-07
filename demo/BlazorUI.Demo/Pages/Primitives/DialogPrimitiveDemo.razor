@@ -12,6 +12,66 @@
     </div>
 
     <div class="space-y-6">
+        <!-- AsChild Pattern -->
+        <section class="space-y-4">
+            <div class="space-y-2">
+                <h2 class="text-2xl font-semibold">AsChild Pattern</h2>
+                <p class="text-muted-foreground">
+                    Use AsChild to compose triggers with your own styled elements.
+                </p>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-6">
+                <!-- Without AsChild -->
+                <div class="space-y-3 p-4 border rounded-lg">
+                    <h3 class="text-lg font-medium">Without AsChild</h3>
+                    <p class="text-sm text-muted-foreground">
+                        DialogTrigger renders its own button element.
+                    </p>
+                    <Dialog>
+                        <DialogTrigger class="px-3 py-2 border rounded text-sm">
+                            Open Dialog
+                        </DialogTrigger>
+                        <DialogPortal>
+                            <DialogOverlay class="fixed inset-0 bg-black/50 z-50" />
+                            <DialogContent class="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-background p-6 rounded-lg border max-w-md z-50">
+                                <DialogTitle class="text-lg font-semibold mb-2">Without AsChild</DialogTitle>
+                                <DialogDescription class="text-sm text-muted-foreground mb-4">
+                                    Trigger rendered its own button element.
+                                </DialogDescription>
+                                <DialogClose class="px-3 py-2 border rounded text-sm">Close</DialogClose>
+                            </DialogContent>
+                        </DialogPortal>
+                    </Dialog>
+                </div>
+
+                <!-- With AsChild -->
+                <div class="space-y-3 p-4 border rounded-lg">
+                    <h3 class="text-lg font-medium">With AsChild</h3>
+                    <p class="text-sm text-muted-foreground">
+                        Button receives click behavior via TriggerContext.
+                    </p>
+                    <Dialog>
+                        <DialogTrigger AsChild>
+                            <Button Variant="ButtonVariant.Outline">Open Dialog</Button>
+                        </DialogTrigger>
+                        <DialogPortal>
+                            <DialogOverlay class="fixed inset-0 bg-black/50 z-50" />
+                            <DialogContent class="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-background p-6 rounded-lg border max-w-md z-50">
+                                <DialogTitle class="text-lg font-semibold mb-2">With AsChild</DialogTitle>
+                                <DialogDescription class="text-sm text-muted-foreground mb-4">
+                                    Button component handles the trigger behavior.
+                                </DialogDescription>
+                                <DialogClose AsChild>
+                                    <Button Variant="ButtonVariant.Secondary">Close</Button>
+                                </DialogClose>
+                            </DialogContent>
+                        </DialogPortal>
+                    </Dialog>
+                </div>
+            </div>
+        </section>
+
         <section class="space-y-4">
             <div class="space-y-2">
                 <h2 class="text-2xl font-semibold">Basic Headless Primitive</h2>

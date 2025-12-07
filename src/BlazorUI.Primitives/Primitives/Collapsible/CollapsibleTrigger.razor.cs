@@ -1,3 +1,4 @@
+using BlazorUI.Primitives.Utilities;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 
@@ -68,6 +69,14 @@ public partial class CollapsibleTrigger : ComponentBase
     public RenderFragment? ChildContent { get; set; }
 
     /// <summary>
+    /// When true, the trigger does not render its own button element.
+    /// Instead, it passes trigger behavior via TriggerContext to child components.
+    /// The child component must consume TriggerContext and apply click behavior.
+    /// </summary>
+    [Parameter]
+    public bool AsChild { get; set; } = false;
+
+    /// <summary>
     /// Gets or sets additional attributes to be applied to the button element.
     /// </summary>
     /// <value>
@@ -75,6 +84,15 @@ public partial class CollapsibleTrigger : ComponentBase
     /// </value>
     [Parameter(CaptureUnmatchedValues = true)]
     public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    /// <summary>
+    /// Context passed to child components when AsChild is true.
+    /// </summary>
+    private TriggerContext TriggerContext => new()
+    {
+        IsOpen = Context?.Open ?? false,
+        Toggle = () => Context?.Toggle?.Invoke()
+    };
 
     /// <summary>
     /// Handles click events on the trigger to toggle the collapsible state.

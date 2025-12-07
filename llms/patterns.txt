@@ -77,9 +77,7 @@ Use Dialog to create modal forms for editing or creating data:
 @using BlazorUI.Components
 
 <Dialog>
-    <DialogTrigger AsChild>
-        <Button>Edit Profile</Button>
-    </DialogTrigger>
+    <DialogTrigger>Edit Profile</DialogTrigger>
     <DialogContent>
         <DialogHeader>
             <DialogTitle>Edit Profile</DialogTitle>
@@ -113,9 +111,7 @@ Use Dialog to create modal forms for editing or creating data:
         </div>
 
         <DialogFooter>
-            <DialogClose AsChild>
-                <Button Variant="outline">Cancel</Button>
-            </DialogClose>
+            <DialogClose>Cancel</DialogClose>
             <Button OnClick="SaveProfile">Save Changes</Button>
         </DialogFooter>
     </DialogContent>
@@ -178,10 +174,8 @@ Build powerful data tables with sorting, filtering, and pagination:
         <DataTableColumn TData="User" Title="Actions">
             <Template Context="user">
                 <DropdownMenu>
-                    <DropdownMenuTrigger AsChild>
-                        <Button Variant="ghost" Size="icon">
-                            <LucideIcon Name="more-horizontal" Size="16" />
-                        </Button>
+                    <DropdownMenuTrigger class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 hover:bg-accent hover:text-accent-foreground h-10 w-10">
+                        <LucideIcon Name="more-horizontal" Size="16" />
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>
                         <DropdownMenuItem OnClick="() => EditUser(user)">
@@ -289,14 +283,12 @@ Create a responsive sidebar with collapsible menus and keyboard shortcuts:
             <SidebarMenu>
                 <SidebarMenuItem>
                     <DropdownMenu>
-                        <DropdownMenuTrigger AsChild>
-                            <SidebarMenuButton>
-                                <Avatar>
-                                    <AvatarImage Src="@currentUser.AvatarUrl" />
-                                    <AvatarFallback>@currentUser.Initials</AvatarFallback>
-                                </Avatar>
-                                <span>@currentUser.Name</span>
-                            </SidebarMenuButton>
+                        <DropdownMenuTrigger class="flex w-full items-center gap-2 rounded-md p-2 text-left text-sm hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
+                            <Avatar>
+                                <AvatarImage Src="@currentUser.AvatarUrl" />
+                                <AvatarFallback>@currentUser.Initials</AvatarFallback>
+                            </Avatar>
+                            <span>@currentUser.Name</span>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent>
                             <DropdownMenuItem>
@@ -355,12 +347,10 @@ Build a searchable command palette for quick actions:
 @using BlazorUI.Components
 
 <Dialog @bind-Open="isOpen">
-    <DialogTrigger AsChild>
-        <Button Variant="outline" Class="w-full justify-start">
-            <LucideIcon Name="search" Size="16" />
-            Search commands...
-            <kbd class="ml-auto pointer-events-none">⌘K</kbd>
-        </Button>
+    <DialogTrigger class="inline-flex w-full items-center justify-start rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2">
+        <LucideIcon Name="search" Size="16" />
+        Search commands...
+        <kbd class="ml-auto pointer-events-none">⌘K</kbd>
     </DialogTrigger>
     <DialogContent Class="p-0">
         <Command>
@@ -627,9 +617,7 @@ Create reusable confirmation dialogs for destructive actions:
         </div>
 
         <DialogFooter>
-            <DialogClose AsChild>
-                <Button Variant="outline">Cancel</Button>
-            </DialogClose>
+            <DialogClose>Cancel</DialogClose>
             <Button Variant="destructive" OnClick="ConfirmDelete">
                 Delete Account
             </Button>
@@ -662,11 +650,9 @@ Create a multi-select dropdown using Popover and Checkbox:
 @using BlazorUI.Components
 
 <Popover>
-    <PopoverTrigger AsChild>
-        <Button Variant="outline" Class="w-64 justify-between">
-            @GetSelectedText()
-            <LucideIcon Name="chevron-down" Size="16" />
-        </Button>
+    <PopoverTrigger class="inline-flex w-64 items-center justify-between rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2">
+        @GetSelectedText()
+        <LucideIcon Name="chevron-down" Size="16" />
     </PopoverTrigger>
     <PopoverContent Class="w-64 p-0">
         <Command>
@@ -722,4 +708,86 @@ Create a multi-select dropdown using Popover and Checkbox:
 
 ---
 
-**Last Updated:** 2025-11-16
+## AsChild Pattern
+
+The `AsChild` pattern allows trigger and close components to pass their behavior to a child component instead of rendering their own button element. This is useful for using styled Button components or other custom elements as triggers.
+
+### Basic AsChild Usage
+
+```razor
+@using BlazorUI.Components
+
+@* Use Button as DialogTrigger *@
+<Dialog>
+    <DialogTrigger AsChild>
+        <Button Variant="ButtonVariant.Destructive">Delete Account</Button>
+    </DialogTrigger>
+    <DialogContent>
+        <DialogHeader>
+            <DialogTitle>Confirm Deletion</DialogTitle>
+        </DialogHeader>
+        <DialogFooter>
+            <DialogClose AsChild>
+                <Button Variant="ButtonVariant.Outline">Cancel</Button>
+            </DialogClose>
+            <Button Variant="ButtonVariant.Destructive">Delete</Button>
+        </DialogFooter>
+    </DialogContent>
+</Dialog>
+```
+
+### DropdownMenu with Button Trigger
+
+```razor
+<DropdownMenu>
+    <DropdownMenuTrigger AsChild>
+        <Button Variant="ButtonVariant.Outline">
+            Actions
+            <LucideIcon Name="chevron-down" Size="16" />
+        </Button>
+    </DropdownMenuTrigger>
+    <DropdownMenuContent>
+        <DropdownMenuItem>Edit</DropdownMenuItem>
+        <DropdownMenuItem>Delete</DropdownMenuItem>
+    </DropdownMenuContent>
+</DropdownMenu>
+```
+
+### InputGroup with DropdownMenu
+
+```razor
+<InputGroup>
+    <InputGroupInput Placeholder="Search..." />
+    <InputGroupAddon Align="InputGroupAlign.InlineEnd">
+        <DropdownMenu>
+            <DropdownMenuTrigger AsChild>
+                <InputGroupButton Variant="ButtonVariant.Ghost">
+                    <LucideIcon Name="chevron-down" Size="16" />
+                </InputGroupButton>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+                <DropdownMenuItem>All Results</DropdownMenuItem>
+                <DropdownMenuItem>Documents</DropdownMenuItem>
+                <DropdownMenuItem>Images</DropdownMenuItem>
+            </DropdownMenuContent>
+        </DropdownMenu>
+    </InputGroupAddon>
+</InputGroup>
+```
+
+### Components Supporting AsChild
+
+The following components support the `AsChild` parameter:
+- `DialogTrigger` / `DialogClose`
+- `DropdownMenuTrigger`
+- `PopoverTrigger`
+- `SheetTrigger` / `SheetClose`
+- `TooltipTrigger`
+- `HoverCardTrigger`
+- `CollapsibleTrigger`
+
+When `AsChild` is true, the trigger passes a `TriggerContext` to child components via `CascadingValue`. The `Button` component automatically consumes this context and applies the appropriate click handlers, aria attributes, and keyboard handling.
+
+---
+
+**Last Updated:** 2025-12-08
