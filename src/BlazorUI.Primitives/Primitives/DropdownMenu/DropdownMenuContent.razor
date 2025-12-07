@@ -1,29 +1,15 @@
 @namespace BlazorUI.Primitives.DropdownMenu
 @using BlazorUI.Primitives.Services
 @inject IPositioningService PositioningService
+@inject IPortalService PortalService
 @inject IJSRuntime JSRuntime
 @implements IAsyncDisposable
 
 @*
     DropdownMenuContent is the main content container for the dropdown menu.
     Handles positioning, click-outside, escape key, keyboard navigation, and ARIA attributes.
+    Renders through a portal to avoid z-index stacking issues and clipping.
 *@
-
-@if (Context.IsOpen)
-{
-    <div @ref="_contentRef"
-         id="@Context.ContentId"
-         role="menu"
-         tabindex="-1"
-         @onkeydown="HandleKeyDown"
-         @attributes="GetAttributesWithoutStyle()"
-         data-state="open"
-         style="@GetMergedStyle()">
-        <CascadingValue Value="this" IsFixed="false">
-            @ChildContent
-        </CascadingValue>
-    </div>
-}
 
 @code {
     [CascadingParameter]
@@ -125,11 +111,11 @@
     private IJSObjectReference? _keyboardNavCleanup;
     private IJSObjectReference? _matchWidthModule;
     private IJSObjectReference? _matchWidthCleanup;
-    private IJSObjectReference? _portalModule;
-    private IJSObjectReference? _portalCleanup;
     private DotNetObjectReference<DropdownMenuContent>? _dotNetRef;
     private IAsyncDisposable? _positioningCleanup;
     private bool _isInitialized = false;
+    private bool _isPositioned = false;
+    private string _portalId = "";
 
     // Track menu items for keyboard navigation
     private List<IDropdownMenuItem> _menuItems = new();
@@ -143,6 +129,8 @@
                 "Ensure DropdownMenuContent is a child of a DropdownMenu component.");
         }
 
+        _portalId = $"dropdown-portal-{Context.ContentId}";
+
         // Subscribe to context changes
         Context.OnStateChanged += HandleContextStateChanged;
     }
@@ -152,12 +140,10 @@
         if (Context.IsOpen && !_isInitialized)
         {
             _isInitialized = true;
+            _isPositioned = false;
 
-            // Set up portal if using fixed strategy
-            if (Strategy == PositioningStrategy.Fixed)
-            {
-                await SetupPortalAsync();
-            }
+            // Register dropdown content through portal
+            PortalService.RegisterPortal(_portalId, RenderDropdownContent());
 
             // Set up positioning
             await SetupPositioningAsync();
@@ -189,14 +175,36 @@
         }
     }
 
+    private RenderFragment RenderDropdownContent() => __builder =>
+    {
+        <div @ref="_contentRef"
+             id="@Context.ContentId"
+             role="menu"
+             tabindex="-1"
+             @onkeydown="HandleKeyDown"
+             @attributes="GetAttributesWithoutStyle()"
+             data-state="open"
+             style="@GetMergedStyle()">
+            <CascadingValue Value="Context" IsFixed="false">
+                <CascadingValue Value="this" IsFixed="false">
+                    @ChildContent
+                </CascadingValue>
+            </CascadingValue>
+        </div>
+    };
+
     private async Task SetupPositioningAsync()
     {
         if (Context.State.TriggerElement == null)
         {
             Console.WriteLine("Warning: DropdownMenuContent - TriggerElement is null, positioning may not work correctly");
-            // Don't call StateHasChanged() - let JavaScript handle visibility
+            _isPositioned = true;
+            PortalService.UpdatePortalContent(_portalId, RenderDropdownContent());
             return;
         }
+
+        // Wait a tick for portal to render
+        await Task.Delay(1);
 
         try
         {
@@ -210,15 +218,17 @@
                 Strategy = Strategy.ToValue()
             };
 
-            // Compute and apply position
+            // Compute and apply position using the portal content ref
             var position = await PositioningService.ComputePositionAsync(
                 Context.State.TriggerElement.Value,
                 _contentRef,
                 options);
 
-            // Apply position and make visible in one operation (no StateHasChanged needed)
-            // This prevents Blazor re-render that would cause sidebar layout recalculation
-            await PositioningService.ApplyPositionAsync(_contentRef, position, makeVisible: true);
+            await PositioningService.ApplyPositionAsync(_contentRef, position);
+
+            // Show the dropdown now that positioning is complete
+            _isPositioned = true;
+            PortalService.UpdatePortalContent(_portalId, RenderDropdownContent());
 
             // Set up width matching if needed
             if (MatchTriggerWidth)
@@ -235,7 +245,8 @@
         catch (Exception ex)
         {
             Console.WriteLine($"Failed to set up positioning: {ex.Message}");
-            // Don't call StateHasChanged() - avoid triggering sidebar layout recalc
+            _isPositioned = true;
+            PortalService.UpdatePortalContent(_portalId, RenderDropdownContent());
         }
     }
 
@@ -292,23 +303,6 @@
         }
     }
 
-    private async Task SetupPortalAsync()
-    {
-        try
-        {
-            _portalModule = await JSRuntime.InvokeAsync<IJSObjectReference>(
-                "import", "./_content/BlazorUI.Primitives/js/primitives/portal.js");
-
-            var portalId = "dropdown-portal-root";
-            _portalCleanup = await _portalModule.InvokeAsync<IJSObjectReference>(
-                "setupPortal", _contentRef, portalId);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Failed to set up portal: {ex.Message}");
-        }
-    }
-
     [JSInvokable]
     public async Task HandleClickOutside()
     {
@@ -329,12 +323,12 @@
 
     private string GetInitialStyle()
     {
-        var baseStyle = $"z-index: {ZIndex};";
+        var baseStyle = $"position: absolute; z-index: {ZIndex};";
 
-        // Position offscreen initially - JavaScript will reposition and show
-        // Don't use display:none because Blazor re-renders will overwrite JS changes
-        // Using visibility:hidden + offscreen positioning prevents layout jumping
-        baseStyle += $" position: {Strategy}; top: -9999px; left: -9999px; visibility: hidden; opacity: 0; pointer-events: none;";
+        if (!_isPositioned)
+        {
+            baseStyle += " opacity: 0; pointer-events: none;";
+        }
 
         return baseStyle;
     }
@@ -572,21 +566,14 @@
             _matchWidthCleanup = null;
         }
 
-        if (_portalCleanup != null)
+        // Unregister portal when dropdown closes
+        if (!string.IsNullOrEmpty(_portalId))
         {
-            try
-            {
-                await _portalCleanup.InvokeVoidAsync("dispose");
-                await _portalCleanup.DisposeAsync();
-            }
-            catch
-            {
-                // Cleanup may already be disposed
-            }
-            _portalCleanup = null;
+            PortalService.UnregisterPortal(_portalId);
         }
 
         _isInitialized = false;
+        _isPositioned = false;
     }
 
     public async ValueTask DisposeAsync()
@@ -606,11 +593,6 @@
         if (_matchWidthModule != null)
         {
             await _matchWidthModule.DisposeAsync();
-        }
-
-        if (_portalModule != null)
-        {
-            await _portalModule.DisposeAsync();
         }
 
         _dotNetRef?.Dispose();
