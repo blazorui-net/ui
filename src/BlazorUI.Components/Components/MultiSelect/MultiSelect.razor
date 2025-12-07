@@ -1,0 +1,189 @@
+@namespace BlazorUI.Components.MultiSelect
+@typeparam TItem
+@using BlazorUI.Components.Popover
+@using BlazorUI.Components.Command
+@using BlazorUI.Components.Checkbox
+@using BlazorUI.Primitives.Services
+
+<CascadingValue Value="this" IsFixed="false">
+    <div class="@ContainerClass">
+        <Popover @bind-Open="_isOpen">
+            <PopoverTrigger role="combobox"
+                           aria-expanded="@_isOpen.ToString().ToLower()"
+                           aria-controls="@($"{Id}-listbox")"
+                           aria-haspopup="listbox"
+                           aria-multiselectable="true"
+                           disabled="@Disabled"
+                           class="@TriggerCssClass">
+                <div class="flex flex-wrap items-center gap-1 flex-1 min-w-0">
+                    @if (HasSelectedItems)
+                    {
+                        @foreach (var value in SelectedValues.Take(MaxDisplayTags))
+                        {
+                            <span class="@TagCssClass">
+                                @GetDisplayText(value)
+                                <button type="button"
+                                        class="@TagRemoveButtonCssClass"
+                                        aria-label="@($"Remove {GetDisplayText(value)}")"
+                                        @onclick="@(() => RemoveValue(value))"
+                                        @onclick:stopPropagation="true">
+                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                         width="12"
+                                         height="12"
+                                         viewBox="0 0 24 24"
+                                         fill="none"
+                                         stroke="currentColor"
+                                         stroke-width="2"
+                                         stroke-linecap="round"
+                                         stroke-linejoin="round"
+                                         class="h-3 w-3">
+                                        <path d="M18 6 6 18" />
+                                        <path d="m6 6 12 12" />
+                                    </svg>
+                                </button>
+                            </span>
+                        }
+                        @if (OverflowCount > 0)
+                        {
+                            <span class="text-xs text-muted-foreground">+@OverflowCount more</span>
+                        }
+                    }
+                    else
+                    {
+                        <span class="text-muted-foreground">@Placeholder</span>
+                    }
+                </div>
+                <div class="flex items-center gap-1 ml-2">
+                    @if (HasSelectedItems)
+                    {
+                        <button type="button"
+                                class="rounded-sm opacity-70 hover:opacity-100 focus:outline-none focus:ring-1 focus:ring-ring"
+                                aria-label="Clear all"
+                                @onclick="ClearAll"
+                                @onclick:stopPropagation="true">
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                 width="14"
+                                 height="14"
+                                 viewBox="0 0 24 24"
+                                 fill="none"
+                                 stroke="currentColor"
+                                 stroke-width="2"
+                                 stroke-linecap="round"
+                                 stroke-linejoin="round"
+                                 class="h-3.5 w-3.5">
+                                <path d="M18 6 6 18" />
+                                <path d="m6 6 12 12" />
+                            </svg>
+                        </button>
+                    }
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                         width="16"
+                         height="16"
+                         viewBox="0 0 24 24"
+                         fill="none"
+                         stroke="currentColor"
+                         stroke-width="2"
+                         stroke-linecap="round"
+                         stroke-linejoin="round"
+                         class="h-4 w-4 shrink-0 opacity-50">
+                        <path d="m6 9 6 6 6-6" />
+                    </svg>
+                </div>
+            </PopoverTrigger>
+            <PopoverContent Side="@PopoverSide.Bottom" Align="@PopoverAlign.Start" Class="@($"{PopoverWidth} !p-0")">
+                <Command>
+                    <CommandInput Placeholder="@SearchPlaceholder" AutoFocus="@_isOpen" />
+                    <CommandList>
+                        <CommandEmpty>@EmptyMessage</CommandEmpty>
+                        <CommandGroup>
+                            @if (ShowSelectAll)
+                            {
+                                var selectAllState = GetSelectAllState();
+                                <div class="@ItemCssClass"
+                                     role="option"
+                                     aria-selected="@(selectAllState == SelectAllState.All ? "true" : selectAllState == SelectAllState.Indeterminate ? "mixed" : "false")"
+                                     @onclick="HandleSelectAllToggle">
+                                    <div class="@(selectAllState != SelectAllState.None ? CheckboxCheckedCssClass : CheckboxUncheckedCssClass) flex items-center justify-center">
+                                        @if (selectAllState == SelectAllState.All)
+                                        {
+                                            <svg xmlns="http://www.w3.org/2000/svg"
+                                                 width="16"
+                                                 height="16"
+                                                 viewBox="0 0 24 24"
+                                                 fill="none"
+                                                 stroke="currentColor"
+                                                 stroke-width="2"
+                                                 stroke-linecap="round"
+                                                 stroke-linejoin="round"
+                                                 class="h-3.5 w-3.5">
+                                                <path d="M20 6 9 17l-5-5" />
+                                            </svg>
+                                        }
+                                        else if (selectAllState == SelectAllState.Indeterminate)
+                                        {
+                                            <svg xmlns="http://www.w3.org/2000/svg"
+                                                 width="16"
+                                                 height="16"
+                                                 viewBox="0 0 24 24"
+                                                 fill="none"
+                                                 stroke="currentColor"
+                                                 stroke-width="2"
+                                                 stroke-linecap="round"
+                                                 stroke-linejoin="round"
+                                                 class="h-3.5 w-3.5">
+                                                <path d="M5 12h14" />
+                                            </svg>
+                                        }
+                                    </div>
+                                    <span class="font-medium">@SelectAllLabel</span>
+                                </div>
+                                <div class="my-1 h-px bg-border" role="separator"></div>
+                            }
+                            @foreach (var item in Items)
+                            {
+                                var itemValue = ValueSelector(item);
+                                var displayText = DisplaySelector(item);
+                                var selected = IsSelected(item);
+
+                                <CommandItem Value="@itemValue" OnSelect="@(() => HandleToggle(item))" SearchText="@displayText" Class="!px-0">
+                                    <div class="flex items-center gap-2 px-2 w-full">
+                                        <div class="@(selected ? CheckboxCheckedCssClass : CheckboxUncheckedCssClass) flex items-center justify-center">
+                                            @if (selected)
+                                            {
+                                                <svg xmlns="http://www.w3.org/2000/svg"
+                                                     width="16"
+                                                     height="16"
+                                                     viewBox="0 0 24 24"
+                                                     fill="none"
+                                                     stroke="currentColor"
+                                                     stroke-width="2"
+                                                     stroke-linecap="round"
+                                                     stroke-linejoin="round"
+                                                     class="h-3.5 w-3.5">
+                                                    <path d="M20 6 9 17l-5-5" />
+                                                </svg>
+                                            }
+                                        </div>
+                                        <span>@displayText</span>
+                                    </div>
+                                </CommandItem>
+                            }
+                        </CommandGroup>
+                    </CommandList>
+                </Command>
+                <div class="flex items-center justify-between border-t p-2">
+                    <button type="button"
+                            class="text-xs text-muted-foreground hover:text-foreground transition-colors"
+                            @onclick="ClearAll">
+                        @ClearLabel
+                    </button>
+                    <button type="button"
+                            class="text-xs text-muted-foreground hover:text-foreground transition-colors"
+                            @onclick="Close">
+                        @CloseLabel
+                    </button>
+                </div>
+            </PopoverContent>
+        </Popover>
+    </div>
+</CascadingValue>

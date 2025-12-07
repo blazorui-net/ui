@@ -65,9 +65,9 @@ For installation and setup instructions, see: **https://raw.githubusercontent.co
 
 ---
 
-## Components (30 Components)
+## Components (31 Components)
 
-### Form Components (9)
+### Form Components (10)
 
 **Button** - Interactive button with multiple variants (default, destructive, outline, secondary, ghost, link) and sizes. - https://raw.githubusercontent.com/blazorui-net/ui/main/llms/components/button.txt
 
@@ -80,6 +80,8 @@ For installation and setup instructions, see: **https://raw.githubusercontent.co
 **Input Group** - Enhanced inputs with icons, buttons, and addons for complex input compositions. - https://raw.githubusercontent.com/blazorui-net/ui/main/llms/components/input-group.txt
 
 **Label** - Styled label component for accessible form control labeling with automatic association. - https://raw.githubusercontent.com/blazorui-net/ui/main/llms/components/label.txt
+
+**MultiSelect** - Searchable multi-select component with checkboxes, tags display, Select All, and overflow indicator. - https://raw.githubusercontent.com/blazorui-net/ui/main/llms/components/multiselect.txt
 
 **Radio Group** - Styled radio button group for mutually exclusive selections with keyboard navigation. - https://raw.githubusercontent.com/blazorui-net/ui/main/llms/components/radio-group.txt
 
@@ -204,4 +206,4 @@ For multi-component usage examples and common patterns, see: **https://raw.githu
 
 ---
 
-**Last Updated:** 2025-11-16
+**Last Updated:** 2025-12-06
