@@ -10,12 +10,6 @@
     Renders through a portal to avoid clipping by overflow:hidden containers.
 *@
 
-@* Hidden element to track DOM position for positioning calculations *@
-@if (Context.IsOpen)
-{
-    <span @ref="_contentRef" style="position: absolute; pointer-events: none; opacity: 0;"></span>
-}
-
 @code {
     [CascadingParameter]
     private TooltipContext Context { get; set; } = null!;
@@ -53,7 +47,6 @@
     [Parameter]
     public int Offset { get; set; } = 8;
 
-    private ElementReference _contentRef;
     private IAsyncDisposable? _positioningCleanup;
     private bool _isInitialized = false;
     private bool _isPositioned = false;
