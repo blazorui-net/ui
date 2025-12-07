@@ -50,9 +50,7 @@ The Dialog component provides accessible modal dialogs with backdrop overlay, fo
 
 ```razor
 <Dialog>
-    <DialogTrigger AsChild>
-        <Button>Open Dialog</Button>
-    </DialogTrigger>
+    <DialogTrigger>Open Dialog</DialogTrigger>
     <DialogContent>
         <DialogHeader>
             <DialogTitle>Dialog Title</DialogTitle>
@@ -60,9 +58,7 @@ The Dialog component provides accessible modal dialogs with backdrop overlay, fo
         </DialogHeader>
         <p>Dialog content goes here</p>
         <DialogFooter>
-            <DialogClose AsChild>
-                <Button Variant="ButtonVariant.Outline">Cancel</Button>
-            </DialogClose>
+            <DialogClose>Cancel</DialogClose>
             <Button>Confirm</Button>
         </DialogFooter>
     </DialogContent>

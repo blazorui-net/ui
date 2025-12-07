@@ -246,9 +246,7 @@ The Textarea component provides a customizable, accessible multi-line text input
 
 ```razor
 <Dialog>
-    <DialogTrigger AsChild>
-        <Button>Add Comment</Button>
-    </DialogTrigger>
+    <DialogTrigger>Add Comment</DialogTrigger>
     <DialogContent>
         <DialogHeader>
             <DialogTitle>Add Comment</DialogTitle>

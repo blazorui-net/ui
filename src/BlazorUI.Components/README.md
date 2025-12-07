@@ -66,9 +66,7 @@ BlazorUI Components come with pre-built CSS - no Tailwind setup required!
 <Button Variant="ButtonVariant.Default">Click me</Button>
 
 <Dialog>
-    <DialogTrigger AsChild>
-        <Button>Open Dialog</Button>
-    </DialogTrigger>
+    <DialogTrigger>Open Dialog</DialogTrigger>
     <DialogContent>
         <DialogHeader>
             <DialogTitle>Welcome to BlazorUI</DialogTitle>

@@ -312,17 +312,13 @@ Add to `_Imports.razor`:
 
 ```razor
 <Dialog>
-    <DialogTrigger AsChild>
-        <Button>Open Dialog</Button>
-    </DialogTrigger>
+    <DialogTrigger>Open Dialog</DialogTrigger>
     <DialogContent>
         <DialogHeader>
             <DialogTitle>Confirm Action</DialogTitle>
         </DialogHeader>
         <DialogFooter>
-            <DialogClose AsChild>
-                <Button Variant="ButtonVariant.Outline">Cancel</Button>
-            </DialogClose>
+            <DialogClose>Cancel</DialogClose>
             <Button Variant="ButtonVariant.Destructive">Confirm</Button>
         </DialogFooter>
     </DialogContent>
@@ -333,11 +329,9 @@ Add to `_Imports.razor`:
 
 ```razor
 <DropdownMenu>
-    <DropdownMenuTrigger AsChild>
-        <Button Variant="ButtonVariant.Outline">
-            Actions
-            <LucideIcon Name="chevron-down" Size="16" />
-        </Button>
+    <DropdownMenuTrigger>
+        Actions
+        <LucideIcon Name="chevron-down" Size="16" />
     </DropdownMenuTrigger>
     <DropdownMenuContent>
         <DropdownMenuItem>Edit</DropdownMenuItem>

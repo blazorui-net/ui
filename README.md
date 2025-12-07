@@ -80,9 +80,7 @@ dotnet add package BlazorUI.Icons.Feather     # 286 icons - minimalist, stroke-b
 <Button Variant="ButtonVariant.Default">Click me</Button>
 
 <Dialog>
-    <DialogTrigger AsChild>
-        <Button>Open Dialog</Button>
-    </DialogTrigger>
+    <DialogTrigger>Open Dialog</DialogTrigger>
     <DialogContent>
         <DialogHeader>
             <DialogTitle>Welcome to BlazorUI</DialogTitle>
