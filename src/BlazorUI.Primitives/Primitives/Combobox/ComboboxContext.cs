@@ -175,6 +175,30 @@ public class ComboboxContext : PrimitiveContextWithEvents<ComboboxState>
     }
 
     /// <summary>
+    /// Updates an existing item's registration.
+    /// Called when component parameters change to ensure callbacks stay current.
+    /// </summary>
+    /// <param name="index">The index of the item to update.</param>
+    /// <param name="value">The value of the item.</param>
+    /// <param name="searchText">The text used for filtering.</param>
+    /// <param name="disabled">Whether the item is disabled.</param>
+    /// <param name="onSelect">The callback to invoke when the item is selected.</param>
+    public void UpdateItem(int index, string? value, string? searchText, bool disabled, EventCallback onSelect)
+    {
+        if (index >= 0 && index < Items.Count)
+        {
+            Items[index] = new ComboboxItemMetadata
+            {
+                Value = value,
+                SearchText = searchText,
+                Disabled = disabled,
+                OnSelect = onSelect
+            };
+            InvalidateFilterCache();
+        }
+    }
+
+    /// <summary>
     /// Unregisters an item from the combobox context.
     /// </summary>
     /// <param name="index">The index of the item to unregister.</param>

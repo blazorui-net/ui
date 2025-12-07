@@ -86,6 +86,24 @@
         UpdateVisibility();
     }
 
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+
+        // Update registration when parameters change (especially OnSelect callback)
+        // This ensures callbacks stay current when parent re-renders with new lambdas
+        if (_index >= 0 && Context != null)
+        {
+            Context.UpdateItem(
+                index: _index,
+                value: Value,
+                searchText: SearchText ?? Value,
+                disabled: Disabled,
+                onSelect: OnSelect
+            );
+        }
+    }
+
     private async Task HandleClick()
     {
         if (Disabled) return;
