@@ -39,7 +39,9 @@
       "Bash(ls:*)",
       "Bash(test:*)",
       "Bash(dotnet restore:*)",
-      "Bash(dotnet msbuild:*)"
+      "Bash(dotnet msbuild:*)",
+      "Bash(gh issue view:*)",
+      "Bash(gh issue close:*)"
     ],
     "deny": [],
     "ask": []
