@@ -708,4 +708,86 @@ Create a multi-select dropdown using Popover and Checkbox:
 
 ---
 
-**Last Updated:** 2025-11-16
+## AsChild Pattern
+
+The `AsChild` pattern allows trigger and close components to pass their behavior to a child component instead of rendering their own button element. This is useful for using styled Button components or other custom elements as triggers.
+
+### Basic AsChild Usage
+
+```razor
+@using BlazorUI.Components
+
+@* Use Button as DialogTrigger *@
+<Dialog>
+    <DialogTrigger AsChild>
+        <Button Variant="ButtonVariant.Destructive">Delete Account</Button>
+    </DialogTrigger>
+    <DialogContent>
+        <DialogHeader>
+            <DialogTitle>Confirm Deletion</DialogTitle>
+        </DialogHeader>
+        <DialogFooter>
+            <DialogClose AsChild>
+                <Button Variant="ButtonVariant.Outline">Cancel</Button>
+            </DialogClose>
+            <Button Variant="ButtonVariant.Destructive">Delete</Button>
+        </DialogFooter>
+    </DialogContent>
+</Dialog>
+```
+
+### DropdownMenu with Button Trigger
+
+```razor
+<DropdownMenu>
+    <DropdownMenuTrigger AsChild>
+        <Button Variant="ButtonVariant.Outline">
+            Actions
+            <LucideIcon Name="chevron-down" Size="16" />
+        </Button>
+    </DropdownMenuTrigger>
+    <DropdownMenuContent>
+        <DropdownMenuItem>Edit</DropdownMenuItem>
+        <DropdownMenuItem>Delete</DropdownMenuItem>
+    </DropdownMenuContent>
+</DropdownMenu>
+```
+
+### InputGroup with DropdownMenu
+
+```razor
+<InputGroup>
+    <InputGroupInput Placeholder="Search..." />
+    <InputGroupAddon Align="InputGroupAlign.InlineEnd">
+        <DropdownMenu>
+            <DropdownMenuTrigger AsChild>
+                <InputGroupButton Variant="ButtonVariant.Ghost">
+                    <LucideIcon Name="chevron-down" Size="16" />
+                </InputGroupButton>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+                <DropdownMenuItem>All Results</DropdownMenuItem>
+                <DropdownMenuItem>Documents</DropdownMenuItem>
+                <DropdownMenuItem>Images</DropdownMenuItem>
+            </DropdownMenuContent>
+        </DropdownMenu>
+    </InputGroupAddon>
+</InputGroup>
+```
+
+### Components Supporting AsChild
+
+The following components support the `AsChild` parameter:
+- `DialogTrigger` / `DialogClose`
+- `DropdownMenuTrigger`
+- `PopoverTrigger`
+- `SheetTrigger` / `SheetClose`
+- `TooltipTrigger`
+- `HoverCardTrigger`
+- `CollapsibleTrigger`
+
+When `AsChild` is true, the trigger passes a `TriggerContext` to child components via `CascadingValue`. The `Button` component automatically consumes this context and applies the appropriate click handlers, aria attributes, and keyboard handling.
+
+---
+
+**Last Updated:** 2025-12-08

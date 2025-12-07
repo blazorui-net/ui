@@ -53,6 +53,27 @@ The Popover component displays floating content anchored to a trigger element. F
 
 ---
 
+## AsChild Pattern
+
+Use `AsChild` on `PopoverTrigger` to use your own element (like a styled Button) as the trigger instead of the default `<button>`:
+
+```razor
+<Popover>
+    <PopoverTrigger AsChild>
+        <Button Variant="ButtonVariant.Ghost" Size="ButtonSize.Icon">
+            <LucideIcon Name="settings" Size="16" />
+        </Button>
+    </PopoverTrigger>
+    <PopoverContent>
+        <p>Settings panel content</p>
+    </PopoverContent>
+</Popover>
+```
+
+**Note:** When `AsChild` is true, the child component (Button) automatically receives trigger behavior via `TriggerContext` including click handling, aria-haspopup, aria-expanded, and keyboard navigation.
+
+---
+
 ## Examples
 
 See **llms/patterns.txt** - Multi-Select with Popover for complete example.

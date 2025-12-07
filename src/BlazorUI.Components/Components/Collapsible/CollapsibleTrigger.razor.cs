@@ -64,6 +64,14 @@ public partial class CollapsibleTrigger : ComponentBase
     public string? Class { get; set; }
 
     /// <summary>
+    /// When true, the trigger does not render its own button element.
+    /// Instead, it passes trigger behavior via TriggerContext to child components.
+    /// Use this when you want a custom component (like Button) to act as the trigger.
+    /// </summary>
+    [Parameter]
+    public bool AsChild { get; set; } = false;
+
+    /// <summary>
     /// Gets or sets the content to be rendered inside the trigger.
     /// </summary>
     /// <value>

@@ -12,6 +12,50 @@
     </div>
 
     <div class="space-y-6">
+        <!-- AsChild Pattern -->
+        <section class="space-y-4">
+            <div class="space-y-2">
+                <h2 class="text-2xl font-semibold">AsChild Pattern</h2>
+                <p class="text-muted-foreground">
+                    Use AsChild to compose triggers with your own styled elements.
+                </p>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-6">
+                <!-- Without AsChild -->
+                <div class="space-y-3 p-4 border rounded-lg">
+                    <h3 class="text-lg font-medium">Without AsChild</h3>
+                    <p class="text-sm text-muted-foreground">
+                        PopoverTrigger renders its own button element.
+                    </p>
+                    <BlazorUI.Primitives.Popover.Popover>
+                        <BlazorUI.Primitives.Popover.PopoverTrigger class="px-3 py-2 border rounded text-sm cursor-pointer hover:bg-accent">
+                            Open Popover
+                        </BlazorUI.Primitives.Popover.PopoverTrigger>
+                        <BlazorUI.Primitives.Popover.PopoverContent class="z-50 w-72 rounded-md border bg-popover p-4 text-popover-foreground shadow-md">
+                            <p class="text-sm">Without AsChild content</p>
+                        </BlazorUI.Primitives.Popover.PopoverContent>
+                    </BlazorUI.Primitives.Popover.Popover>
+                </div>
+
+                <!-- With AsChild -->
+                <div class="space-y-3 p-4 border rounded-lg">
+                    <h3 class="text-lg font-medium">With AsChild</h3>
+                    <p class="text-sm text-muted-foreground">
+                        Button receives click behavior via TriggerContext.
+                    </p>
+                    <BlazorUI.Primitives.Popover.Popover>
+                        <BlazorUI.Primitives.Popover.PopoverTrigger AsChild>
+                            <Button Variant="ButtonVariant.Outline">Open Popover</Button>
+                        </BlazorUI.Primitives.Popover.PopoverTrigger>
+                        <BlazorUI.Primitives.Popover.PopoverContent class="z-50 w-72 rounded-md border bg-popover p-4 text-popover-foreground shadow-md">
+                            <p class="text-sm">With AsChild content</p>
+                        </BlazorUI.Primitives.Popover.PopoverContent>
+                    </BlazorUI.Primitives.Popover.Popover>
+                </div>
+            </div>
+        </section>
+
         <section class="space-y-4">
             <div class="space-y-2">
                 <h2 class="text-2xl font-semibold">Basic Headless Primitive</h2>

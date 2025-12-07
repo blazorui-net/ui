@@ -16,6 +16,62 @@
     <div class="space-y-6">
     </div>
 
+    <!-- AsChild Pattern -->
+    <div class="space-y-4">
+        <h2 class="text-2xl font-semibold">AsChild Pattern</h2>
+        <p class="text-sm text-muted-foreground">
+            Use AsChild to compose triggers with your own styled Button components.
+        </p>
+
+        <div class="grid md:grid-cols-2 gap-6">
+            <!-- Without AsChild -->
+            <div class="space-y-3 p-4 border rounded-lg">
+                <h3 class="text-lg font-medium">Without AsChild</h3>
+                <p class="text-sm text-muted-foreground">
+                    SheetTrigger renders its own button with inline classes.
+                </p>
+                <Sheet>
+                    <SheetTrigger class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2">
+                        Open Sheet
+                    </SheetTrigger>
+                    <SheetContent>
+                        <SheetHeader>
+                            <SheetTitle>Without AsChild</SheetTitle>
+                            <SheetDescription>Uses inline CSS classes on trigger.</SheetDescription>
+                        </SheetHeader>
+                    </SheetContent>
+                </Sheet>
+            </div>
+
+            <!-- With AsChild -->
+            <div class="space-y-3 p-4 border rounded-lg">
+                <h3 class="text-lg font-medium">With AsChild</h3>
+                <p class="text-sm text-muted-foreground">
+                    Button receives trigger behavior via TriggerContext.
+                </p>
+                <Sheet>
+                    <SheetTrigger AsChild>
+                        <Button Variant="ButtonVariant.Outline">
+                            <LucideIcon Name="menu" Size="16" />
+                            Open Menu
+                        </Button>
+                    </SheetTrigger>
+                    <SheetContent Side="BlazorUI.Primitives.Sheet.SheetSide.Left">
+                        <SheetHeader>
+                            <SheetTitle>With AsChild</SheetTitle>
+                            <SheetDescription>Button component styled trigger.</SheetDescription>
+                        </SheetHeader>
+                        <SheetFooter>
+                            <SheetClose AsChild>
+                                <Button Variant="ButtonVariant.Outline">Close</Button>
+                            </SheetClose>
+                        </SheetFooter>
+                    </SheetContent>
+                </Sheet>
+            </div>
+        </div>
+    </div>
+
     <div class="space-y-4">
         <h2 class="text-2xl font-semibold">Side: Right (Default)</h2>
         <p class="text-sm text-muted-foreground">
@@ -23,7 +79,7 @@
         </p>
 
         <Sheet>
-            <SheetTrigger>
+            <SheetTrigger AsChild>
                 <Button Variant="ButtonVariant.Outline">Open Sheet</Button>
             </SheetTrigger>
 
@@ -68,7 +124,7 @@
         </p>
 
         <Sheet Side="BlazorUI.Primitives.Sheet.SheetSide.Top">
-            <SheetTrigger>
+            <SheetTrigger AsChild>
                 <Button Variant="ButtonVariant.Outline">Open from Top</Button>
             </SheetTrigger>
 
@@ -114,7 +170,7 @@
         </p>
 
         <Sheet Side="BlazorUI.Primitives.Sheet.SheetSide.Bottom">
-            <SheetTrigger>
+            <SheetTrigger AsChild>
                 <Button Variant="ButtonVariant.Outline">Open from Bottom</Button>
             </SheetTrigger>
 
@@ -170,7 +226,7 @@
         </p>
 
         <Sheet Side="BlazorUI.Primitives.Sheet.SheetSide.Left">
-            <SheetTrigger>
+            <SheetTrigger AsChild>
                 <Button Variant="ButtonVariant.Outline">Open from Left</Button>
             </SheetTrigger>
 
@@ -253,7 +309,7 @@
         </p>
 
         <Sheet>
-            <SheetTrigger>
+            <SheetTrigger AsChild>
                 <Button Variant="ButtonVariant.Outline">Open Sheet</Button>
             </SheetTrigger>
 
@@ -272,12 +328,12 @@
                 </div>
 
                 <SheetFooter>
-                    <BlazorUI.Primitives.Sheet.SheetClose class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2">
-                        Cancel
-                    </BlazorUI.Primitives.Sheet.SheetClose>
-                    <BlazorUI.Primitives.Sheet.SheetClose class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2">
-                        Confirm
-                    </BlazorUI.Primitives.Sheet.SheetClose>
+                    <SheetClose AsChild>
+                        <Button Variant="ButtonVariant.Outline">Cancel</Button>
+                    </SheetClose>
+                    <SheetClose AsChild>
+                        <Button>Confirm</Button>
+                    </SheetClose>
                 </SheetFooter>
             </SheetContent>
         </Sheet>
@@ -290,7 +346,7 @@
         </p>
 
         <Sheet>
-            <SheetTrigger>
+            <SheetTrigger AsChild>
                 <Button Variant="ButtonVariant.Outline">Open Wide Sheet</Button>
             </SheetTrigger>
 

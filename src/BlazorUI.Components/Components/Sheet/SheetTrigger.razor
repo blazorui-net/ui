@@ -6,7 +6,7 @@
     Renders the trigger button for opening the sheet.
 *@
 
-<BlazorUI.Primitives.Sheet.SheetTrigger @attributes="AdditionalAttributes">
+<BlazorUI.Primitives.Sheet.SheetTrigger AsChild="@AsChild" @attributes="AdditionalAttributes">
     @ChildContent
 </BlazorUI.Primitives.Sheet.SheetTrigger>
 
@@ -16,6 +16,14 @@
     /// </summary>
     [Parameter]
     public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>
+    /// When true, the trigger does not render its own button element.
+    /// Instead, it passes trigger behavior via TriggerContext to child components.
+    /// Use this when you want a custom component (like Button) to act as the trigger.
+    /// </summary>
+    [Parameter]
+    public bool AsChild { get; set; } = false;
 
     /// <summary>
     /// Additional attributes to apply to the trigger button.

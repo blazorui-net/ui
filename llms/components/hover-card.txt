@@ -63,6 +63,40 @@ The HoverCard component displays rich content previews on hover with configurabl
 
 ---
 
+## AsChild Pattern
+
+Use `AsChild` on `HoverCardTrigger` to use your own element as the trigger instead of the default `<span>`:
+
+### Button Trigger
+
+```razor
+<HoverCard>
+    <HoverCardTrigger AsChild>
+        <Button Variant="ButtonVariant.Link">@username</Button>
+    </HoverCardTrigger>
+    <HoverCardContent>
+        <!-- User profile card -->
+    </HoverCardContent>
+</HoverCard>
+```
+
+### Link Trigger
+
+```razor
+<HoverCard>
+    <HoverCardTrigger AsChild>
+        <a href="/users/johndoe" class="font-medium underline">John Doe</a>
+    </HoverCardTrigger>
+    <HoverCardContent>
+        <!-- User preview card -->
+    </HoverCardContent>
+</HoverCard>
+```
+
+**Note:** When `AsChild` is true, the child component automatically receives trigger behavior via `TriggerContext` including hover and focus event handling with configurable delays.
+
+---
+
 ## Related Components
 
 - **Tooltip** - llms/components/tooltip.txt

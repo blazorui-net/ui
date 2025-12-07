@@ -80,7 +80,9 @@ dotnet add package BlazorUI.Icons.Feather     # 286 icons - minimalist, stroke-b
 <Button Variant="ButtonVariant.Default">Click me</Button>
 
 <Dialog>
-    <DialogTrigger>Open Dialog</DialogTrigger>
+    <DialogTrigger AsChild>
+        <Button>Open Dialog</Button>
+    </DialogTrigger>
     <DialogContent>
         <DialogHeader>
             <DialogTitle>Welcome to BlazorUI</DialogTitle>
@@ -88,9 +90,16 @@ dotnet add package BlazorUI.Icons.Feather     # 286 icons - minimalist, stroke-b
                 Beautiful Blazor components inspired by shadcn/ui
             </DialogDescription>
         </DialogHeader>
+        <DialogFooter>
+            <DialogClose AsChild>
+                <Button Variant="ButtonVariant.Outline">Close</Button>
+            </DialogClose>
+        </DialogFooter>
     </DialogContent>
 </Dialog>
 ```
+
+**AsChild Pattern:** Use `AsChild` on trigger components to use your own styled elements (like Button) instead of the default button. This is the industry-standard pattern from Radix UI/shadcn/ui.
 
 ### Learn More
 

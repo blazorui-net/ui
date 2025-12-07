@@ -1,15 +1,26 @@
 @namespace BlazorUI.Primitives.Sheet
+@using BlazorUI.Primitives.Utilities
 
 @* Sheet trigger button - opens the sheet when clicked *@
-<button type="button"
-        id="@Context.TriggerId"
-        @onclick="HandleClick"
-        @attributes="AdditionalAttributes"
-        aria-haspopup="dialog"
-        aria-expanded="@Context.IsOpen.ToString().ToLower()"
-        aria-controls="@Context.ContentId">
-    @ChildContent
-</button>
+@if (AsChild)
+{
+    @* When AsChild is true, pass trigger context to child for it to handle *@
+    <CascadingValue Value="TriggerContext" Name="TriggerContext">
+        @ChildContent
+    </CascadingValue>
+}
+else
+{
+    <button type="button"
+            id="@Context.TriggerId"
+            @onclick="HandleClick"
+            @attributes="AdditionalAttributes"
+            aria-haspopup="dialog"
+            aria-expanded="@Context.IsOpen.ToString().ToLower()"
+            aria-controls="@Context.ContentId">
+        @ChildContent
+    </button>
+}
 
 @code {
     [CascadingParameter]
@@ -20,6 +31,14 @@
     /// </summary>
     [Parameter]
     public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>
+    /// When true, the trigger does not render its own button element.
+    /// Instead, it passes trigger behavior via TriggerContext to child components.
+    /// The child component must consume TriggerContext and apply click/aria behavior.
+    /// </summary>
+    [Parameter]
+    public bool AsChild { get; set; } = false;
 
     /// <summary>
     /// Additional attributes to apply to the trigger button element.
@@ -39,6 +58,20 @@
     /// </summary>
     [Parameter]
     public bool CustomClickHandling { get; set; } = false;
+
+    /// <summary>
+    /// Context passed to child components when AsChild is true.
+    /// </summary>
+    private TriggerContext TriggerContext => new()
+    {
+        TriggerId = Context.TriggerId,
+        IsOpen = Context.IsOpen,
+        Toggle = () => Context.Toggle(),
+        Open = () => Context.Open(),
+        Close = () => Context.Close(),
+        AriaHasPopup = "dialog",
+        AriaControls = Context.ContentId
+    };
 
     private async Task HandleClick(MouseEventArgs args)
     {

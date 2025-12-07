@@ -69,6 +69,41 @@ The Sheet component displays a side panel that slides in from the top, right, bo
 
 ---
 
+## AsChild Pattern
+
+Use `AsChild` on `SheetTrigger` and `SheetClose` to use your own elements instead of the default `<button>`:
+
+### SheetTrigger with AsChild
+
+```razor
+<Sheet>
+    <SheetTrigger AsChild>
+        <Button Variant="ButtonVariant.Outline">
+            <LucideIcon Name="menu" Size="16" />
+            Open Menu
+        </Button>
+    </SheetTrigger>
+    <SheetContent Side="SheetSide.Left">
+        <!-- Navigation menu -->
+    </SheetContent>
+</Sheet>
+```
+
+### SheetClose with AsChild
+
+```razor
+<SheetFooter>
+    <SheetClose AsChild>
+        <Button Variant="ButtonVariant.Outline">Cancel</Button>
+    </SheetClose>
+    <Button>Save Changes</Button>
+</SheetFooter>
+```
+
+**Note:** When `AsChild` is true, the child component (Button) automatically receives trigger behavior via `TriggerContext` including click handling, aria-haspopup, aria-expanded, and focus management.
+
+---
+
 ## Examples
 
 ### Sheet from Right (Default)

@@ -192,6 +192,88 @@
     </div>
 
     <div class="space-y-4">
+        <h2 class="text-2xl font-semibold">AsChild Pattern</h2>
+        <p class="text-sm text-muted-foreground">
+            Use AsChild to compose triggers with your own styled Button components instead of inline styles.
+        </p>
+
+        <div class="grid md:grid-cols-2 gap-6">
+            <!-- Without AsChild -->
+            <div class="space-y-3 p-4 border rounded-lg">
+                <h3 class="text-lg font-medium">Without AsChild</h3>
+                <p class="text-sm text-muted-foreground">
+                    DialogTrigger renders its own button element with inline classes.
+                </p>
+                <Dialog>
+                    <DialogTrigger class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2">
+                        Open Dialog
+                    </DialogTrigger>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>Without AsChild</DialogTitle>
+                            <DialogDescription>
+                                This dialog uses inline CSS classes on the trigger.
+                            </DialogDescription>
+                        </DialogHeader>
+                    </DialogContent>
+                </Dialog>
+            </div>
+
+            <!-- With AsChild -->
+            <div class="space-y-3 p-4 border rounded-lg">
+                <h3 class="text-lg font-medium">With AsChild</h3>
+                <p class="text-sm text-muted-foreground">
+                    Button component receives trigger behavior via TriggerContext.
+                </p>
+                <Dialog>
+                    <DialogTrigger AsChild>
+                        <Button Variant="ButtonVariant.Destructive">
+                            <LucideIcon Name="trash-2" Size="16" />
+                            Delete Account
+                        </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>Delete Account</DialogTitle>
+                            <DialogDescription>
+                                This action cannot be undone. This will permanently delete your account.
+                            </DialogDescription>
+                        </DialogHeader>
+                        <DialogFooter>
+                            <DialogClose AsChild>
+                                <Button Variant="ButtonVariant.Outline">Cancel</Button>
+                            </DialogClose>
+                            <Button Variant="ButtonVariant.Destructive">Delete</Button>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
+            </div>
+        </div>
+
+        <div class="bg-muted p-4 rounded-md mt-4">
+            <p class="text-sm font-medium mb-2">Code Example:</p>
+            <pre class="text-sm overflow-x-auto"><code>&lt;Dialog&gt;
+    &lt;DialogTrigger AsChild&gt;
+        &lt;Button Variant="ButtonVariant.Destructive"&gt;
+            Delete Account
+        &lt;/Button&gt;
+    &lt;/DialogTrigger&gt;
+    &lt;DialogContent&gt;
+        &lt;DialogHeader&gt;
+            &lt;DialogTitle&gt;Delete Account&lt;/DialogTitle&gt;
+        &lt;/DialogHeader&gt;
+        &lt;DialogFooter&gt;
+            &lt;DialogClose AsChild&gt;
+                &lt;Button Variant="ButtonVariant.Outline"&gt;Cancel&lt;/Button&gt;
+            &lt;/DialogClose&gt;
+            &lt;Button Variant="ButtonVariant.Destructive"&gt;Delete&lt;/Button&gt;
+        &lt;/DialogFooter&gt;
+    &lt;/DialogContent&gt;
+&lt;/Dialog&gt;</code></pre>
+        </div>
+    </div>
+
+    <div class="space-y-4">
         <h2 class="text-2xl font-semibold">Features</h2>
         <ul class="list-disc list-inside space-y-2 text-sm">
             <li>Full keyboard navigation support</li>
