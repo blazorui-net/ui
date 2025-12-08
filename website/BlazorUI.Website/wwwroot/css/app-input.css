@@ -10,3 +10,8 @@
 @source "../../Components";
 
 /* Website-specific custom styles can go here */
+
+/* Portal wrapper - removed from layout flow so portal content doesn't cause layout shifts */
+.blazorui-portal {
+  display: contents;
+}

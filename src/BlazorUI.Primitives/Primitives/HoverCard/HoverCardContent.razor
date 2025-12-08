@@ -12,12 +12,6 @@
     Renders through a portal to avoid z-index stacking issues and clipping.
 *@
 
-@* Hidden element to track DOM position for positioning calculations *@
-@if (Context.IsOpen)
-{
-    <span @ref="_contentRef" style="position: absolute; pointer-events: none; opacity: 0;"></span>
-}
-
 @code {
     [CascadingParameter]
     private HoverCardContext Context { get; set; } = null!;
@@ -55,7 +49,6 @@
     [Parameter]
     public int Offset { get; set; } = 4;
 
-    private ElementReference _contentRef;
     private IAsyncDisposable? _positioningCleanup;
     private bool _isInitialized = false;
     private bool _isPositioned = false;

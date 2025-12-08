@@ -33,10 +33,7 @@ export function onClickOutside(element, dotNetRef, methodName = 'HandleClickOuts
 
         if (!isMouseDownInside && isOutside) {
             try {
-                // Check if dotNetRef is still valid before invoking
-                if (dotNetRef && !dotNetRef._disposed) {
-                    dotNetRef.invokeMethodAsync(methodName);
-                }
+                dotNetRef.invokeMethodAsync(methodName);
             } catch (error) {
                 console.error('click-outside callback error:', error);
             }
