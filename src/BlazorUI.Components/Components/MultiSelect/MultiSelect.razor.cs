@@ -290,7 +290,7 @@ public partial class MultiSelect<TItem> : ComponentBase, IAsyncDisposable
             {
                 // Load JS module and setup keyboard handling
                 _multiSelectModule = await JSRuntime.InvokeAsync<IJSObjectReference>(
-                    "import", "./_content/BlazorUI.Primitives/js/primitives/multiselect.js");
+                    "import", "./_content/BlazorUI.Components/js/multiselect.js");
 
                 _dotNetRef = DotNetObjectReference.Create(this);
 
