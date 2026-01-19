@@ -1,7 +1,11 @@
 @namespace BlazorUI.Components.MultiSelect
 @typeparam TItem
 @using BlazorUI.Components.Popover
+@using BlazorUI.Components.Badge
+@using BlazorUI.Components.Separator
 @using BlazorUI.Primitives.Services
+@using BlazorUI.Primitives.Checkbox
+@using BlazorUI.Icons.Lucide.Components
 
 <div class="@ContainerClass">
     <Popover @bind-Open="_isOpen">
@@ -17,18 +21,16 @@
                 {
                     @foreach (var value in SelectedValues.Take(MaxDisplayTags))
                     {
-                        <span class="@TagCssClass">
+                        <Badge Variant="BadgeVariant.Secondary" Class="gap-1">
                             @GetDisplayText(value)
                             <button type="button"
                                     class="@TagRemoveButtonCssClass"
                                     aria-label="@($"Remove {GetDisplayText(value)}")"
                                     @onclick="@(() => RemoveValue(value))"
                                     @onclick:stopPropagation="true">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-3 w-3">
-                                    <path d="M18 6 6 18" /><path d="m6 6 12 12" />
-                                </svg>
+                                <LucideIcon Name="x" Size="12" Class="h-3 w-3" />
                             </button>
-                        </span>
+                        </Badge>
                     }
                     @if (OverflowCount > 0)
                     {
@@ -48,14 +50,10 @@
                             aria-label="Clear all"
                             @onclick="ClearAll"
                             @onclick:stopPropagation="true">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-3.5 w-3.5">
-                            <path d="M18 6 6 18" /><path d="m6 6 12 12" />
-                        </svg>
+                        <LucideIcon Name="x" Size="14" Class="h-3.5 w-3.5" />
                     </button>
                 }
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 shrink-0 opacity-50">
-                    <path d="m6 9 6 6 6-6" />
-                </svg>
+                <LucideIcon Name="chevron-down" Size="16" Class="h-4 w-4 shrink-0 opacity-50" />
             </div>
         </PopoverTrigger>
 
@@ -66,9 +64,7 @@
                         Class="@($"{PopoverWidth} !p-0")">
             @* Search input section *@
             <div class="flex items-center border-b border-border px-3">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 h-4 w-4 shrink-0 opacity-50">
-                    <circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" />
-                </svg>
+                <LucideIcon Name="search" Size="16" Class="mr-2 h-4 w-4 shrink-0 opacity-50" />
                 <input @ref="_searchInputRef"
                        id="@($"{Id}-search")"
                        type="text"
@@ -95,24 +91,22 @@
                              @onclick="HandleSelectAllToggle"
                              @onclick:stopPropagation="true"
                              class="@ItemCssClass">
-                            @* Simple checkbox indicator - no button element *@
-                            <div class="@(selectAllState != SelectAllState.None ? CheckboxCheckedCssClass : CheckboxUncheckedCssClass) flex items-center justify-center">
+                            <Checkbox Checked="@(selectAllState == SelectAllState.All)"
+                                      Indeterminate="@(selectAllState == SelectAllState.Indeterminate)"
+                                      class="@CheckboxCssClass"
+                                      AriaLabel="@SelectAllLabel">
                                 @if (selectAllState == SelectAllState.All)
                                 {
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-3.5 w-3.5">
-                                        <path d="M20 6 9 17l-5-5" />
-                                    </svg>
+                                    <LucideIcon Name="check" Size="14" Class="h-3.5 w-3.5 stroke-current" />
                                 }
                                 else if (selectAllState == SelectAllState.Indeterminate)
                                 {
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-3.5 w-3.5">
-                                        <path d="M5 12h14" />
-                                    </svg>
+                                    <LucideIcon Name="minus" Size="14" Class="h-3.5 w-3.5 stroke-current" />
                                 }
-                            </div>
+                            </Checkbox>
                             <span class="font-medium">@SelectAllLabel</span>
                         </div>
-                        <div class="my-1 h-px bg-border" role="separator"></div>
+                        <Separator Decorative="false" Class="my-1" />
                     }
 
                     @* Individual items *@
@@ -127,15 +121,14 @@
                              @onclick="@(() => HandleToggle(item))"
                              @onclick:stopPropagation="true"
                              class="@ItemCssClass">
-                            @* Simple checkbox indicator - no button element *@
-                            <div class="@(isSelected ? CheckboxCheckedCssClass : CheckboxUncheckedCssClass) flex items-center justify-center">
+                            <Checkbox Checked="@isSelected"
+                                      class="@CheckboxCssClass"
+                                      AriaLabel="@displayText">
                                 @if (isSelected)
                                 {
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-3.5 w-3.5">
-                                        <path d="M20 6 9 17l-5-5" />
-                                    </svg>
+                                    <LucideIcon Name="check" Size="14" Class="h-3.5 w-3.5 stroke-current" />
                                 }
-                            </div>
+                            </Checkbox>
                             <span>@displayText</span>
                         </div>
                     }

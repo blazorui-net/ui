@@ -498,12 +498,6 @@ public partial class MultiSelect<TItem> : ComponentBase, IAsyncDisposable
     }
 
     /// <summary>
-    /// Gets the CSS class for the tag.
-    /// </summary>
-    private string TagCssClass =>
-        "inline-flex items-center gap-1 rounded-full border bg-secondary px-2 py-0.5 text-xs font-semibold transition-colors";
-
-    /// <summary>
     /// Gets the CSS class for the tag remove button.
     /// </summary>
     private string TagRemoveButtonCssClass =>
@@ -519,23 +513,15 @@ public partial class MultiSelect<TItem> : ComponentBase, IAsyncDisposable
 
     /// <summary>
     /// Gets the CSS class for the checkbox.
+    /// Uses data-state attribute from Checkbox primitive for checked/unchecked/indeterminate styling.
     /// </summary>
     private string CheckboxCssClass =>
-        "h-4 w-4 shrink-0 rounded-sm border border-primary ring-offset-background " +
+        "h-4 w-4 shrink-0 rounded-sm border border-primary ring-offset-background flex items-center justify-center " +
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 " +
-        "disabled:cursor-not-allowed disabled:opacity-50";
-
-    /// <summary>
-    /// Gets the CSS class for a checked checkbox.
-    /// </summary>
-    private string CheckboxCheckedCssClass =>
-        CheckboxCssClass + " bg-primary text-primary-foreground";
-
-    /// <summary>
-    /// Gets the CSS class for an unchecked checkbox.
-    /// </summary>
-    private string CheckboxUncheckedCssClass =>
-        CheckboxCssClass + " bg-background";
+        "disabled:cursor-not-allowed disabled:opacity-50 " +
+        "data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground " +
+        "data-[state=indeterminate]:bg-primary data-[state=indeterminate]:text-primary-foreground " +
+        "data-[state=unchecked]:bg-background";
 }
 
 /// <summary>
