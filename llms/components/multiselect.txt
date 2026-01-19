@@ -12,13 +12,22 @@ The Multi Select component allows selecting multiple options from a searchable d
 - Multiple selection with checkboxes
 - Search/filter functionality
 - Select All with indeterminate state
-- Selected items displayed as tags
+- Selected items displayed as tags (Badge component)
 - "+N more" overflow indicator
 - Clear all functionality
 - Form validation (EditContext)
 - Keyboard navigation
 - ARIA attributes
 - Dark mode compatible
+
+**Architecture:**
+Built using primitives and components for a clean, maintainable implementation:
+- **Popover primitive** - Dropdown positioning and click-outside handling
+- **Checkbox primitive** - Selection indicators with indeterminate state
+- **Badge component** - Selected item tags with remove buttons
+- **Separator component** - Visual divider between Select All and items
+- **InputGroup component** - Search input with icon prefix
+- **LucideIcon component** - Icons (search, check, minus, x, chevron-down)
 
 ---
 
@@ -191,4 +200,4 @@ The Multi Select component allows selecting multiple options from a searchable d
 
 ---
 
-**Last Updated:** 2025-12-06
+**Last Updated:** 2025-01-19

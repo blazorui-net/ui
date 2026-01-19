@@ -125,6 +125,14 @@ public partial class MultiSelect<TItem> : ComponentBase, IAsyncDisposable
     public string PopoverWidth { get; set; } = "w-[300px]";
 
     /// <summary>
+    /// Gets or sets whether clicking outside the dropdown should close it.
+    /// When true, the dropdown will close and the search query will be cleared.
+    /// Default is true.
+    /// </summary>
+    [Parameter]
+    public bool AutoClose { get; set; } = true;
+
+    /// <summary>
     /// Gets or sets an expression that identifies the bound values.
     /// Used for form validation integration.
     /// </summary>
@@ -274,6 +282,25 @@ public partial class MultiSelect<TItem> : ComponentBase, IAsyncDisposable
     }
 
     /// <summary>
+    /// Gets the click-outside event handler based on AutoClose setting.
+    /// Returns an empty EventCallback when AutoClose is false.
+    /// </summary>
+    private EventCallback GetClickOutsideHandler()
+    {
+        return AutoClose
+            ? EventCallback.Factory.Create(this, HandleClickOutside)
+            : default;
+    }
+
+    /// <summary>
+    /// Handles click-outside events when AutoClose is enabled.
+    /// </summary>
+    private void HandleClickOutside()
+    {
+        Close();
+    }
+
+    /// <summary>
     /// Captures the ElementReference from InputGroupInput and sets up JS interop.
     /// This is called when the InputGroupInput renders, ensuring the ref is valid.
     /// </summary>
@@ -290,7 +317,7 @@ public partial class MultiSelect<TItem> : ComponentBase, IAsyncDisposable
             {
                 // Load JS module and setup keyboard handling
                 _multiSelectModule = await JSRuntime.InvokeAsync<IJSObjectReference>(
-                    "import", "./_content/BlazorUI.Primitives/js/primitives/multiselect.js");
+                    "import", "./_content/BlazorUI.Components/js/multiselect.js");
 
                 _dotNetRef = DotNetObjectReference.Create(this);
 

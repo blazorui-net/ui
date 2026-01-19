@@ -27,7 +27,7 @@ For installation and setup instructions, see: **https://raw.githubusercontent.co
 
 ---
 
-## Primitives (16 Components)
+## Primitives (15 Components)
 
 **Note:** Primitives are headless components for advanced users who need full styling control. Most users should use the pre-styled Components instead.
 
@@ -36,8 +36,6 @@ For installation and setup instructions, see: **https://raw.githubusercontent.co
 **Checkbox Primitive** - Binary selection control supporting checked, unchecked, and indeterminate states with ARIA attributes. - https://github.com/blazorui-net/ui/tree/main/src/BlazorUI.Primitives/Primitives/Checkbox
 
 **Collapsible Primitive** - Expandable content area with trigger control for showing and hiding content. - https://github.com/blazorui-net/ui/tree/main/src/BlazorUI.Primitives/Primitives/Collapsible
-
-**Combobox Primitive** - Autocomplete input with dropdown suggestions, keyboard navigation, and search functionality. - https://github.com/blazorui-net/ui/tree/main/src/BlazorUI.Primitives/Primitives/Combobox
 
 **Dialog Primitive** - Modal window with overlay, focus trap, and escape key handling for accessible dialogs. - https://github.com/blazorui-net/ui/tree/main/src/BlazorUI.Primitives/Primitives/Dialog
 
@@ -206,4 +204,4 @@ For multi-component usage examples and common patterns, see: **https://raw.githu
 
 ---
 
-**Last Updated:** 2025-12-06
+**Last Updated:** 2025-01-19
