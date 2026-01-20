@@ -185,7 +185,6 @@ export function applyPosition(floating, position, makeVisible = false) {
             floating.style.pointerEvents = 'auto';
 
             // Dispatch event to signal element is now visible and positioned
-            console.log('[positioning] Dispatching blazorui:visible event for:', floating.id || floating.tagName, floating);
             floating.dispatchEvent(new CustomEvent('blazorui:visible', { bubbles: true }));
         });
     }

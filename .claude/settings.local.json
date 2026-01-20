@@ -45,7 +45,8 @@
       "Bash(xargs cat:*)",
       "Bash(done)",
       "WebFetch(domain:unsplash.com)",
-      "WebFetch(domain:images.unsplash.com)"
+      "WebFetch(domain:images.unsplash.com)",
+      "Bash(echo:*)"
     ],
     "deny": [],
     "ask": []

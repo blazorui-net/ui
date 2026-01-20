@@ -141,32 +141,22 @@ let autofocusListenerInitialized = false;
 function initAutofocusListener() {
     if (autofocusListenerInitialized) return;
 
-    console.log('[autofocus] Initializing visibility listener');
-
     document.addEventListener('blazorui:visible', (event) => {
         const element = event.target;
-        console.log('[autofocus] Received blazorui:visible event for:', element.id || element.tagName, element);
 
         // Check if the element or any of its children has data-autofocus
         if (element.hasAttribute('data-autofocus')) {
-            console.log('[autofocus] Element has data-autofocus, focusing');
             element.focus();
-            const focused = document.activeElement === element;
-            console.log('[autofocus] Focus result:', focused, 'activeElement:', document.activeElement?.id || document.activeElement?.tagName);
         } else {
             // Check children for data-autofocus
             const autofocusChild = element.querySelector('[data-autofocus]');
             if (autofocusChild) {
-                console.log('[autofocus] Found child with data-autofocus, focusing:', autofocusChild.id || autofocusChild.tagName);
                 autofocusChild.focus();
-                const focused = document.activeElement === autofocusChild;
-                console.log('[autofocus] Focus result:', focused, 'activeElement:', document.activeElement?.id || document.activeElement?.tagName);
             }
         }
     });
 
     autofocusListenerInitialized = true;
-    console.log('[autofocus] Visibility listener initialized');
 }
 
 // Initialize listener when module loads
@@ -179,9 +169,6 @@ initAutofocusListener();
  */
 export function triggerAutofocus(element) {
     if (!element) return;
-
-    console.log('[autofocus] triggerAutofocus called for:', element.id || element.tagName);
-    console.log('[autofocus] Dispatching blazorui:visible event for:', element.id || element.tagName, element);
 
     // Dispatch the same event that positioning service uses
     element.dispatchEvent(new CustomEvent('blazorui:visible', { bubbles: true }));
