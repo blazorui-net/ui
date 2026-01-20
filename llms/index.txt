@@ -63,9 +63,9 @@ For installation and setup instructions, see: **https://raw.githubusercontent.co
 
 ---
 
-## Components (31 Components)
+## Components (39 Components)
 
-### Form Components (10)
+### Form Components (12)
 
 **Button** - Interactive button with multiple variants (default, destructive, outline, secondary, ghost, link) and sizes. - https://raw.githubusercontent.com/blazorui-net/ui/main/llms/components/button.txt
 
@@ -87,7 +87,11 @@ For installation and setup instructions, see: **https://raw.githubusercontent.co
 
 **Textarea** - Multi-line text input with automatic content-based sizing and validation support. - https://raw.githubusercontent.com/blazorui-net/ui/main/llms/components/textarea.txt
 
-### Layout & Navigation Components (8)
+**Calendar** - Interactive calendar for date selection with constraints and disabled dates support. - https://raw.githubusercontent.com/blazorui-net/ui/main/llms/components/calendar.txt
+
+**Date Picker** - Date picker with popover calendar, custom formatting, and date constraints. - https://raw.githubusercontent.com/blazorui-net/ui/main/llms/components/date-picker.txt
+
+### Layout & Navigation Components (9)
 
 **Accordion** - Styled collapsible content sections with smooth animations and shadcn/ui design. - https://raw.githubusercontent.com/blazorui-net/ui/main/llms/components/accordion.txt
 
@@ -105,7 +109,9 @@ For installation and setup instructions, see: **https://raw.githubusercontent.co
 
 **Tabs** - Styled tabbed interface for organizing related content with keyboard navigation. - https://raw.githubusercontent.com/blazorui-net/ui/main/llms/components/tabs.txt
 
-### Overlay Components (8)
+**Navigation Menu** - Horizontal navigation with dropdown menus for site-wide navigation. - https://raw.githubusercontent.com/blazorui-net/ui/main/llms/components/navigation-menu.txt
+
+### Overlay Components (9)
 
 **Combobox** - Styled autocomplete input with searchable dropdown and keyboard navigation. - https://raw.githubusercontent.com/blazorui-net/ui/main/llms/components/combobox.txt
 
@@ -123,7 +129,9 @@ For installation and setup instructions, see: **https://raw.githubusercontent.co
 
 **Tooltip** - Styled brief informational popup on hover or focus with shadcn/ui design. - https://raw.githubusercontent.com/blazorui-net/ui/main/llms/components/tooltip.txt
 
-### Display Components (5)
+**Toast** - Temporary notification messages with service-based API, multiple positions, and auto-dismiss. - https://raw.githubusercontent.com/blazorui-net/ui/main/llms/components/toast.txt
+
+### Display Components (9)
 
 **Avatar** - User profile image component with fallback support for initials and icons. - https://raw.githubusercontent.com/blazorui-net/ui/main/llms/components/avatar.txt
 
@@ -134,6 +142,14 @@ For installation and setup instructions, see: **https://raw.githubusercontent.co
 **Select** - Styled dropdown selection component with groups, labels, and shadcn/ui design. - https://raw.githubusercontent.com/blazorui-net/ui/main/llms/components/select.txt
 
 **Skeleton** - Animated loading placeholder for content and images during data fetching. - https://raw.githubusercontent.com/blazorui-net/ui/main/llms/components/skeleton.txt
+
+**Alert** - Callout component for important messages with Default and Destructive variants. - https://raw.githubusercontent.com/blazorui-net/ui/main/llms/components/alert.txt
+
+**Alert Dialog** - Modal dialog requiring user acknowledgement, cannot be dismissed by clicking outside. - https://raw.githubusercontent.com/blazorui-net/ui/main/llms/components/alert-dialog.txt
+
+**Progress** - Progress bar indicator showing completion percentage of a task. - https://raw.githubusercontent.com/blazorui-net/ui/main/llms/components/progress.txt
+
+**Spinner** - Loading spinner for indeterminate operations with size variants. - https://raw.githubusercontent.com/blazorui-net/ui/main/llms/components/spinner.txt
 
 ---
 

@@ -231,7 +231,7 @@ Primitives give you complete control over styling while handling all the complex
 
 ## Components
 
-BlazorUI includes **33 styled components** with full shadcn/ui design compatibility:
+BlazorUI includes **41 styled components** with full shadcn/ui design compatibility:
 
 ### Form Components
 - **Button** - Multiple variants (default, destructive, outline, secondary, ghost, link) with icon support
@@ -247,6 +247,8 @@ BlazorUI includes **33 styled components** with full shadcn/ui design compatibil
 - **Select** - Dropdown select with search and keyboard navigation
 - **Switch** - Toggle switch component
 - **Textarea** - Multi-line text input with automatic sizing
+- **Calendar** - Interactive calendar for date selection with constraints
+- **Date Picker** - Date picker with popover calendar and formatting options
 
 ### Layout & Navigation
 - **Accordion** - Collapsible content sections
@@ -256,6 +258,7 @@ BlazorUI includes **33 styled components** with full shadcn/ui design compatibil
 - **Separator** - Visual dividers
 - **Sidebar** - Responsive sidebar with collapsible icon mode, variants (default, floating, inset), and mobile sheet integration
 - **Tabs** - Tabbed interfaces with controlled/uncontrolled modes
+- **Navigation Menu** - Horizontal navigation with dropdown menus
 
 ### Overlay Components
 - **Command** - Command palette with keyboard navigation
@@ -265,6 +268,7 @@ BlazorUI includes **33 styled components** with full shadcn/ui design compatibil
 - **Popover** - Floating content containers
 - **Sheet** - Slide-out panels (top, right, bottom, left)
 - **Tooltip** - Contextual hover tooltips
+- **Toast** - Temporary notification messages with multiple positions
 
 ### Data & Content
 - **DataTable** - Powerful tables with sorting, filtering, pagination, and selection
@@ -272,9 +276,13 @@ BlazorUI includes **33 styled components** with full shadcn/ui design compatibil
 - **RichTextEditor** - WYSIWYG editor with formatting toolbar and HTML output
 
 ### Display Components
+- **Alert** - Callout messages with variants for important notifications
+- **Alert Dialog** - Modal requiring user acknowledgement
 - **Avatar** - User avatars with fallback support
 - **Badge** - Status badges and labels
+- **Progress** - Progress bar indicator
 - **Skeleton** - Loading placeholders
+- **Spinner** - Loading spinner with size variants
 
 ### Icons
 
