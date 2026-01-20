@@ -231,7 +231,7 @@ Primitives give you complete control over styling while handling all the complex
 
 ## Components
 
-BlazorUI includes **41 styled components** with full shadcn/ui design compatibility:
+BlazorUI includes **51 styled components** with full shadcn/ui design compatibility:
 
 ### Form Components
 - **Button** - Multiple variants (default, destructive, outline, secondary, ghost, link) with icon support
@@ -249,12 +249,19 @@ BlazorUI includes **41 styled components** with full shadcn/ui design compatibil
 - **Textarea** - Multi-line text input with automatic sizing
 - **Calendar** - Interactive calendar for date selection with constraints
 - **Date Picker** - Date picker with popover calendar and formatting options
+- **Slider** - Range input for selecting numeric values
+- **Toggle** - Two-state button for toggleable options
+- **Toggle Group** - Group of toggles with single or multiple selection
 
 ### Layout & Navigation
 - **Accordion** - Collapsible content sections
+- **Breadcrumb** - Navigation trail showing hierarchical location
 - **Card** - Container for grouped content with header and footer
+- **Carousel** - Slideshow component for cycling through content
 - **Collapsible** - Expandable/collapsible panels
 - **Item** - Flexible list items with media, content, and actions
+- **Pagination** - Page navigation with previous/next controls
+- **Scroll Area** - Custom scrollable area with styled scrollbars
 - **Separator** - Visual dividers
 - **Sidebar** - Responsive sidebar with collapsible icon mode, variants (default, floating, inset), and mobile sheet integration
 - **Tabs** - Tabbed interfaces with controlled/uncontrolled modes
@@ -262,8 +269,11 @@ BlazorUI includes **41 styled components** with full shadcn/ui design compatibil
 
 ### Overlay Components
 - **Command** - Command palette with keyboard navigation
+- **Context Menu** - Right-click menu with customizable items
 - **Dialog** - Modal dialogs
+- **Drawer** - Mobile-friendly panel sliding from screen edge
 - **DropdownMenu** - Context menus with nested submenus
+- **Menubar** - Desktop application-style menu bar
 - **HoverCard** - Rich hover previews
 - **Popover** - Floating content containers
 - **Sheet** - Slide-out panels (top, right, bottom, left)

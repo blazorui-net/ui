@@ -211,16 +211,6 @@
 
             // Set up keyboard navigation
             await SetupKeyboardNavAsync();
-
-            // Focus the dropdown content
-            try
-            {
-                await _contentRef.FocusAsync();
-            }
-            catch
-            {
-                // Focus may fail, that's okay
-            }
         }
         catch (Exception ex)
         {
@@ -241,12 +231,14 @@
              id="@Context.ContentId"
              role="menu"
              tabindex="-1"
+             data-autofocus
              @onkeydown="HandleKeyDown"
+             @onkeydown:preventDefault="true"
              @attributes="GetAttributesWithoutStyle()"
              data-state="open"
              style="@GetMergedStyle()">
             <CascadingValue Value="Context" IsFixed="false">
-                <CascadingValue Value="this" IsFixed="false">
+                <CascadingValue Value="this" Name="DropdownMenuContentContext" IsFixed="false">
                     @ChildContent
                 </CascadingValue>
             </CascadingValue>
@@ -444,129 +436,34 @@
             return;
         }
 
-        // Arrow navigation
-        var enabledItems = _menuItems.Where(item => !item.Disabled).ToList();
-        if (enabledItems.Count == 0) return;
+        // Arrow navigation - use JS to navigate in DOM order
+        if (_keyboardNavModule == null) return;
 
-        var currentIndex = Context.FocusedIndex;
-
-        switch (args.Key)
+        try
         {
-            case "ArrowDown":
-                await NavigateNext(enabledItems, currentIndex);
-                break;
-
-            case "ArrowUp":
-                await NavigatePrevious(enabledItems, currentIndex);
-                break;
-
-            case "Home":
-                await FocusItem(enabledItems, 0);
-                break;
-
-            case "End":
-                await FocusItem(enabledItems, enabledItems.Count - 1);
-                break;
-        }
-    }
-
-    private async Task NavigateNext(List<IDropdownMenuItem> enabledItems, int currentIndex)
-    {
-        int nextIndex;
-
-        if (currentIndex == -1)
-        {
-            // No item focused, focus first
-            nextIndex = 0;
-        }
-        else
-        {
-            // Find current item in enabled list
-            var currentEnabledIndex = GetEnabledItemIndex(enabledItems, currentIndex);
-
-            if (currentEnabledIndex == -1)
+            switch (args.Key)
             {
-                // Current item not in enabled list, focus first
-                nextIndex = 0;
-            }
-            else if (currentEnabledIndex == enabledItems.Count - 1)
-            {
-                // At last item
-                if (Loop)
-                {
-                    nextIndex = 0; // Wrap to first
-                }
-                else
-                {
-                    return; // Don't move
-                }
-            }
-            else
-            {
-                nextIndex = currentEnabledIndex + 1;
+                case "ArrowDown":
+                    await _keyboardNavModule.InvokeVoidAsync("navigateNext", _contentRef, Loop);
+                    break;
+
+                case "ArrowUp":
+                    await _keyboardNavModule.InvokeVoidAsync("navigatePrevious", _contentRef, Loop);
+                    break;
+
+                case "Home":
+                    await _keyboardNavModule.InvokeVoidAsync("navigateFirst", _contentRef);
+                    break;
+
+                case "End":
+                    await _keyboardNavModule.InvokeVoidAsync("navigateLast", _contentRef);
+                    break;
             }
         }
-
-        await FocusItem(enabledItems, nextIndex);
-    }
-
-    private async Task NavigatePrevious(List<IDropdownMenuItem> enabledItems, int currentIndex)
-    {
-        int prevIndex;
-
-        if (currentIndex == -1)
+        catch
         {
-            // No item focused, focus last
-            prevIndex = enabledItems.Count - 1;
+            // Ignore navigation errors
         }
-        else
-        {
-            // Find current item in enabled list
-            var currentEnabledIndex = GetEnabledItemIndex(enabledItems, currentIndex);
-
-            if (currentEnabledIndex == -1)
-            {
-                // Current item not in enabled list, focus last
-                prevIndex = enabledItems.Count - 1;
-            }
-            else if (currentEnabledIndex == 0)
-            {
-                // At first item
-                if (Loop)
-                {
-                    prevIndex = enabledItems.Count - 1; // Wrap to last
-                }
-                else
-                {
-                    return; // Don't move
-                }
-            }
-            else
-            {
-                prevIndex = currentEnabledIndex - 1;
-            }
-        }
-
-        await FocusItem(enabledItems, prevIndex);
-    }
-
-    private int GetEnabledItemIndex(List<IDropdownMenuItem> enabledItems, int absoluteIndex)
-    {
-        if (absoluteIndex < 0 || absoluteIndex >= _menuItems.Count) return -1;
-
-        var currentItem = _menuItems[absoluteIndex];
-        return enabledItems.IndexOf(currentItem);
-    }
-
-    private async Task FocusItem(List<IDropdownMenuItem> enabledItems, int enabledIndex)
-    {
-        if (enabledIndex < 0 || enabledIndex >= enabledItems.Count) return;
-
-        var item = enabledItems[enabledIndex];
-        var absoluteIndex = _menuItems.IndexOf(item);
-
-        Context.SetFocusedIndex(absoluteIndex);
-        await item.FocusAsync();
     }
 
     private async Task CleanupAsync()

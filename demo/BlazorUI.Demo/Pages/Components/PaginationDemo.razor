@@ -1,0 +1,121 @@
+@page "/components/pagination"
+@using BlazorUI.Components.Pagination
+@using BlazorUI.Components.Separator
+
+<PageTitle>Pagination Component - BlazorUI</PageTitle>
+
+<div class="space-y-8 max-w-4xl">
+    <div>
+        <div class="space-y-3">
+            <h1 class="text-4xl font-bold tracking-tight">Pagination Component</h1>
+            <p class="text-xl text-muted-foreground">
+                Pagination with page navigation, previous and next controls.
+            </p>
+        </div>
+    </div>
+
+    <!-- Basic Example -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Basic Example</h2>
+            <p class="text-sm text-muted-foreground">
+                A simple pagination component with page numbers.
+            </p>
+        </div>
+        <Pagination>
+            <PaginationContent>
+                <PaginationItem>
+                    <PaginationPrevious OnClick="@(() => GoToPage(_currentPage - 1))" Disabled="@(_currentPage <= 1)" />
+                </PaginationItem>
+                @for (int i = 1; i <= 5; i++)
+                {
+                    var page = i;
+                    <PaginationItem>
+                        <PaginationLink IsActive="@(_currentPage == page)" OnClick="@(() => GoToPage(page))">@(page)</PaginationLink>
+                    </PaginationItem>
+                }
+                <PaginationItem>
+                    <PaginationNext OnClick="@(() => GoToPage(_currentPage + 1))" Disabled="@(_currentPage >= 5)" />
+                </PaginationItem>
+            </PaginationContent>
+        </Pagination>
+        <p class="text-sm text-muted-foreground text-center">Current page: @_currentPage</p>
+    </div>
+
+    <!-- With Ellipsis -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">With Ellipsis</h2>
+            <p class="text-sm text-muted-foreground">
+                Show ellipsis for large page ranges.
+            </p>
+        </div>
+        <Pagination>
+            <PaginationContent>
+                <PaginationItem>
+                    <PaginationPrevious />
+                </PaginationItem>
+                <PaginationItem>
+                    <PaginationLink IsActive="true">1</PaginationLink>
+                </PaginationItem>
+                <PaginationItem>
+                    <PaginationLink>2</PaginationLink>
+                </PaginationItem>
+                <PaginationItem>
+                    <PaginationEllipsis />
+                </PaginationItem>
+                <PaginationItem>
+                    <PaginationLink>9</PaginationLink>
+                </PaginationItem>
+                <PaginationItem>
+                    <PaginationLink>10</PaginationLink>
+                </PaginationItem>
+                <PaginationItem>
+                    <PaginationNext />
+                </PaginationItem>
+            </PaginationContent>
+        </Pagination>
+    </div>
+
+    <!-- API Reference -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">API Reference</h2>
+        </div>
+        <div class="border rounded-lg p-6 space-y-4">
+            <div>
+                <h3 class="font-semibold mb-2">Components</h3>
+                <div class="space-y-2 text-sm">
+                    <p><code class="bg-muted px-1 py-0.5 rounded">Pagination</code> - Container with nav element</p>
+                    <p><code class="bg-muted px-1 py-0.5 rounded">PaginationContent</code> - List container</p>
+                    <p><code class="bg-muted px-1 py-0.5 rounded">PaginationItem</code> - Individual item wrapper</p>
+                    <p><code class="bg-muted px-1 py-0.5 rounded">PaginationLink</code> - Page number link</p>
+                    <p><code class="bg-muted px-1 py-0.5 rounded">PaginationPrevious</code> - Previous page button</p>
+                    <p><code class="bg-muted px-1 py-0.5 rounded">PaginationNext</code> - Next page button</p>
+                    <p><code class="bg-muted px-1 py-0.5 rounded">PaginationEllipsis</code> - Ellipsis indicator</p>
+                </div>
+            </div>
+            <Separator />
+            <div>
+                <h3 class="font-semibold mb-2">PaginationLink Parameters</h3>
+                <div class="space-y-2 text-sm">
+                    <p><strong>IsActive:</strong> <code class="bg-muted px-1 py-0.5 rounded">bool</code> - Highlights the current page</p>
+                    <p><strong>Disabled:</strong> <code class="bg-muted px-1 py-0.5 rounded">bool</code> - Disables the link</p>
+                    <p><strong>OnClick:</strong> <code class="bg-muted px-1 py-0.5 rounded">EventCallback</code> - Click handler</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private int _currentPage = 1;
+
+    private void GoToPage(int page)
+    {
+        if (page >= 1 && page <= 5)
+        {
+            _currentPage = page;
+        }
+    }
+}

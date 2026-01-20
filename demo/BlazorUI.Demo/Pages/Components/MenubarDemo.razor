@@ -1,0 +1,135 @@
+@page "/components/menubar"
+@using BlazorUI.Components.Menubar
+@using BlazorUI.Components.Separator
+
+<PageTitle>Menubar Component - BlazorUI</PageTitle>
+
+<div class="space-y-8 max-w-4xl">
+    <div>
+        <div class="space-y-3">
+            <h1 class="text-4xl font-bold tracking-tight">Menubar Component</h1>
+            <p class="text-xl text-muted-foreground">
+                A visually persistent menu common in desktop applications.
+            </p>
+        </div>
+    </div>
+
+    <!-- Basic Example -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Basic Example</h2>
+            <p class="text-sm text-muted-foreground">
+                A simple menubar with dropdown menus.
+            </p>
+        </div>
+        <Menubar>
+            <MenubarMenu>
+                <MenubarTrigger>File</MenubarTrigger>
+                <MenubarContent>
+                    <MenubarItem OnClick="@(() => HandleAction("New Tab"))">
+                        New Tab
+                        <MenubarShortcut>Ctrl+T</MenubarShortcut>
+                    </MenubarItem>
+                    <MenubarItem OnClick="@(() => HandleAction("New Window"))">
+                        New Window
+                        <MenubarShortcut>Ctrl+N</MenubarShortcut>
+                    </MenubarItem>
+                    <MenubarSeparator />
+                    <MenubarItem OnClick="@(() => HandleAction("Share"))">Share</MenubarItem>
+                    <MenubarSeparator />
+                    <MenubarItem OnClick="@(() => HandleAction("Print"))">
+                        Print...
+                        <MenubarShortcut>Ctrl+P</MenubarShortcut>
+                    </MenubarItem>
+                </MenubarContent>
+            </MenubarMenu>
+            <MenubarMenu>
+                <MenubarTrigger>Edit</MenubarTrigger>
+                <MenubarContent>
+                    <MenubarItem OnClick="@(() => HandleAction("Undo"))">
+                        Undo
+                        <MenubarShortcut>Ctrl+Z</MenubarShortcut>
+                    </MenubarItem>
+                    <MenubarItem OnClick="@(() => HandleAction("Redo"))">
+                        Redo
+                        <MenubarShortcut>Ctrl+Y</MenubarShortcut>
+                    </MenubarItem>
+                    <MenubarSeparator />
+                    <MenubarItem OnClick="@(() => HandleAction("Cut"))">
+                        Cut
+                        <MenubarShortcut>Ctrl+X</MenubarShortcut>
+                    </MenubarItem>
+                    <MenubarItem OnClick="@(() => HandleAction("Copy"))">
+                        Copy
+                        <MenubarShortcut>Ctrl+C</MenubarShortcut>
+                    </MenubarItem>
+                    <MenubarItem OnClick="@(() => HandleAction("Paste"))">
+                        Paste
+                        <MenubarShortcut>Ctrl+V</MenubarShortcut>
+                    </MenubarItem>
+                </MenubarContent>
+            </MenubarMenu>
+            <MenubarMenu>
+                <MenubarTrigger>View</MenubarTrigger>
+                <MenubarContent>
+                    <MenubarItem OnClick="@(() => HandleAction("Zoom In"))">Zoom In</MenubarItem>
+                    <MenubarItem OnClick="@(() => HandleAction("Zoom Out"))">Zoom Out</MenubarItem>
+                    <MenubarSeparator />
+                    <MenubarItem OnClick="@(() => HandleAction("Toggle Fullscreen"))">Toggle Fullscreen</MenubarItem>
+                </MenubarContent>
+            </MenubarMenu>
+            <MenubarMenu>
+                <MenubarTrigger>Help</MenubarTrigger>
+                <MenubarContent>
+                    <MenubarItem OnClick="@(() => HandleAction("Documentation"))">Documentation</MenubarItem>
+                    <MenubarSeparator />
+                    <MenubarItem OnClick="@(() => HandleAction("About"))">About</MenubarItem>
+                </MenubarContent>
+            </MenubarMenu>
+        </Menubar>
+        @if (!string.IsNullOrEmpty(_lastAction))
+        {
+            <p class="text-sm text-muted-foreground">Last action: @_lastAction</p>
+        }
+    </div>
+
+    <!-- API Reference -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">API Reference</h2>
+        </div>
+        <div class="border rounded-lg p-6 space-y-4">
+            <div>
+                <h3 class="font-semibold mb-2">Components</h3>
+                <div class="space-y-2 text-sm">
+                    <p><code class="bg-muted px-1 py-0.5 rounded">Menubar</code> - Root container</p>
+                    <p><code class="bg-muted px-1 py-0.5 rounded">MenubarMenu</code> - Individual menu</p>
+                    <p><code class="bg-muted px-1 py-0.5 rounded">MenubarTrigger</code> - Menu button</p>
+                    <p><code class="bg-muted px-1 py-0.5 rounded">MenubarContent</code> - Dropdown content</p>
+                    <p><code class="bg-muted px-1 py-0.5 rounded">MenubarItem</code> - Menu item</p>
+                    <p><code class="bg-muted px-1 py-0.5 rounded">MenubarLabel</code> - Section label</p>
+                    <p><code class="bg-muted px-1 py-0.5 rounded">MenubarSeparator</code> - Visual divider</p>
+                    <p><code class="bg-muted px-1 py-0.5 rounded">MenubarShortcut</code> - Keyboard shortcut hint</p>
+                </div>
+            </div>
+            <Separator />
+            <div>
+                <h3 class="font-mono text-sm font-semibold mb-2">MenubarItem Parameters</h3>
+                <div class="space-y-2 text-sm">
+                    <p><strong>OnClick:</strong> <code class="bg-muted px-1 py-0.5 rounded">EventCallback</code> - Click handler</p>
+                    <p><strong>Disabled:</strong> <code class="bg-muted px-1 py-0.5 rounded">bool</code> - Disables the item</p>
+                    <p><strong>Inset:</strong> <code class="bg-muted px-1 py-0.5 rounded">bool</code> - Adds left padding</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private string? _lastAction;
+
+    private void HandleAction(string action)
+    {
+        _lastAction = action;
+    }
+}

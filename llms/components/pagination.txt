@@ -1,0 +1,222 @@
+# Pagination Component
+
+Page navigation with previous/next controls and page number links.
+
+---
+
+## Overview
+
+The Pagination component provides navigation controls for multi-page content. It includes previous/next buttons, page number links, and ellipsis indicators for large page ranges.
+
+---
+
+## Package
+
+- **Package:** BlazorUI.Components
+- **Namespace:** BlazorUI.Components.Pagination
+- **Source:** https://github.com/blazorui-net/ui/tree/main/src/BlazorUI.Components/Components/Pagination
+
+---
+
+## Installation
+
+```bash
+dotnet add package BlazorUI.Components
+```
+
+Add to `_Imports.razor`:
+
+```razor
+@using BlazorUI.Components.Pagination
+```
+
+---
+
+## API Reference
+
+### Main Component: `<Pagination>`
+
+Navigation container for pagination controls.
+
+**Parameters:**
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `Class` | `string?` | `null` | Additional CSS classes |
+| `ChildContent` | `RenderFragment?` | - | PaginationContent |
+
+### Sub-components
+
+#### `<PaginationContent>`
+
+List container for pagination items.
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `Class` | `string?` | `null` | Additional CSS classes |
+| `ChildContent` | `RenderFragment?` | - | PaginationItem elements |
+
+#### `<PaginationItem>`
+
+Wrapper for individual pagination controls.
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `Class` | `string?` | `null` | Additional CSS classes |
+| `ChildContent` | `RenderFragment?` | - | Link, button, or ellipsis |
+
+#### `<PaginationLink>`
+
+Page number link.
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `IsActive` | `bool` | `false` | Highlights as current page |
+| `Disabled` | `bool` | `false` | Disables the link |
+| `OnClick` | `EventCallback` | - | Click handler |
+| `Size` | `PaginationLinkSize` | `Default` | Size variant (Default, Icon) |
+| `Class` | `string?` | `null` | Additional CSS classes |
+| `ChildContent` | `RenderFragment?` | - | Page number |
+
+#### `<PaginationPrevious>`
+
+Previous page button.
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `Disabled` | `bool` | `false` | Disables the button |
+| `OnClick` | `EventCallback` | - | Click handler |
+| `Class` | `string?` | `null` | Additional CSS classes |
+
+#### `<PaginationNext>`
+
+Next page button.
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `Disabled` | `bool` | `false` | Disables the button |
+| `OnClick` | `EventCallback` | - | Click handler |
+| `Class` | `string?` | `null` | Additional CSS classes |
+
+#### `<PaginationEllipsis>`
+
+Ellipsis indicator for skipped pages.
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `Class` | `string?` | `null` | Additional CSS classes |
+
+### Enum: `PaginationLinkSize`
+
+| Value | Description |
+|-------|-------------|
+| `Default` | Standard size |
+| `Icon` | Compact icon-only size |
+
+---
+
+## Basic Usage
+
+```razor
+<Pagination>
+    <PaginationContent>
+        <PaginationItem>
+            <PaginationPrevious OnClick="@(() => GoToPage(currentPage - 1))"
+                                Disabled="@(currentPage <= 1)" />
+        </PaginationItem>
+        @for (int i = 1; i <= 5; i++)
+        {
+            var page = i;
+            <PaginationItem>
+                <PaginationLink IsActive="@(currentPage == page)"
+                               OnClick="@(() => GoToPage(page))">
+                    @(page)
+                </PaginationLink>
+            </PaginationItem>
+        }
+        <PaginationItem>
+            <PaginationNext OnClick="@(() => GoToPage(currentPage + 1))"
+                           Disabled="@(currentPage >= 5)" />
+        </PaginationItem>
+    </PaginationContent>
+</Pagination>
+
+@code {
+    private int currentPage = 1;
+
+    private void GoToPage(int page)
+    {
+        if (page >= 1 && page <= 5)
+            currentPage = page;
+    }
+}
+```
+
+---
+
+## Examples
+
+### Example 1: With Ellipsis
+
+```razor
+<Pagination>
+    <PaginationContent>
+        <PaginationItem>
+            <PaginationPrevious />
+        </PaginationItem>
+        <PaginationItem>
+            <PaginationLink IsActive="true">1</PaginationLink>
+        </PaginationItem>
+        <PaginationItem>
+            <PaginationLink>2</PaginationLink>
+        </PaginationItem>
+        <PaginationItem>
+            <PaginationEllipsis />
+        </PaginationItem>
+        <PaginationItem>
+            <PaginationLink>9</PaginationLink>
+        </PaginationItem>
+        <PaginationItem>
+            <PaginationLink>10</PaginationLink>
+        </PaginationItem>
+        <PaginationItem>
+            <PaginationNext />
+        </PaginationItem>
+    </PaginationContent>
+</Pagination>
+```
+
+### Example 2: Simple Previous/Next
+
+```razor
+<Pagination>
+    <PaginationContent>
+        <PaginationItem>
+            <PaginationPrevious Disabled="@(page == 1)" />
+        </PaginationItem>
+        <PaginationItem>
+            <PaginationNext Disabled="@(page == totalPages)" />
+        </PaginationItem>
+    </PaginationContent>
+</Pagination>
+```
+
+---
+
+## Accessibility
+
+- Uses `<nav role="navigation" aria-label="pagination">` for screen readers
+- Previous/Next buttons have descriptive labels
+- Current page has `aria-current="page"`
+- Ellipsis is hidden from screen readers with `aria-hidden`
+
+---
+
+## Related Components
+
+- **DataTable** - llms/components/data-table.txt - Table with built-in pagination
+- **Breadcrumb** - llms/components/breadcrumb.txt - Navigation trail
+
+---
+
+**Last Updated:** 2025-01-20

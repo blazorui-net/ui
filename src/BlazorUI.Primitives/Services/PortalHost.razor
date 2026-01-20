@@ -1,6 +1,7 @@
 @namespace BlazorUI.Primitives.Services
-@implements IDisposable
+@implements IAsyncDisposable
 @inject IPortalService PortalService
+@inject IJSRuntime JSRuntime
 
 @* Renders all registered portals at the document body level *@
 @{
@@ -17,14 +18,30 @@
 
 @code {
     private HashSet<string> _renderedThisCycle = new();
+    private IJSObjectReference? _portalModule;
 
     protected override void OnInitialized()
     {
         PortalService.OnPortalsChanged += StateHasChanged;
     }
 
-    protected override void OnAfterRender(bool firstRender)
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        if (firstRender)
+        {
+            // Load portal.js to initialize the auto-focus observer
+            // This ensures elements with data-autofocus are automatically focused when rendered
+            try
+            {
+                _portalModule = await JSRuntime.InvokeAsync<IJSObjectReference>(
+                    "import", "./_content/BlazorUI.Primitives/js/primitives/portal.js");
+            }
+            catch
+            {
+                // Ignore errors during prerendering
+            }
+        }
+
         // Notify all portals that were rendered this cycle
         // This signals to content components that their ElementRef is now valid
         foreach (var portalId in _renderedThisCycle)
@@ -33,8 +50,13 @@
         }
     }
 
-    public void Dispose()
+    public async ValueTask DisposeAsync()
     {
         PortalService.OnPortalsChanged -= StateHasChanged;
+
+        if (_portalModule != null)
+        {
+            await _portalModule.DisposeAsync();
+        }
     }
 }

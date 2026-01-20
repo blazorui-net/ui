@@ -63,9 +63,9 @@ For installation and setup instructions, see: **https://raw.githubusercontent.co
 
 ---
 
-## Components (39 Components)
+## Components (49 Components)
 
-### Form Components (12)
+### Form Components (14)
 
 **Button** - Interactive button with multiple variants (default, destructive, outline, secondary, ghost, link) and sizes. - https://raw.githubusercontent.com/blazorui-net/ui/main/llms/components/button.txt
 
@@ -91,11 +91,19 @@ For installation and setup instructions, see: **https://raw.githubusercontent.co
 
 **Date Picker** - Date picker with popover calendar, custom formatting, and date constraints. - https://raw.githubusercontent.com/blazorui-net/ui/main/llms/components/date-picker.txt
 
-### Layout & Navigation Components (9)
+**Slider** - Range input for selecting numeric values within a range. - https://raw.githubusercontent.com/blazorui-net/ui/main/llms/components/slider.txt
+
+**Toggle** - Two-state button for toggleable options. - https://raw.githubusercontent.com/blazorui-net/ui/main/llms/components/toggle.txt
+
+### Layout & Navigation Components (15)
 
 **Accordion** - Styled collapsible content sections with smooth animations and shadcn/ui design. - https://raw.githubusercontent.com/blazorui-net/ui/main/llms/components/accordion.txt
 
+**Breadcrumb** - Navigation trail showing hierarchical location. - https://raw.githubusercontent.com/blazorui-net/ui/main/llms/components/breadcrumb.txt
+
 **Card** - Container component for grouped content with header, body, and footer sections. - https://raw.githubusercontent.com/blazorui-net/ui/main/llms/components/card.txt
+
+**Carousel** - Slideshow component for cycling through content. - https://raw.githubusercontent.com/blazorui-net/ui/main/llms/components/carousel.txt
 
 **Collapsible** - Styled expandable content area with trigger control and smooth transitions. - https://raw.githubusercontent.com/blazorui-net/ui/main/llms/components/collapsible.txt
 
@@ -103,25 +111,37 @@ For installation and setup instructions, see: **https://raw.githubusercontent.co
 
 **Item** - Flexible list item component with media (avatar/icon), content, and action areas. - https://raw.githubusercontent.com/blazorui-net/ui/main/llms/components/item.txt
 
+**Pagination** - Page navigation with previous/next controls. - https://raw.githubusercontent.com/blazorui-net/ui/main/llms/components/pagination.txt
+
+**Scroll Area** - Custom scrollable area with styled scrollbars. - https://raw.githubusercontent.com/blazorui-net/ui/main/llms/components/scroll-area.txt
+
 **Separator** - Visual divider for content sections with horizontal and vertical orientation support. - https://raw.githubusercontent.com/blazorui-net/ui/main/llms/components/separator.txt
 
 **Sidebar** - Responsive navigation sidebar with collapsible menus, keyboard shortcuts (Ctrl/Cmd+B), and mobile support. - https://raw.githubusercontent.com/blazorui-net/ui/main/llms/components/sidebar.txt
 
 **Tabs** - Styled tabbed interface for organizing related content with keyboard navigation. - https://raw.githubusercontent.com/blazorui-net/ui/main/llms/components/tabs.txt
 
+**Toggle Group** - Group of toggles with single or multiple selection. - https://raw.githubusercontent.com/blazorui-net/ui/main/llms/components/toggle-group.txt
+
 **Navigation Menu** - Horizontal navigation with dropdown menus for site-wide navigation. - https://raw.githubusercontent.com/blazorui-net/ui/main/llms/components/navigation-menu.txt
 
-### Overlay Components (9)
+### Overlay Components (11)
 
 **Combobox** - Styled autocomplete input with searchable dropdown and keyboard navigation. - https://raw.githubusercontent.com/blazorui-net/ui/main/llms/components/combobox.txt
 
 **Command** - Command palette for quick actions and navigation with keyboard shortcuts and search. - https://raw.githubusercontent.com/blazorui-net/ui/main/llms/components/command.txt
 
+**Context Menu** - Right-click menu with customizable items and shortcuts. - https://raw.githubusercontent.com/blazorui-net/ui/main/llms/components/context-menu.txt
+
 **Dialog** - Styled modal dialog with backdrop, focus management, and shadcn/ui design. - https://raw.githubusercontent.com/blazorui-net/ui/main/llms/components/dialog.txt
+
+**Drawer** - Mobile-friendly panel sliding from screen edge. - https://raw.githubusercontent.com/blazorui-net/ui/main/llms/components/drawer.txt
 
 **Dropdown Menu** - Styled context menu with items, separators, keyboard shortcuts, and nested submenus. - https://raw.githubusercontent.com/blazorui-net/ui/main/llms/components/dropdown-menu.txt
 
 **Hover Card** - Styled rich preview card on hover with delay control and shadcn/ui design. - https://raw.githubusercontent.com/blazorui-net/ui/main/llms/components/hover-card.txt
+
+**Menubar** - Desktop application-style menu bar with dropdown menus. - https://raw.githubusercontent.com/blazorui-net/ui/main/llms/components/menubar.txt
 
 **Popover** - Styled floating panel for additional content and actions with shadcn/ui design. - https://raw.githubusercontent.com/blazorui-net/ui/main/llms/components/popover.txt
 
@@ -220,4 +240,4 @@ For multi-component usage examples and common patterns, see: **https://raw.githu
 
 ---
 
-**Last Updated:** 2025-01-19
+**Last Updated:** 2025-01-20

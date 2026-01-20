@@ -42,7 +42,8 @@
       "Bash(dotnet msbuild:*)",
       "Bash(gh issue view:*)",
       "Bash(gh issue close:*)",
-      "Bash(xargs cat:*)"
+      "Bash(xargs cat:*)",
+      "Bash(done)"
     ],
     "deny": [],
     "ask": []

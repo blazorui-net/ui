@@ -7,8 +7,10 @@
      role="menuitem"
      tabindex="@(Disabled ? -1 : -1)"
      aria-disabled="@Disabled.ToString().ToLower()"
+     data-disabled="@(Disabled ? "true" : null)"
      @onclick="HandleClick"
      @onkeydown="HandleKeyDown"
+     @onkeydown:preventDefault="true"
      @attributes="AdditionalAttributes">
     @ChildContent
 </div>
@@ -17,7 +19,7 @@
     [CascadingParameter]
     private DropdownMenuContext Context { get; set; } = null!;
 
-    [CascadingParameter]
+    [CascadingParameter(Name = "DropdownMenuContentContext")]
     private DropdownMenuContent? ContentContext { get; set; }
 
     private ElementReference _itemRef;
