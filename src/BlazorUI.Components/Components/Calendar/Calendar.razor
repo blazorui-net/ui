@@ -81,7 +81,7 @@
                                     {
                                         <button type="button"
                                                 class="@GetDayClasses(day.Value)"
-                                                disabled="@IsDisabled(day.Value)"
+                                                disabled="@(IsDisabled(day.Value) || IsOutsideMonth(day.Value))"
                                                 @onclick="@(() => SelectDate(day.Value))">
                                             @day.Value.Day
                                         </button>
@@ -154,6 +154,12 @@
     /// </summary>
     [Parameter]
     public DayOfWeek FirstDayOfWeek { get; set; } = DayOfWeek.Sunday;
+
+    /// <summary>
+    /// Whether to show days from previous and next months.
+    /// </summary>
+    [Parameter]
+    public bool ShowOutsideDays { get; set; } = true;
 
     /// <summary>
     /// Additional CSS classes to apply to the calendar.
@@ -313,7 +319,8 @@
                 }
                 else
                 {
-                    week.Add(null); // Days outside the month shown as empty
+                    // Show outside days if enabled, otherwise null (empty cell)
+                    week.Add(ShowOutsideDays ? currentDate : null);
                 }
                 currentDate = currentDate.AddDays(1);
             }
@@ -343,6 +350,7 @@
         var isSelectedDate = Selected.HasValue && date.Date == Selected.Value.Date;
         var isTodayDate = IsToday(date);
         var isDisabledDate = IsDisabled(date);
+        var isOutsideDate = IsOutsideMonth(date);
 
         return ClassNames.cn(
             "inline-flex h-9 w-9 items-center justify-center rounded-md text-sm font-normal",
@@ -352,7 +360,8 @@
             "hover:bg-accent hover:text-accent-foreground",
             isSelectedDate ? "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground" : null,
             isTodayDate && !isSelectedDate ? "bg-accent text-accent-foreground" : null,
-            isDisabledDate ? "text-muted-foreground opacity-50" : null
+            isDisabledDate ? "text-muted-foreground opacity-50" : null,
+            isOutsideDate ? "text-muted-foreground opacity-50" : null
         );
     }
 
