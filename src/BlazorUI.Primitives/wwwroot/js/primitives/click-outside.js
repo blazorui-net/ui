@@ -280,11 +280,22 @@ export function onClickOutsideByIds(elementId, dotNetRef, methodName = 'HandleCl
     // Check if target is inside a nested portal (Select, Combobox, etc.)
     // Uses data-portal-content attribute for generic, future-proof detection
     // Returns the portal ID if inside a nested portal, null otherwise
+    // IMPORTANT: Distinguishes between PARENT portals (that contain our trigger) and
+    // CHILD portals (opened from within our component). Only child portals should
+    // prevent click-outside from closing.
     const getNestedPortalId = (target) => {
         // Check if click is inside ANY portal content using the data-portal-content attribute
         const portalContent = target.closest('[data-portal-content]');
         if (portalContent && portalContent.id !== elementId) {
-            // It's a nested portal content, not our main element - return its ID
+            // Found a portal that's not our element
+            // Check if it's a PARENT portal by seeing if our trigger is inside it
+            const ourTrigger = excludeElementId ? document.getElementById(excludeElementId) : null;
+            if (ourTrigger && portalContent.contains(ourTrigger)) {
+                // Our trigger is inside this portal - it's a PARENT portal, not nested
+                // Treat as normal click (not inside nested portal)
+                return null;
+            }
+            // It's a sibling or child portal - return its ID
             return portalContent.id;
         }
         return null;
