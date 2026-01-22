@@ -3,6 +3,8 @@
 @using BlazorUI.Primitives.Table
 @using BlazorUI.Components.Utilities
 @using BlazorUI.Components.Checkbox
+@using BlazorUI.Components.Empty
+@using BlazorUI.Components.Pagination
 
 <CascadingValue Value="this" IsFixed="true">
     <div class="@ContainerCssClass">
@@ -39,9 +41,7 @@
                 }
                 else
                 {
-                    <div class="flex items-center justify-center p-8 text-muted-foreground">
-                        <div class="text-sm">No results found.</div>
-                    </div>
+                    <Empty Title="No results found" Size="EmptySize.Small" />
                 }
             }
             else
@@ -139,11 +139,25 @@
 
         @if (ShowPagination && !IsLoading && _processedData.Any())
         {
-            <DataTablePagination TData="TData"
-                                 State="@_tableState"
-                                 PageSizes="@PageSizes"
-                                 OnPageChanged="@HandlePageChanged"
-                                 OnPageSizeChanged="@HandlePageSizeChanged" />
+            <Pagination State="@_tableState.Pagination"
+                        PageSizes="@PageSizes"
+                        OnPageChanged="@HandlePageChanged"
+                        OnPageSizeChanged="@HandlePageSizeChanged"
+                        Class="flex items-center justify-between px-2 py-4">
+                <PaginationInfo />
+                <PaginationContent Class="flex items-center gap-6 lg:gap-8">
+                    <PaginationPageSizeSelector />
+                    <div class="flex items-center gap-2">
+                        <PaginationPageDisplay />
+                        <div class="flex items-center gap-1">
+                            <PaginationItem><PaginationFirst /></PaginationItem>
+                            <PaginationItem><PaginationPrevious ShowText="false" /></PaginationItem>
+                            <PaginationItem><PaginationNext ShowText="false" /></PaginationItem>
+                            <PaginationItem><PaginationLast /></PaginationItem>
+                        </div>
+                    </div>
+                </PaginationContent>
+            </Pagination>
         }
     </div>
 
