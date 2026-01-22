@@ -32,7 +32,8 @@
                         PopoverWidth="w-[300px]" />
             @if (selectedLanguages?.Any() == true)
             {
-                <p class="text-sm">Selected: <strong>@string.Join(", ", selectedLanguages.Select(GetLanguageLabel))</strong></p>
+                <p class="text-sm">Selected (display): <strong>@string.Join(", ", selectedLanguages.Select(GetLanguageLabel))</strong></p>
+                <p class="text-sm">Selected (values): <strong>[@string.Join(", ", selectedLanguages)]</strong></p>
             }
         </div>
     </section>
@@ -113,7 +114,8 @@
                         PopoverWidth="w-[250px]" />
             @if (selectedFrameworks?.Any() == true)
             {
-                <p class="text-sm">Selected: <strong>@string.Join(", ", selectedFrameworks.Select(GetFrameworkLabel))</strong></p>
+                <p class="text-sm">Selected (display): <strong>@string.Join(", ", selectedFrameworks.Select(GetFrameworkLabel))</strong></p>
+                <p class="text-sm">Selected (values): <strong>[@string.Join(", ", selectedFrameworks)]</strong></p>
             }
         </div>
     </section>

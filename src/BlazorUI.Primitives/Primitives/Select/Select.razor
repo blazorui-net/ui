@@ -98,6 +98,8 @@
         // Sync initial value to context
         _context.State.Value = _state.Value;
         _context.State.Disabled = Disabled;
+        // Set initial DisplayText (will be updated when items register with correct display text)
+        _context.State.DisplayText = _state.Value?.ToString();
 
         // Subscribe to context value changes
         _context.OnValueChange = async (newValue) =>
@@ -129,8 +131,9 @@
         {
             _state.ControlledValue = Value;
             _context.State.Value = Value;
-            // Update DisplayText to match the new value
-            _context.State.DisplayText = Value?.ToString();
+            // Update DisplayText - try to look up from registered items first,
+            // fall back to Value.ToString() (RegisterItem will fix this when items register)
+            _context.State.DisplayText = _context.GetDisplayTextForValue(Value) ?? Value?.ToString();
         }
 
         // Handle controlled open state

@@ -218,6 +218,18 @@ public class SelectContext<TValue> : PrimitiveContextWithEvents<SelectState<TVal
             DisplayText = displayText
         };
         Items.Add(metadata);
+
+        // If this item's value matches the currently selected value,
+        // update the DisplayText to show the proper display name instead of Value.ToString()
+        if (displayText != null && EqualityComparer<TValue>.Default.Equals(State.Value, value))
+        {
+            // Only update if DisplayText is null or was set to Value.ToString() fallback
+            if (State.DisplayText == null || State.DisplayText == value?.ToString())
+            {
+                UpdateState(state => state.DisplayText = displayText);
+            }
+        }
+
         return Items.Count - 1;
     }
 
@@ -337,6 +349,19 @@ public class SelectContext<TValue> : PrimitiveContextWithEvents<SelectState<TVal
                 SelectValue(item.Value, item.DisplayText);
             }
         }
+    }
+
+    /// <summary>
+    /// Gets the display text for a given value by looking up registered items.
+    /// </summary>
+    /// <param name="value">The value to look up.</param>
+    /// <returns>The display text if found, otherwise null.</returns>
+    public string? GetDisplayTextForValue(TValue? value)
+    {
+        if (value == null) return null;
+
+        var item = Items.FirstOrDefault(i => EqualityComparer<TValue>.Default.Equals(i.Value, value));
+        return item?.DisplayText;
     }
 }
 

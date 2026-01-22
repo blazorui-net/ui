@@ -16,6 +16,7 @@
             data-state="@(_context.IsOpen ? "open" : "closed")"
             @onclick="HandleClick"
             @onkeydown="HandleKeyDown"
+            @onkeydown:preventDefault="true"
             @attributes="AdditionalAttributes">
         @ChildContent
     </button>
