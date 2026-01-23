@@ -22,12 +22,21 @@ export function initializeEditor(element, dotNetRef, editorId, options) {
     }
 
     const quillOptions = {
-        theme: 'snow',
+        theme: null,  // Headless mode - we handle the toolbar ourselves
         placeholder: options.placeholder || '',
         readOnly: options.readOnly || false,
         modules: {
-            toolbar: options.toolbar === false ? false : (options.toolbar || null)
-        }
+            toolbar: false  // We build our own toolbar in Blazor
+        },
+        // Explicitly register all formats we support
+        formats: [
+            'bold', 'italic', 'underline', 'strike',
+            'header',
+            'list',
+            'blockquote', 'code-block',
+            'link',
+            'indent'
+        ]
     };
 
     const quill = new Quill(element, quillOptions);
@@ -48,12 +57,14 @@ export function initializeEditor(element, dotNetRef, editorId, options) {
         }, 150);
     });
 
-    // Selection-change for focus/blur detection
+    // Selection-change for focus/blur detection and format tracking
     quill.on('selection-change', (range, oldRange, source) => {
+        const format = range ? quill.getFormat(range) : {};
         dotNetRef.invokeMethodAsync('OnSelectionChangeCallback', {
             range: range,
             oldRange: oldRange,
-            source: source
+            source: source,
+            format: format
         }).catch(err => console.error('Error in selection-change:', err));
     });
 
@@ -188,6 +199,36 @@ export function format(editorId, formatName, value) {
 }
 
 /**
+ * Applies formatting and returns the updated format state
+ * Used for all formats to ensure immediate state sync
+ * @param {string} editorId - Unique identifier for the editor
+ * @param {string} formatName - Name of the format
+ * @param {*} value - Format value
+ * @returns {Object} Updated format state
+ */
+export function formatAndGetState(editorId, formatName, value) {
+    const stored = editorStates.get(editorId);
+    if (stored) {
+        const quill = stored.quill;
+        const range = quill.getSelection();
+
+        // Special handling for code-block removal in Quill v2
+        // TODO: Quill's format('code-block', false) doesn't work correctly - see DEV-TASKS.md #32
+        if (formatName === 'code-block' && value === false && range) {
+            // For now, just call format - removal doesn't work but at least won't error
+            quill.format(formatName, value);
+        } else {
+            quill.format(formatName, value);
+        }
+
+        // Get the updated format state immediately after applying
+        const newRange = quill.getSelection();
+        return newRange ? quill.getFormat(newRange) : quill.getFormat();
+    }
+    return {};
+}
+
+/**
  * Gets the formatting at the current selection
  * @param {string} editorId - Unique identifier for the editor
  * @returns {Object} Format object
@@ -242,4 +283,39 @@ export function blur(editorId) {
     if (stored) {
         stored.quill.blur();
     }
+}
+
+/**
+ * Prompts for a URL and inserts a link
+ * @param {string} editorId - Unique identifier for the editor
+ * @returns {boolean} True if link was inserted, false if cancelled
+ */
+export function promptLink(editorId) {
+    const stored = editorStates.get(editorId);
+    if (!stored) return false;
+
+    const quill = stored.quill;
+    const range = quill.getSelection();
+
+    if (!range) {
+        // No selection - can't insert link
+        return false;
+    }
+
+    // Check if there's already a link
+    const format = quill.getFormat(range);
+    if (format.link) {
+        // Remove existing link
+        quill.format('link', false);
+        return true;
+    }
+
+    // Prompt for URL
+    const url = window.prompt('Enter URL:', 'https://');
+    if (url && url !== 'https://') {
+        quill.format('link', url);
+        return true;
+    }
+
+    return false;
 }

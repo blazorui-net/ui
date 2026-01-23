@@ -26,18 +26,7 @@
 
         <div class="space-y-4">
             <RichTextEditor @bind-Value="basicValue" Placeholder="Start typing here..." />
-
-            @if (!string.IsNullOrEmpty(basicValue))
-            {
-                <Card>
-                    <CardHeader>
-                        <CardTitle Class="text-sm">HTML Output</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <pre class="text-xs bg-muted p-3 rounded-md overflow-auto whitespace-pre-wrap">@basicValue</pre>
-                    </CardContent>
-                </Card>
-            }
+            @RenderHtmlOutput(basicValue)
         </div>
     </section>
 
@@ -50,11 +39,14 @@
             </p>
         </div>
 
-        <div class="space-y-2">
-            <Label For="description-editor">Description</Label>
-            <RichTextEditor @bind-Value="labeledValue"
-                            Id="description-editor"
-                            Placeholder="Enter a description..." />
+        <div class="space-y-4">
+            <div class="space-y-2">
+                <Label For="description-editor">Description</Label>
+                <RichTextEditor @bind-Value="labeledValue"
+                                Id="description-editor"
+                                Placeholder="Enter a description..." />
+            </div>
+            @RenderHtmlOutput(labeledValue)
         </div>
     </section>
 
@@ -68,32 +60,44 @@
         </div>
 
         <div class="grid gap-6">
-            <div class="space-y-2">
-                <Label>Simple Toolbar</Label>
-                <RichTextEditor @bind-Value="simpleValue"
-                                Toolbar="ToolbarPreset.Simple"
-                                Placeholder="Basic formatting only..." />
+            <div class="space-y-4">
+                <div class="space-y-2">
+                    <Label>Simple Toolbar</Label>
+                    <RichTextEditor @bind-Value="simpleValue"
+                                    Toolbar="ToolbarPreset.Simple"
+                                    Placeholder="Basic formatting only..." />
+                </div>
+                @RenderHtmlOutput(simpleValue)
             </div>
 
-            <div class="space-y-2">
-                <Label>Standard Toolbar (Default)</Label>
-                <RichTextEditor @bind-Value="standardValue"
-                                Toolbar="ToolbarPreset.Standard"
-                                Placeholder="Common formatting options..." />
+            <div class="space-y-4">
+                <div class="space-y-2">
+                    <Label>Standard Toolbar (Default)</Label>
+                    <RichTextEditor @bind-Value="standardValue"
+                                    Toolbar="ToolbarPreset.Standard"
+                                    Placeholder="Common formatting options..." />
+                </div>
+                @RenderHtmlOutput(standardValue)
             </div>
 
-            <div class="space-y-2">
-                <Label>Full Toolbar</Label>
-                <RichTextEditor @bind-Value="fullValue"
-                                Toolbar="ToolbarPreset.Full"
-                                Placeholder="All formatting options..." />
+            <div class="space-y-4">
+                <div class="space-y-2">
+                    <Label>Full Toolbar</Label>
+                    <RichTextEditor @bind-Value="fullValue"
+                                    Toolbar="ToolbarPreset.Full"
+                                    Placeholder="All formatting options..." />
+                </div>
+                @RenderHtmlOutput(fullValue)
             </div>
 
-            <div class="space-y-2">
-                <Label>No Toolbar</Label>
-                <RichTextEditor @bind-Value="noToolbarValue"
-                                Toolbar="ToolbarPreset.None"
-                                Placeholder="Plain editor without toolbar..." />
+            <div class="space-y-4">
+                <div class="space-y-2">
+                    <Label>No Toolbar</Label>
+                    <RichTextEditor @bind-Value="noToolbarValue"
+                                    Toolbar="ToolbarPreset.None"
+                                    Placeholder="Plain editor without toolbar..." />
+                </div>
+                @RenderHtmlOutput(noToolbarValue)
             </div>
         </div>
     </section>
@@ -115,22 +119,22 @@
                     <li><em>Italic</em> - Select text and click I or press <Kbd>Ctrl+I</Kbd></li>
                     <li><u>Underline</u> - Select text and click U or press <Kbd>Ctrl+U</Kbd></li>
                     <li><s>Strikethrough</s> - Select text and click the strikethrough button</li>
-                    <li>Headers - H1 through H6 heading levels</li>
-                    <li><span class="text-red-500">Font Color</span> - Choose text color from the color picker</li>
-                    <li>Background Color - Highlight text with background colors</li>
-                    <li>Bullet List - Click the bullet list icon to add unordered lists</li>
-                    <li>Numbered List - Click the numbered list icon for ordered lists</li>
-                    <li>Text Alignment - Left, center, right alignment options</li>
+                    <li>Headers - H1, H2, H3 heading levels via dropdown</li>
+                    <li>Bullet List - Click the bullet list icon</li>
+                    <li>Numbered List - Click the numbered list icon</li>
+                    <li>Link - Select text and click link icon to add URL</li>
                     <li>Blockquote - Add quoted text blocks</li>
                     <li>Code Block - Add code snippets</li>
-                    <li>Links and Images - Insert hyperlinks and images</li>
                 </ul>
             </div>
         </div>
 
-        <RichTextEditor @bind-Value="toolbarDemoValue"
-                        Toolbar="ToolbarPreset.Full"
-                        Placeholder="Try out the toolbar features..." />
+        <div class="space-y-4">
+            <RichTextEditor @bind-Value="toolbarDemoValue"
+                            Toolbar="ToolbarPreset.Full"
+                            Placeholder="Try out the toolbar features..." />
+            @RenderHtmlOutput(toolbarDemoValue)
+        </div>
     </section>
 
     @* Pre-populated Content *@
@@ -142,7 +146,10 @@
             </p>
         </div>
 
-        <RichTextEditor @bind-Value="prePopulatedValue" />
+        <div class="space-y-4">
+            <RichTextEditor @bind-Value="prePopulatedValue" />
+            @RenderHtmlOutput(prePopulatedValue)
+        </div>
     </section>
 
     @* Height Control *@
@@ -155,18 +162,24 @@
         </div>
 
         <div class="grid gap-6">
-            <div class="space-y-2">
-                <Label>MaxHeight="200px" (scrollbar appears after 200px)</Label>
-                <RichTextEditor @bind-Value="maxHeightValue"
-                                MaxHeight="200px"
-                                Placeholder="Type a lot of content to see the scrollbar..." />
+            <div class="space-y-4">
+                <div class="space-y-2">
+                    <Label>MaxHeight="200px" (scrollbar appears after 200px)</Label>
+                    <RichTextEditor @bind-Value="maxHeightValue"
+                                    MaxHeight="200px"
+                                    Placeholder="Type a lot of content to see the scrollbar..." />
+                </div>
+                @RenderHtmlOutput(maxHeightValue)
             </div>
 
-            <div class="space-y-2">
-                <Label>Height="150px" (fixed height, always shows scrollbar when needed)</Label>
-                <RichTextEditor @bind-Value="fixedHeightValue"
-                                Height="150px"
-                                Placeholder="Fixed height editor..." />
+            <div class="space-y-4">
+                <div class="space-y-2">
+                    <Label>Height="150px" (fixed height, always shows scrollbar when needed)</Label>
+                    <RichTextEditor @bind-Value="fixedHeightValue"
+                                    Height="150px"
+                                    Placeholder="Fixed height editor..." />
+                </div>
+                @RenderHtmlOutput(fixedHeightValue)
             </div>
         </div>
     </section>
@@ -205,6 +218,7 @@
                                     Id="feedback-editor"
                                     Placeholder="What's on your mind?" />
                 </div>
+                @RenderHtmlOutput(feedbackValue)
             </CardContent>
             <CardFooter>
                 <Button OnClick="HandleSubmit" Disabled="@string.IsNullOrWhiteSpace(feedbackValue)">
@@ -233,7 +247,7 @@
                 <p class="text-sm text-muted-foreground">
                     Add Quill.js CSS to your <code class="bg-muted px-1 rounded">&lt;head&gt;</code>:
                 </p>
-                <pre class="text-xs bg-muted p-3 rounded-md overflow-auto">&lt;link href="https://cdn.jsdelivr.net/npm/quill@2/dist/quill.snow.css" rel="stylesheet" /&gt;</pre>
+                <pre class="text-xs bg-muted p-3 rounded-md overflow-auto">&lt;link href="https://cdn.jsdelivr.net/npm/quill@2/dist/quill.core.css" rel="stylesheet" /&gt;</pre>
                 <p class="text-sm text-muted-foreground mt-2">
                     Add Quill.js script before the closing <code class="bg-muted px-1 rounded">&lt;/body&gt;</code> tag:
                 </p>
@@ -246,7 +260,7 @@
                     <li><strong>None</strong> - No toolbar, plain editing area</li>
                     <li><strong>Simple</strong> - Bold, italic, underline, and lists</li>
                     <li><strong>Standard</strong> - Headers, basic formatting, lists, links (default)</li>
-                    <li><strong>Full</strong> - All formatting options including colors, alignment, code blocks, and images</li>
+                    <li><strong>Full</strong> - All formatting options including blockquote and code blocks</li>
                     <li><strong>Custom</strong> - Use ToolbarContent to provide your own toolbar</li>
                 </ul>
             </div>
@@ -307,4 +321,25 @@
         submitted = true;
         StateHasChanged();
     }
+
+    private RenderFragment RenderHtmlOutput(string? value) => builder =>
+    {
+        if (!string.IsNullOrEmpty(value))
+        {
+            builder.OpenElement(0, "div");
+            builder.AddAttribute(1, "class", "mt-4 rounded-lg border bg-muted/30 p-4");
+
+            builder.OpenElement(2, "div");
+            builder.AddAttribute(3, "class", "text-xs font-medium text-muted-foreground mb-2");
+            builder.AddContent(4, "HTML Output");
+            builder.CloseElement();
+
+            builder.OpenElement(5, "pre");
+            builder.AddAttribute(6, "class", "text-xs bg-muted p-3 rounded-md overflow-auto whitespace-pre-wrap break-all");
+            builder.AddContent(7, value);
+            builder.CloseElement();
+
+            builder.CloseElement();
+        }
+    };
 }

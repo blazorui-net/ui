@@ -1,15 +1,89 @@
 @namespace BlazorUI.Components.RichTextEditor
 @using Microsoft.JSInterop
+@using BlazorUI.Icons.Lucide.Components
 @inject IJSRuntime JS
 @implements IAsyncDisposable
 
 <div class="@ContainerCssClass" data-slot="rich-text-editor" id="@Id">
-    @if (ToolbarContent != null)
+    @if (Toolbar != ToolbarPreset.None && ToolbarContent == null)
     {
         <div class="@ToolbarCssClass" data-slot="toolbar">
+            <div class="flex items-center gap-0.5">
+                @if (Toolbar >= ToolbarPreset.Standard)
+                {
+                    <select class="@DropdownCssClass" value="@_headerLevel" @onchange="HandleHeaderChange">
+                        <option value="">Normal</option>
+                        <option value="1">Heading 1</option>
+                        <option value="2">Heading 2</option>
+                        <option value="3">Heading 3</option>
+                    </select>
+                    <div class="w-px h-6 bg-border mx-1"></div>
+                }
+
+                <button type="button" class="@GetButtonCssClass(_isBold)" disabled="@Disabled"
+                        @onclick="@(() => ToggleFormatAsync("bold"))" title="Bold (Ctrl+B)">
+                    <LucideIcon Name="bold" Size="16" />
+                </button>
+                <button type="button" class="@GetButtonCssClass(_isItalic)" disabled="@Disabled"
+                        @onclick="@(() => ToggleFormatAsync("italic"))" title="Italic (Ctrl+I)">
+                    <LucideIcon Name="italic" Size="16" />
+                </button>
+                <button type="button" class="@GetButtonCssClass(_isUnderline)" disabled="@Disabled"
+                        @onclick="@(() => ToggleFormatAsync("underline"))" title="Underline (Ctrl+U)">
+                    <LucideIcon Name="underline" Size="16" />
+                </button>
+
+                @if (Toolbar >= ToolbarPreset.Standard)
+                {
+                    <button type="button" class="@GetButtonCssClass(_isStrike)" disabled="@Disabled"
+                            @onclick="@(() => ToggleFormatAsync("strike"))" title="Strikethrough">
+                        <LucideIcon Name="strikethrough" Size="16" />
+                    </button>
+                }
+
+                <div class="w-px h-6 bg-border mx-1"></div>
+
+                <button type="button" class="@GetButtonCssClass(_isBulletList)" disabled="@Disabled"
+                        @onclick="@(() => ToggleFormatAsync("list", "bullet"))" title="Bullet List">
+                    <LucideIcon Name="list" Size="16" />
+                </button>
+                <button type="button" class="@GetButtonCssClass(_isOrderedList)" disabled="@Disabled"
+                        @onclick="@(() => ToggleFormatAsync("list", "ordered"))" title="Numbered List">
+                    <LucideIcon Name="list-ordered" Size="16" />
+                </button>
+
+                @if (Toolbar >= ToolbarPreset.Standard)
+                {
+                    <div class="w-px h-6 bg-border mx-1"></div>
+                    <button type="button" class="@ToolbarButtonCssClass" disabled="@Disabled"
+                            @onclick="InsertLinkAsync" title="Insert Link">
+                        <LucideIcon Name="link" Size="16" />
+                    </button>
+                }
+
+                @if (Toolbar == ToolbarPreset.Full)
+                {
+                    <div class="w-px h-6 bg-border mx-1"></div>
+                    <button type="button" class="@GetButtonCssClass(_isBlockquote)" disabled="@Disabled"
+                            @onclick="@(() => ToggleFormatAsync("blockquote"))" title="Blockquote">
+                        <LucideIcon Name="quote" Size="16" />
+                    </button>
+                    <button type="button" class="@GetButtonCssClass(_isCodeBlock)" disabled="@Disabled"
+                            @onclick="@(() => ToggleFormatAsync("code-block"))" title="Code Block">
+                        <LucideIcon Name="code" Size="16" />
+                    </button>
+                }
+            </div>
+        </div>
+    }
+
+    @if (ToolbarContent != null)
+    {
+        <div class="@ToolbarCssClass" data-slot="custom-toolbar">
             @ToolbarContent
         </div>
     }
+
     <div @ref="_editorRef"
          class="@EditorCssClass"
          style="@EditorStyle"

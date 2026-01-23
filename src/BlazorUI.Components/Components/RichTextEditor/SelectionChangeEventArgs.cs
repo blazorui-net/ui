@@ -19,4 +19,9 @@ public class SelectionChangeEventArgs
     /// Gets or sets the source of the change (user, api, silent).
     /// </summary>
     public string? Source { get; set; }
+
+    /// <summary>
+    /// Gets or sets the formatting at the current selection.
+    /// </summary>
+    public Dictionary<string, object?>? Format { get; set; }
 }

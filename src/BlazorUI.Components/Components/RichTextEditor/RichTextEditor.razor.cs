@@ -1,3 +1,4 @@
+using System.Text.Json;
 using BlazorUI.Components.Utilities;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
@@ -17,6 +18,17 @@ public partial class RichTextEditor : ComponentBase, IAsyncDisposable
     private bool _jsInitialized;
     private string? _lastKnownValue;
     private bool _pendingValueUpdate;
+
+    // === Format State Tracking ===
+    private bool _isBold;
+    private bool _isItalic;
+    private bool _isUnderline;
+    private bool _isStrike;
+    private bool _isBulletList;
+    private bool _isOrderedList;
+    private bool _isBlockquote;
+    private bool _isCodeBlock;
+    private string _headerLevel = "";
 
     // === Parameters - Value Binding ===
 
@@ -230,6 +242,12 @@ public partial class RichTextEditor : ComponentBase, IAsyncDisposable
     [JSInvokable]
     public async Task OnSelectionChangeCallback(SelectionChangeEventArgs args)
     {
+        // Update format state from selection
+        if (args.Format != null)
+        {
+            UpdateFormatState(args.Format);
+        }
+
         // Detect focus/blur from selection (null range = lost focus)
         if (args.Range == null && args.OldRange != null)
         {
@@ -241,6 +259,117 @@ public partial class RichTextEditor : ComponentBase, IAsyncDisposable
         }
 
         await OnSelectionChange.InvokeAsync(args);
+    }
+
+    private static bool GetFormatBool(Dictionary<string, object?> format, string key)
+    {
+        if (!format.TryGetValue(key, out var value) || value == null)
+            return false;
+
+        if (value is bool b)
+            return b;
+
+        if (value is JsonElement je && je.ValueKind == JsonValueKind.True)
+            return true;
+
+        return false;
+    }
+
+    private static string GetFormatString(Dictionary<string, object?> format, string key)
+    {
+        if (!format.TryGetValue(key, out var value) || value == null)
+            return "";
+
+        if (value is string s)
+            return s;
+
+        if (value is JsonElement je)
+        {
+            if (je.ValueKind == JsonValueKind.String)
+                return je.GetString() ?? "";
+            if (je.ValueKind == JsonValueKind.Number)
+                return je.GetInt32().ToString();
+        }
+
+        return value.ToString() ?? "";
+    }
+
+    // === Toolbar Actions ===
+
+    private async Task ToggleFormatAsync(string format, object? value = null)
+    {
+        if (_jsModule == null || !_jsInitialized || Disabled) return;
+
+        // Toggle: if already active, remove; otherwise apply
+        bool isActive = format switch
+        {
+            "bold" => _isBold,
+            "italic" => _isItalic,
+            "underline" => _isUnderline,
+            "strike" => _isStrike,
+            "blockquote" => _isBlockquote,
+            "code-block" => _isCodeBlock,
+            "list" when value?.ToString() == "bullet" => _isBulletList,
+            "list" when value?.ToString() == "ordered" => _isOrderedList,
+            _ => false
+        };
+
+        var newValue = isActive ? false : (value ?? true);
+
+        // Use formatAndGetState for all formats to ensure immediate state sync
+        var formatState = await _jsModule.InvokeAsync<Dictionary<string, object?>>(
+            "formatAndGetState", _editorId, format, newValue);
+        UpdateFormatState(formatState);
+
+        // Refocus the editor after toolbar button click
+        await _jsModule.InvokeVoidAsync("focus", _editorId);
+    }
+
+    private void UpdateFormatState(Dictionary<string, object?> format)
+    {
+        if (format == null) return;
+
+        _isBold = GetFormatBool(format, "bold");
+        _isItalic = GetFormatBool(format, "italic");
+        _isUnderline = GetFormatBool(format, "underline");
+        _isStrike = GetFormatBool(format, "strike");
+        _isBlockquote = GetFormatBool(format, "blockquote");
+        _isCodeBlock = GetFormatBool(format, "code-block");
+
+        var listValue = GetFormatString(format, "list");
+        _isBulletList = listValue == "bullet";
+        _isOrderedList = listValue == "ordered";
+
+        _headerLevel = GetFormatString(format, "header");
+
+        StateHasChanged();
+    }
+
+    private async Task HandleHeaderChange(ChangeEventArgs e)
+    {
+        if (_jsModule == null || !_jsInitialized || Disabled) return;
+
+        var value = e.Value?.ToString();
+        if (string.IsNullOrEmpty(value))
+        {
+            await _jsModule.InvokeVoidAsync("format", _editorId, "header", false);
+        }
+        else
+        {
+            await _jsModule.InvokeVoidAsync("format", _editorId, "header", int.Parse(value));
+        }
+
+        // Refocus the editor after dropdown change
+        await _jsModule.InvokeVoidAsync("focus", _editorId);
+    }
+
+    private async Task InsertLinkAsync()
+    {
+        if (_jsModule == null || !_jsInitialized || Disabled) return;
+
+        // Use the JS prompt to get URL from user
+        await _jsModule.InvokeVoidAsync("promptLink", _editorId);
+        await _jsModule.InvokeVoidAsync("focus", _editorId);
     }
 
     // === Public API Methods ===
@@ -353,39 +482,7 @@ public partial class RichTextEditor : ComponentBase, IAsyncDisposable
     private object BuildEditorOptions() => new
     {
         placeholder = Placeholder ?? "",
-        readOnly = Disabled || ReadOnly,
-        toolbar = GetToolbarConfig()
-    };
-
-    private object? GetToolbarConfig() => Toolbar switch
-    {
-        ToolbarPreset.None => false,
-        ToolbarPreset.Simple => new object[]
-        {
-            new object[] { "bold", "italic", "underline" },
-            new object[] { new { list = "ordered" }, new { list = "bullet" } }
-        },
-        ToolbarPreset.Standard => new object[]
-        {
-            new object[] { new { header = new object[] { 1, 2, 3, false } } },
-            new object[] { "bold", "italic", "underline", "strike" },
-            new object[] { new { list = "ordered" }, new { list = "bullet" } },
-            new object[] { "link" },
-            new object[] { "clean" }
-        },
-        ToolbarPreset.Full => new object[]
-        {
-            new object[] { new { header = new object[] { 1, 2, 3, 4, 5, 6, false } } },
-            new object[] { "bold", "italic", "underline", "strike" },
-            new object[] { new { color = Array.Empty<string>() }, new { background = Array.Empty<string>() } },
-            new object[] { new { align = Array.Empty<string>() } },
-            new object[] { new { list = "ordered" }, new { list = "bullet" }, new { indent = "-1" }, new { indent = "+1" } },
-            new object[] { "blockquote", "code-block" },
-            new object[] { "link", "image" },
-            new object[] { "clean" }
-        },
-        ToolbarPreset.Custom => null, // Use ToolbarContent instead
-        _ => null
+        readOnly = Disabled || ReadOnly
     };
 
     // === CSS Classes ===
@@ -403,7 +500,6 @@ public partial class RichTextEditor : ComponentBase, IAsyncDisposable
     );
 
     private string EditorCssClass => ClassNames.cn(
-        "prose prose-sm dark:prose-invert max-w-none",
         "text-base md:text-sm",
         ClassNames.when(Disabled, "cursor-not-allowed")
     );
@@ -432,6 +528,23 @@ public partial class RichTextEditor : ComponentBase, IAsyncDisposable
             return string.Join("; ", styles);
         }
     }
+
+    private string ToolbarButtonCssClass => ClassNames.cn(
+        "inline-flex items-center justify-center rounded-md h-8 w-8",
+        "text-muted-foreground hover:bg-accent hover:text-accent-foreground",
+        "transition-colors disabled:opacity-50 disabled:pointer-events-none"
+    );
+
+    private string GetButtonCssClass(bool isActive) => ClassNames.cn(
+        ToolbarButtonCssClass,
+        ClassNames.when(isActive, "bg-accent text-accent-foreground border border-ring")
+    );
+
+    private string DropdownCssClass => ClassNames.cn(
+        "h-8 px-2 rounded-md border border-input bg-background text-sm",
+        "focus:outline-none focus:ring-2 focus:ring-ring",
+        "disabled:opacity-50 disabled:pointer-events-none"
+    );
 
     // === Dispose ===
 
