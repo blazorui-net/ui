@@ -4,6 +4,10 @@
 @using BlazorUI.Components.Toggle
 @using BlazorUI.Components.Button
 @using BlazorUI.Components.Separator
+@using BlazorUI.Components.NativeSelect
+@using BlazorUI.Components.Dialog
+@using BlazorUI.Components.Input
+@using BlazorUI.Components.Label
 @inject IJSRuntime JS
 @implements IAsyncDisposable
 
@@ -14,12 +18,17 @@
             <div class="flex items-center gap-0.5">
                 @if (Toolbar >= ToolbarPreset.Standard)
                 {
-                    <select class="@DropdownCssClass" value="@_headerLevel" @onchange="HandleHeaderChange" disabled="@Disabled">
+                    <NativeSelect TValue="string"
+                                 Value="@_headerLevel"
+                                 ValueChanged="@HandleHeaderChangeAsync"
+                                 Disabled="@Disabled"
+                                 Size="NativeSelectSize.Small"
+                                 Class="w-auto min-w-[100px]">
                         <option value="">Normal</option>
                         <option value="1">Heading 1</option>
                         <option value="2">Heading 2</option>
                         <option value="3">Heading 3</option>
-                    </select>
+                    </NativeSelect>
                     <Separator Orientation="SeparatorOrientation.Vertical" Class="h-6 mx-1" />
                 }
 
@@ -132,4 +141,46 @@
          aria-invalid="@(AriaInvalid?.ToString()?.ToLower())"
          data-slot="editor">
     </div>
+
+    @* Link Dialog *@
+    <Dialog @bind-Open="_linkDialogOpen">
+        <DialogContent Class="sm:max-w-md">
+            <DialogHeader>
+                <DialogTitle>@(_hasExistingLink ? "Edit Link" : "Insert Link")</DialogTitle>
+                <DialogDescription>
+                    @(_hasExistingLink ? "Update the URL or remove the link." : "Enter the URL for the selected text.")
+                </DialogDescription>
+            </DialogHeader>
+            <div class="grid gap-4 py-4">
+                <div class="grid gap-2">
+                    <Label For="link-url">URL</Label>
+                    <Input Id="link-url"
+                           Type="InputType.Url"
+                           Placeholder="https://example.com"
+                           @bind-Value="_linkUrl"
+                           @bind-Value:after="ValidateLinkUrl" />
+                    @if (!string.IsNullOrEmpty(_linkUrlError))
+                    {
+                        <p class="text-sm text-destructive">@_linkUrlError</p>
+                    }
+                </div>
+            </div>
+            <DialogFooter Class="flex-col sm:flex-row gap-2">
+                @if (_hasExistingLink)
+                {
+                    <Button Variant="ButtonVariant.Destructive"
+                            OnClick="RemoveLinkAsync"
+                            Class="sm:mr-auto">
+                        Remove Link
+                    </Button>
+                }
+                <Button Variant="ButtonVariant.Outline" OnClick="CloseLinkDialog">
+                    Cancel
+                </Button>
+                <Button OnClick="ApplyLinkAsync" Disabled="@(!IsValidUrl(_linkUrl))">
+                    @(_hasExistingLink ? "Update" : "Insert")
+                </Button>
+            </DialogFooter>
+        </DialogContent>
+    </Dialog>
 </div>

@@ -46,11 +46,22 @@ export function initializeEditor(element, dotNetRef, editorId, options) {
     const textChangeHandler = (delta, oldDelta, source) => {
         clearTimeout(textChangeTimeout);
         textChangeTimeout = setTimeout(() => {
+            // Check if callbacks are suppressed (during programmatic updates)
+            const state = editorStates.get(editorId);
+            if (state && state.suppressCallbacks) {
+                return;
+            }
+
+            // Use getSemanticHTML for normalized output (Quill 2.0+)
+            const html = typeof quill.getSemanticHTML === 'function'
+                ? quill.getSemanticHTML()
+                : quill.root.innerHTML;
+
             dotNetRef.invokeMethodAsync('OnTextChangeCallback', {
                 delta: JSON.stringify(delta),
                 oldDelta: JSON.stringify(oldDelta),
                 source: source,
-                html: quill.root.innerHTML,
+                html: html,
                 text: quill.getText(),
                 length: quill.getLength()
             }).catch(err => console.error('Error in text-change:', err));
@@ -75,7 +86,8 @@ export function initializeEditor(element, dotNetRef, editorId, options) {
         dotNetRef,
         textChangeTimeout,
         textChangeHandler,
-        selectionChangeHandler
+        selectionChangeHandler,
+        suppressCallbacks: false
     });
 }
 
@@ -101,6 +113,7 @@ export function disposeEditor(editorId) {
  * Sets the HTML content of the editor
  * Uses Quill's clipboard module to properly convert HTML to Delta,
  * maintaining synchronization between DOM and internal state.
+ * Suppresses callbacks to prevent update loops during programmatic updates.
  * @param {string} editorId - Unique identifier for the editor
  * @param {string} html - HTML content to set
  */
@@ -108,25 +121,42 @@ export function setHtml(editorId, html) {
     const stored = editorStates.get(editorId);
     if (stored) {
         const quill = stored.quill;
-        if (!html) {
-            // Empty content - set empty Delta
-            quill.setContents([{ insert: '\n' }], 'api');
-        } else {
-            // Convert HTML to Delta using Quill's clipboard module
-            const delta = quill.clipboard.convert({ html: html });
-            quill.setContents(delta, 'api');
+
+        // Suppress callbacks during programmatic update
+        stored.suppressCallbacks = true;
+
+        try {
+            if (!html) {
+                // Empty content - set empty Delta
+                quill.setContents([{ insert: '\n' }], 'api');
+            } else {
+                // Convert HTML to Delta using Quill's clipboard module
+                const delta = quill.clipboard.convert({ html: html });
+                quill.setContents(delta, 'api');
+            }
+        } finally {
+            // Re-enable callbacks after a short delay to allow any pending events to be suppressed
+            setTimeout(() => {
+                stored.suppressCallbacks = false;
+            }, 200);
         }
     }
 }
 
 /**
- * Gets the HTML content of the editor
+ * Gets the HTML content of the editor using Quill's semantic HTML output
+ * Uses getSemanticHTML() for normalized, consistent HTML across browsers
  * @param {string} editorId - Unique identifier for the editor
  * @returns {string} HTML content
  */
 export function getHtml(editorId) {
     const stored = editorStates.get(editorId);
     if (stored) {
+        // Use getSemanticHTML for normalized output (Quill 2.0+)
+        // Falls back to innerHTML if not available
+        if (typeof stored.quill.getSemanticHTML === 'function') {
+            return stored.quill.getSemanticHTML();
+        }
         return stored.quill.root.innerHTML;
     }
     return '';
@@ -134,13 +164,24 @@ export function getHtml(editorId) {
 
 /**
  * Sets the editor contents using a Delta object
+ * Suppresses callbacks to prevent update loops during programmatic updates.
  * @param {string} editorId - Unique identifier for the editor
  * @param {string} delta - JSON string representation of the Delta
  */
 export function setContents(editorId, delta) {
     const stored = editorStates.get(editorId);
     if (stored && delta) {
-        stored.quill.setContents(JSON.parse(delta));
+        // Suppress callbacks during programmatic update
+        stored.suppressCallbacks = true;
+
+        try {
+            stored.quill.setContents(JSON.parse(delta), 'api');
+        } finally {
+            // Re-enable callbacks after a short delay to allow any pending events to be suppressed
+            setTimeout(() => {
+                stored.suppressCallbacks = false;
+            }, 200);
+        }
     }
 }
 
@@ -238,15 +279,52 @@ export function formatAndGetState(editorId, formatName, value) {
 
         // Special handling for block format removal in Quill v2
         // Quill's format('code-block', false) and format('blockquote', false) don't work correctly
-        // Use removeFormat() as a workaround
+        // We need to preserve inline formats when removing block formats
         if ((formatName === 'code-block' || formatName === 'blockquote') && value === false && range) {
-            // Get the line bounds for the current selection
             const [line, offset] = quill.getLine(range.index);
             if (line) {
                 const lineIndex = quill.getIndex(line);
                 const lineLength = line.length();
-                // Remove all formatting from the line
+
+                // Get the Delta for this line to preserve inline formats
+                const lineDelta = quill.getContents(lineIndex, lineLength);
+
+                // Collect inline formats from each operation in the line
+                const inlineFormats = [];
+                let currentIndex = lineIndex;
+
+                for (const op of lineDelta.ops) {
+                    if (op.insert && typeof op.insert === 'string' && op.attributes) {
+                        // Filter to only inline formats (not block formats)
+                        const inlineAttrs = {};
+                        const inlineFormatNames = ['bold', 'italic', 'underline', 'strike', 'link', 'code'];
+                        for (const key of inlineFormatNames) {
+                            if (op.attributes[key] !== undefined) {
+                                inlineAttrs[key] = op.attributes[key];
+                            }
+                        }
+                        if (Object.keys(inlineAttrs).length > 0) {
+                            inlineFormats.push({
+                                index: currentIndex,
+                                length: op.insert.length,
+                                formats: inlineAttrs
+                            });
+                        }
+                    }
+                    if (op.insert) {
+                        currentIndex += typeof op.insert === 'string' ? op.insert.length : 1;
+                    }
+                }
+
+                // Remove all formatting from the line (this removes the block format)
                 quill.removeFormat(lineIndex, lineLength, 'api');
+
+                // Re-apply the inline formats we saved
+                for (const fmt of inlineFormats) {
+                    for (const [key, val] of Object.entries(fmt.formats)) {
+                        quill.formatText(fmt.index, fmt.length, key, val, 'api');
+                    }
+                }
             }
         } else {
             quill.format(formatName, value);
@@ -316,37 +394,3 @@ export function blur(editorId) {
     }
 }
 
-/**
- * Prompts for a URL and inserts a link
- * @param {string} editorId - Unique identifier for the editor
- * @returns {boolean} True if link was inserted, false if cancelled
- */
-export function promptLink(editorId) {
-    const stored = editorStates.get(editorId);
-    if (!stored) return false;
-
-    const quill = stored.quill;
-    const range = quill.getSelection();
-
-    if (!range) {
-        // No selection - can't insert link
-        return false;
-    }
-
-    // Check if there's already a link
-    const format = quill.getFormat(range);
-    if (format.link) {
-        // Remove existing link
-        quill.format('link', false);
-        return true;
-    }
-
-    // Prompt for URL
-    const url = window.prompt('Enter URL:', 'https://');
-    if (url && url !== 'https://') {
-        quill.format('link', url);
-        return true;
-    }
-
-    return false;
-}

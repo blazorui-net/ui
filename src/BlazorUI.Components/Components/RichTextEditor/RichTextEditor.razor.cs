@@ -30,6 +30,13 @@ public partial class RichTextEditor : ComponentBase, IAsyncDisposable
     private bool _isCodeBlock;
     private string _headerLevel = "";
 
+    // === Link Dialog State ===
+    private bool _linkDialogOpen;
+    private string _linkUrl = "";
+    private string? _linkUrlError;
+    private bool _hasExistingLink;
+    private EditorRange? _savedSelection;
+
     // === Parameters - Value Binding ===
 
     /// <summary>
@@ -351,11 +358,12 @@ public partial class RichTextEditor : ComponentBase, IAsyncDisposable
         StateHasChanged();
     }
 
-    private async Task HandleHeaderChange(ChangeEventArgs e)
+    private async Task HandleHeaderChangeAsync(string? value)
     {
         if (_jsModule == null || !_jsInitialized || Disabled) return;
 
-        var value = e.Value?.ToString();
+        _headerLevel = value ?? "";
+
         if (string.IsNullOrEmpty(value))
         {
             await _jsModule.InvokeVoidAsync("format", _editorId, "header", false);
@@ -373,8 +381,100 @@ public partial class RichTextEditor : ComponentBase, IAsyncDisposable
     {
         if (_jsModule == null || !_jsInitialized || Disabled) return;
 
-        // Use the JS prompt to get URL from user
-        await _jsModule.InvokeVoidAsync("promptLink", _editorId);
+        // Save the current selection before opening dialog
+        _savedSelection = await GetSelectionAsync();
+
+        // Check if there's already a link at the selection
+        var format = await _jsModule.InvokeAsync<Dictionary<string, object?>>("getFormat", _editorId);
+        object? linkValue = null;
+        _hasExistingLink = format != null && format.TryGetValue("link", out linkValue) && linkValue != null;
+
+        if (_hasExistingLink)
+        {
+            if (linkValue is string existingUrl)
+            {
+                _linkUrl = existingUrl;
+            }
+            else if (linkValue is System.Text.Json.JsonElement je && je.ValueKind == System.Text.Json.JsonValueKind.String)
+            {
+                _linkUrl = je.GetString() ?? "https://";
+            }
+            else
+            {
+                _linkUrl = "https://";
+            }
+        }
+        else
+        {
+            _linkUrl = "https://";
+        }
+
+        _linkUrlError = null;
+        _linkDialogOpen = true;
+    }
+
+    private void CloseLinkDialog()
+    {
+        _linkDialogOpen = false;
+        _linkUrl = "";
+        _linkUrlError = null;
+        _savedSelection = null;
+    }
+
+    private void ValidateLinkUrl()
+    {
+        if (string.IsNullOrWhiteSpace(_linkUrl) || _linkUrl == "https://")
+        {
+            _linkUrlError = null;
+        }
+        else if (!IsValidUrl(_linkUrl))
+        {
+            _linkUrlError = "Please enter a valid URL";
+        }
+        else
+        {
+            _linkUrlError = null;
+        }
+    }
+
+    private static bool IsValidUrl(string? url)
+    {
+        if (string.IsNullOrWhiteSpace(url) || url == "https://")
+            return false;
+
+        return Uri.TryCreate(url, UriKind.Absolute, out var uri)
+               && (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps);
+    }
+
+    private async Task ApplyLinkAsync()
+    {
+        if (_jsModule == null || !_jsInitialized || !IsValidUrl(_linkUrl)) return;
+
+        // Restore selection before applying link
+        if (_savedSelection != null)
+        {
+            await SetSelectionAsync(_savedSelection.Index, _savedSelection.Length);
+        }
+
+        await _jsModule.InvokeVoidAsync("format", _editorId, "link", _linkUrl);
+
+        CloseLinkDialog();
+        await _jsModule.InvokeVoidAsync("focus", _editorId);
+    }
+
+    private async Task RemoveLinkAsync()
+    {
+        if (_jsModule == null || !_jsInitialized) return;
+
+        // Restore selection before removing link
+        if (_savedSelection != null)
+        {
+            await SetSelectionAsync(_savedSelection.Index, _savedSelection.Length);
+        }
+
+        await _jsModule.InvokeVoidAsync("format", _editorId, "link", false);
+
+        CloseLinkDialog();
         await _jsModule.InvokeVoidAsync("focus", _editorId);
     }
 
@@ -483,6 +583,38 @@ public partial class RichTextEditor : ComponentBase, IAsyncDisposable
         }
     }
 
+    /// <summary>
+    /// Gets the Delta (JSON) content of the editor.
+    /// Delta is Quill's native document format that preserves all formatting information.
+    /// </summary>
+    public async Task<string> GetDeltaAsync()
+    {
+        if (_jsModule != null && _jsInitialized)
+        {
+            return await _jsModule.InvokeAsync<string>("getContents", _editorId) ?? "{}";
+        }
+        return "{}";
+    }
+
+    /// <summary>
+    /// Sets the editor content using a Delta (JSON) object.
+    /// This is the preferred method when working with Quill's native format.
+    /// </summary>
+    public async Task SetDeltaAsync(string? deltaJson)
+    {
+        if (_jsModule != null && _jsInitialized)
+        {
+            if (string.IsNullOrEmpty(deltaJson))
+            {
+                await _jsModule.InvokeVoidAsync("setContents", _editorId, "{\"ops\":[{\"insert\":\"\\n\"}]}");
+            }
+            else
+            {
+                await _jsModule.InvokeVoidAsync("setContents", _editorId, deltaJson);
+            }
+        }
+    }
+
     // === Private Helper Methods ===
 
     private object BuildEditorOptions() => new
@@ -534,12 +666,6 @@ public partial class RichTextEditor : ComponentBase, IAsyncDisposable
             return string.Join("; ", styles);
         }
     }
-
-    private string DropdownCssClass => ClassNames.cn(
-        "h-8 px-2 rounded-md border border-input bg-background text-sm",
-        "focus:outline-none focus:ring-2 focus:ring-ring",
-        "disabled:opacity-50 disabled:pointer-events-none"
-    );
 
     // === Dispose ===
 
