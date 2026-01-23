@@ -184,9 +184,15 @@ public partial class RichTextEditor : ComponentBase, IAsyncDisposable
         if (_jsInitialized && Value != _lastKnownValue && !_pendingValueUpdate)
         {
             _pendingValueUpdate = true;
-            await SetHtmlAsync(Value);
-            _lastKnownValue = Value;
-            _pendingValueUpdate = false;
+            try
+            {
+                await SetHtmlAsync(Value);
+                _lastKnownValue = Value;
+            }
+            finally
+            {
+                _pendingValueUpdate = false;
+            }
         }
     }
 
@@ -528,17 +534,6 @@ public partial class RichTextEditor : ComponentBase, IAsyncDisposable
             return string.Join("; ", styles);
         }
     }
-
-    private string ToolbarButtonCssClass => ClassNames.cn(
-        "inline-flex items-center justify-center rounded-md h-8 w-8",
-        "text-muted-foreground hover:bg-accent hover:text-accent-foreground",
-        "transition-colors disabled:opacity-50 disabled:pointer-events-none"
-    );
-
-    private string GetButtonCssClass(bool isActive) => ClassNames.cn(
-        ToolbarButtonCssClass,
-        ClassNames.when(isActive, "bg-accent text-accent-foreground border border-ring")
-    );
 
     private string DropdownCssClass => ClassNames.cn(
         "h-8 px-2 rounded-md border border-input bg-background text-sm",

@@ -5,7 +5,8 @@
         data-state="@(IsPressed ? "on" : "off")"
         disabled="@Disabled"
         class="@CssClass"
-        @onclick="HandleClick">
+        @onclick="HandleClick"
+        @attributes="AdditionalAttributes">
     @ChildContent
 </button>
 
@@ -33,6 +34,9 @@
 
     [Parameter]
     public RenderFragment? ChildContent { get; set; }
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
 
     private bool _internalPressed;
     private bool IsControlled => PressedChanged.HasDelegate;

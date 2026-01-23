@@ -1,6 +1,9 @@
 @namespace BlazorUI.Components.RichTextEditor
 @using Microsoft.JSInterop
 @using BlazorUI.Icons.Lucide.Components
+@using BlazorUI.Components.Toggle
+@using BlazorUI.Components.Button
+@using BlazorUI.Components.Separator
 @inject IJSRuntime JS
 @implements IAsyncDisposable
 
@@ -11,67 +14,104 @@
             <div class="flex items-center gap-0.5">
                 @if (Toolbar >= ToolbarPreset.Standard)
                 {
-                    <select class="@DropdownCssClass" value="@_headerLevel" @onchange="HandleHeaderChange">
+                    <select class="@DropdownCssClass" value="@_headerLevel" @onchange="HandleHeaderChange" disabled="@Disabled">
                         <option value="">Normal</option>
                         <option value="1">Heading 1</option>
                         <option value="2">Heading 2</option>
                         <option value="3">Heading 3</option>
                     </select>
-                    <div class="w-px h-6 bg-border mx-1"></div>
+                    <Separator Orientation="SeparatorOrientation.Vertical" Class="h-6 mx-1" />
                 }
 
-                <button type="button" class="@GetButtonCssClass(_isBold)" disabled="@Disabled"
-                        @onclick="@(() => ToggleFormatAsync("bold"))" title="Bold (Ctrl+B)">
+                <Toggle Pressed="@_isBold"
+                        PressedChanged="@(async _ => await ToggleFormatAsync("bold"))"
+                        Size="ToggleSize.Small"
+                        Disabled="@Disabled"
+                        Class="h-8 w-8 p-0"
+                        title="Bold (Ctrl+B)">
                     <LucideIcon Name="bold" Size="16" />
-                </button>
-                <button type="button" class="@GetButtonCssClass(_isItalic)" disabled="@Disabled"
-                        @onclick="@(() => ToggleFormatAsync("italic"))" title="Italic (Ctrl+I)">
+                </Toggle>
+                <Toggle Pressed="@_isItalic"
+                        PressedChanged="@(async _ => await ToggleFormatAsync("italic"))"
+                        Size="ToggleSize.Small"
+                        Disabled="@Disabled"
+                        Class="h-8 w-8 p-0"
+                        title="Italic (Ctrl+I)">
                     <LucideIcon Name="italic" Size="16" />
-                </button>
-                <button type="button" class="@GetButtonCssClass(_isUnderline)" disabled="@Disabled"
-                        @onclick="@(() => ToggleFormatAsync("underline"))" title="Underline (Ctrl+U)">
+                </Toggle>
+                <Toggle Pressed="@_isUnderline"
+                        PressedChanged="@(async _ => await ToggleFormatAsync("underline"))"
+                        Size="ToggleSize.Small"
+                        Disabled="@Disabled"
+                        Class="h-8 w-8 p-0"
+                        title="Underline (Ctrl+U)">
                     <LucideIcon Name="underline" Size="16" />
-                </button>
+                </Toggle>
 
                 @if (Toolbar >= ToolbarPreset.Standard)
                 {
-                    <button type="button" class="@GetButtonCssClass(_isStrike)" disabled="@Disabled"
-                            @onclick="@(() => ToggleFormatAsync("strike"))" title="Strikethrough">
+                    <Toggle Pressed="@_isStrike"
+                            PressedChanged="@(async _ => await ToggleFormatAsync("strike"))"
+                            Size="ToggleSize.Small"
+                            Disabled="@Disabled"
+                            Class="h-8 w-8 p-0"
+                            title="Strikethrough">
                         <LucideIcon Name="strikethrough" Size="16" />
-                    </button>
+                    </Toggle>
                 }
 
-                <div class="w-px h-6 bg-border mx-1"></div>
+                <Separator Orientation="SeparatorOrientation.Vertical" Class="h-6 mx-1" />
 
-                <button type="button" class="@GetButtonCssClass(_isBulletList)" disabled="@Disabled"
-                        @onclick="@(() => ToggleFormatAsync("list", "bullet"))" title="Bullet List">
+                <Toggle Pressed="@_isBulletList"
+                        PressedChanged="@(async _ => await ToggleFormatAsync("list", "bullet"))"
+                        Size="ToggleSize.Small"
+                        Disabled="@Disabled"
+                        Class="h-8 w-8 p-0"
+                        title="Bullet List">
                     <LucideIcon Name="list" Size="16" />
-                </button>
-                <button type="button" class="@GetButtonCssClass(_isOrderedList)" disabled="@Disabled"
-                        @onclick="@(() => ToggleFormatAsync("list", "ordered"))" title="Numbered List">
+                </Toggle>
+                <Toggle Pressed="@_isOrderedList"
+                        PressedChanged="@(async _ => await ToggleFormatAsync("list", "ordered"))"
+                        Size="ToggleSize.Small"
+                        Disabled="@Disabled"
+                        Class="h-8 w-8 p-0"
+                        title="Numbered List">
                     <LucideIcon Name="list-ordered" Size="16" />
-                </button>
+                </Toggle>
 
                 @if (Toolbar >= ToolbarPreset.Standard)
                 {
-                    <div class="w-px h-6 bg-border mx-1"></div>
-                    <button type="button" class="@ToolbarButtonCssClass" disabled="@Disabled"
-                            @onclick="InsertLinkAsync" title="Insert Link">
+                    <Separator Orientation="SeparatorOrientation.Vertical" Class="h-6 mx-1" />
+                    <Button Variant="ButtonVariant.Ghost"
+                            Size="ButtonSize.IconSmall"
+                            OnClick="@(async _ => await InsertLinkAsync())"
+                            Disabled="@Disabled"
+                            Class="h-8 w-8"
+                            AriaLabel="Insert Link"
+                            title="Insert Link">
                         <LucideIcon Name="link" Size="16" />
-                    </button>
+                    </Button>
                 }
 
                 @if (Toolbar == ToolbarPreset.Full)
                 {
-                    <div class="w-px h-6 bg-border mx-1"></div>
-                    <button type="button" class="@GetButtonCssClass(_isBlockquote)" disabled="@Disabled"
-                            @onclick="@(() => ToggleFormatAsync("blockquote"))" title="Blockquote">
+                    <Separator Orientation="SeparatorOrientation.Vertical" Class="h-6 mx-1" />
+                    <Toggle Pressed="@_isBlockquote"
+                            PressedChanged="@(async _ => await ToggleFormatAsync("blockquote"))"
+                            Size="ToggleSize.Small"
+                            Disabled="@Disabled"
+                            Class="h-8 w-8 p-0"
+                            title="Blockquote">
                         <LucideIcon Name="quote" Size="16" />
-                    </button>
-                    <button type="button" class="@GetButtonCssClass(_isCodeBlock)" disabled="@Disabled"
-                            @onclick="@(() => ToggleFormatAsync("code-block"))" title="Code Block">
+                    </Toggle>
+                    <Toggle Pressed="@_isCodeBlock"
+                            PressedChanged="@(async _ => await ToggleFormatAsync("code-block"))"
+                            Size="ToggleSize.Small"
+                            Disabled="@Disabled"
+                            Class="h-8 w-8 p-0"
+                            title="Code Block">
                         <LucideIcon Name="code" Size="16" />
-                    </button>
+                    </Toggle>
                 }
             </div>
         </div>

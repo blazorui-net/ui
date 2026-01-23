@@ -43,7 +43,7 @@ export function initializeEditor(element, dotNetRef, editorId, options) {
 
     // Debounced text-change handler
     let textChangeTimeout;
-    quill.on('text-change', (delta, oldDelta, source) => {
+    const textChangeHandler = (delta, oldDelta, source) => {
         clearTimeout(textChangeTimeout);
         textChangeTimeout = setTimeout(() => {
             dotNetRef.invokeMethodAsync('OnTextChangeCallback', {
@@ -55,10 +55,11 @@ export function initializeEditor(element, dotNetRef, editorId, options) {
                 length: quill.getLength()
             }).catch(err => console.error('Error in text-change:', err));
         }, 150);
-    });
+    };
+    quill.on('text-change', textChangeHandler);
 
     // Selection-change for focus/blur detection and format tracking
-    quill.on('selection-change', (range, oldRange, source) => {
+    const selectionChangeHandler = (range, oldRange, source) => {
         const format = range ? quill.getFormat(range) : {};
         dotNetRef.invokeMethodAsync('OnSelectionChangeCallback', {
             range: range,
@@ -66,9 +67,16 @@ export function initializeEditor(element, dotNetRef, editorId, options) {
             source: source,
             format: format
         }).catch(err => console.error('Error in selection-change:', err));
-    });
+    };
+    quill.on('selection-change', selectionChangeHandler);
 
-    editorStates.set(editorId, { quill, dotNetRef, textChangeTimeout });
+    editorStates.set(editorId, {
+        quill,
+        dotNetRef,
+        textChangeTimeout,
+        textChangeHandler,
+        selectionChangeHandler
+    });
 }
 
 /**
@@ -78,20 +86,36 @@ export function initializeEditor(element, dotNetRef, editorId, options) {
 export function disposeEditor(editorId) {
     const stored = editorStates.get(editorId);
     if (stored) {
+        // Clear pending debounce timeout
         clearTimeout(stored.textChangeTimeout);
+
+        // Remove event handlers to prevent memory leaks
+        stored.quill.off('text-change', stored.textChangeHandler);
+        stored.quill.off('selection-change', stored.selectionChangeHandler);
+
         editorStates.delete(editorId);
     }
 }
 
 /**
  * Sets the HTML content of the editor
+ * Uses Quill's clipboard module to properly convert HTML to Delta,
+ * maintaining synchronization between DOM and internal state.
  * @param {string} editorId - Unique identifier for the editor
  * @param {string} html - HTML content to set
  */
 export function setHtml(editorId, html) {
     const stored = editorStates.get(editorId);
     if (stored) {
-        stored.quill.root.innerHTML = html || '';
+        const quill = stored.quill;
+        if (!html) {
+            // Empty content - set empty Delta
+            quill.setContents([{ insert: '\n' }], 'api');
+        } else {
+            // Convert HTML to Delta using Quill's clipboard module
+            const delta = quill.clipboard.convert({ html: html });
+            quill.setContents(delta, 'api');
+        }
     }
 }
 
@@ -212,11 +236,18 @@ export function formatAndGetState(editorId, formatName, value) {
         const quill = stored.quill;
         const range = quill.getSelection();
 
-        // Special handling for code-block removal in Quill v2
-        // TODO: Quill's format('code-block', false) doesn't work correctly - see DEV-TASKS.md #32
-        if (formatName === 'code-block' && value === false && range) {
-            // For now, just call format - removal doesn't work but at least won't error
-            quill.format(formatName, value);
+        // Special handling for block format removal in Quill v2
+        // Quill's format('code-block', false) and format('blockquote', false) don't work correctly
+        // Use removeFormat() as a workaround
+        if ((formatName === 'code-block' || formatName === 'blockquote') && value === false && range) {
+            // Get the line bounds for the current selection
+            const [line, offset] = quill.getLine(range.index);
+            if (line) {
+                const lineIndex = quill.getIndex(line);
+                const lineLength = line.length();
+                // Remove all formatting from the line
+                quill.removeFormat(lineIndex, lineLength, 'api');
+            }
         } else {
             quill.format(formatName, value);
         }

@@ -140,6 +140,16 @@ public partial class Button : ComponentBase
     public IconPosition IconPosition { get; set; } = IconPosition.Start;
 
     /// <summary>
+    /// Gets or sets additional HTML attributes to apply to the button element.
+    /// </summary>
+    /// <remarks>
+    /// Captures any unmatched attributes and passes them through to the underlying button element.
+    /// Useful for attributes like title, data-*, etc.
+    /// </remarks>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    /// <summary>
     /// Gets the trigger context from a parent trigger component when using AsChild pattern.
     /// </summary>
     /// <remarks>
