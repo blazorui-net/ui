@@ -1,25 +1,25 @@
 # Rich Text Editor Component
 
-WYSIWYG rich text editor with formatting toolbar and HTML output.
+WYSIWYG rich text editor built on Quill.js v2 with custom Blazor toolbar and HTML/Delta output.
 
 ---
 
 ## Overview
 
-The RichTextEditor component provides a visual rich text editing experience where formatting appears directly as users type. It uses a contenteditable element with a comprehensive toolbar for text formatting, making it ideal for non-technical users who prefer visual feedback over markup syntax.
+The RichTextEditor component provides a visual rich text editing experience using Quill.js v2 in headless mode with a custom Blazor toolbar. It outputs both HTML and Delta (Quill's native JSON format) for maximum flexibility.
 
 **Features:**
-- WYSIWYG editing (What You See Is What You Get)
-- Formatting toolbar with text styles, lists, colors, and alignment
-- Two-way data binding (@bind-Value)
-- Keyboard shortcuts (Ctrl+B, Ctrl+I, Ctrl+U, Ctrl+Z, Ctrl+Y)
-- Font size selection (5 sizes)
-- Font color picker (12 colors)
+- Built on Quill.js v2 (industry-standard rich text editor)
+- Headless mode with custom Blazor toolbar using BlazorUI components
+- Toolbar presets (None, Simple, Standard, Full, Custom)
+- Two-way binding for HTML (@bind-Value) and Delta (@bind-DeltaValue)
+- Keyboard shortcuts (Ctrl+B, Ctrl+I, Ctrl+U)
+- Headers (H1, H2, H3)
+- Bold, italic, underline, strikethrough
 - Bullet and numbered lists
-- Text alignment (left, center, right, justify)
+- Blockquote and code blocks
+- Link insertion with BlazorUI Dialog
 - Configurable height (min, max, or fixed)
-- Undo/Redo support
-- Outputs clean HTML
 - Dark mode compatible
 - Full accessibility support
 
@@ -30,6 +30,7 @@ The RichTextEditor component provides a visual rich text editing experience wher
 - **Package:** BlazorUI.Components
 - **Namespace:** BlazorUI.Components.RichTextEditor
 - **Source:** https://github.com/blazorui-net/ui/tree/main/src/BlazorUI.Components/Components/RichTextEditor
+- **Dependencies:** Quill.js v2 (CDN)
 
 ---
 
@@ -37,6 +38,13 @@ The RichTextEditor component provides a visual rich text editing experience wher
 
 ```bash
 dotnet add package BlazorUI.Components
+```
+
+Add Quill.js to your `App.razor` or `_Host.cshtml`:
+
+```html
+<link href="https://cdn.jsdelivr.net/npm/quill@2/dist/quill.core.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/quill@2/dist/quill.js"></script>
 ```
 
 Add to `_Imports.razor`:
@@ -49,26 +57,91 @@ Add to `_Imports.razor`:
 
 ## API Reference
 
+### Parameters
+
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
-| `Value` | `string?` | `null` | HTML content value (supports @bind-Value) |
-| `ValueChanged` | `EventCallback<string?>` | - | Callback on value change |
-| `Placeholder` | `string?` | `null` | Placeholder text when editor is empty |
+| `Value` | `string?` | `null` | HTML content (supports @bind-Value) |
+| `ValueChanged` | `EventCallback<string?>` | - | Callback on HTML value change |
+| `DeltaValue` | `string?` | `null` | Delta JSON content (supports @bind-DeltaValue) |
+| `DeltaValueChanged` | `EventCallback<string?>` | - | Callback on Delta value change |
+| `Toolbar` | `ToolbarPreset` | `Standard` | Toolbar configuration preset |
+| `ToolbarContent` | `RenderFragment?` | `null` | Custom toolbar content |
+| `Placeholder` | `string?` | `null` | Placeholder text when empty |
 | `Disabled` | `bool` | `false` | Whether the editor is disabled |
-| `Class` | `string?` | `null` | Additional CSS classes for container |
-| `Id` | `string?` | `null` | HTML id for the contenteditable element |
+| `ReadOnly` | `bool` | `false` | Whether the editor is read-only |
+| `Class` | `string?` | `null` | Additional CSS classes |
+| `Id` | `string?` | `null` | HTML id attribute |
+| `MinHeight` | `string` | `"150px"` | Minimum height of editor |
+| `MaxHeight` | `string?` | `null` | Maximum height before scrollbar |
+| `Height` | `string?` | `null` | Fixed height (overrides Min/Max) |
 | `AriaLabel` | `string?` | `null` | ARIA label for accessibility |
-| `AriaDescribedBy` | `string?` | `null` | ID of element describing the editor |
-| `AriaInvalid` | `bool?` | `null` | Whether the editor value is invalid |
-| `MinHeight` | `string` | `"150px"` | Minimum height of content area |
-| `MaxHeight` | `string?` | `null` | Maximum height before scrollbar appears |
-| `Height` | `string?` | `null` | Fixed height (overrides Min/MaxHeight) |
+| `AriaDescribedBy` | `string?` | `null` | ID of describing element |
+| `AriaInvalid` | `bool?` | `null` | Whether value is invalid |
+
+### Event Parameters
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `OnTextChange` | `EventCallback<TextChangeEventArgs>` | Fired when content changes |
+| `OnSelectionChange` | `EventCallback<SelectionChangeEventArgs>` | Fired when selection changes |
+| `OnFocus` | `EventCallback` | Fired when editor gains focus |
+| `OnBlur` | `EventCallback` | Fired when editor loses focus |
+
+### Toolbar Presets
+
+| Preset | Features |
+|--------|----------|
+| `None` | No toolbar, plain editor |
+| `Simple` | Bold, Italic, Underline, Bullet List, Ordered List |
+| `Standard` | Simple + Header dropdown, Strikethrough, Link |
+| `Full` | Standard + Blockquote, Code Block |
+| `Custom` | User provides ToolbarContent |
 
 ### Public Methods
 
 | Method | Returns | Description |
 |--------|---------|-------------|
-| `FocusAsync()` | `Task` | Programmatically focus the editor |
+| `FocusAsync()` | `Task` | Focus the editor |
+| `BlurAsync()` | `Task` | Remove focus from editor |
+| `GetSelectionAsync()` | `Task<EditorRange?>` | Get current selection |
+| `SetSelectionAsync(int index, int length)` | `Task` | Set selection range |
+| `FormatAsync(string name, object? value)` | `Task` | Apply formatting |
+| `GetTextAsync()` | `Task<string>` | Get plain text content |
+| `GetLengthAsync()` | `Task<int>` | Get content length |
+| `GetHtmlAsync()` | `Task<string>` | Get HTML content |
+| `SetHtmlAsync(string? html)` | `Task` | Set HTML content |
+| `GetDeltaAsync()` | `Task<string>` | Get Delta JSON content |
+| `SetDeltaAsync(string? deltaJson)` | `Task` | Set Delta content |
+
+### Event Args
+
+#### TextChangeEventArgs
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `Delta` | `string?` | JSON delta of the change |
+| `OldDelta` | `string?` | Previous delta |
+| `Source` | `string?` | Change source ("user", "api") |
+| `Html` | `string?` | Current HTML content |
+| `Text` | `string?` | Current plain text |
+| `Length` | `int` | Content length |
+
+#### SelectionChangeEventArgs
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `Range` | `EditorRange?` | Current selection range |
+| `OldRange` | `EditorRange?` | Previous selection |
+| `Source` | `string?` | Change source |
+| `Format` | `Dictionary<string, object?>?` | Active formats at selection |
+
+#### EditorRange
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `Index` | `int` | Start position |
+| `Length` | `int` | Selection length |
 
 ---
 
@@ -87,6 +160,26 @@ Add to `_Imports.razor`:
 ---
 
 ## Examples
+
+### Toolbar Presets
+
+```razor
+@* Simple toolbar - basic formatting *@
+<RichTextEditor @bind-Value="content1" Toolbar="ToolbarPreset.Simple" />
+
+@* Standard toolbar (default) - includes headers and links *@
+<RichTextEditor @bind-Value="content2" Toolbar="ToolbarPreset.Standard" />
+
+@* Full toolbar - all formatting options *@
+<RichTextEditor @bind-Value="content3" Toolbar="ToolbarPreset.Full" />
+
+@* No toolbar *@
+<RichTextEditor @bind-Value="content4" Toolbar="ToolbarPreset.None" />
+
+@code {
+    private string? content1, content2, content3, content4;
+}
+```
 
 ### With Label
 
@@ -148,36 +241,82 @@ Add to `_Imports.razor`:
 }
 ```
 
-### Disabled State
+### Disabled and Read-Only States
 
 ```razor
+@* Disabled - no editing, toolbar disabled *@
 <RichTextEditor
-    Value="<p>This editor is <strong>disabled</strong> and cannot be edited.</p>"
+    Value="<p>This editor is <strong>disabled</strong>.</p>"
     Disabled="true" />
+
+@* Read-only - content visible but not editable *@
+<RichTextEditor
+    Value="<p>This content is <strong>read-only</strong>.</p>"
+    ReadOnly="true" />
 ```
 
-### With HTML Output Display
+### With Delta Binding
 
 ```razor
 @using BlazorUI.Components.RichTextEditor
-@using BlazorUI.Components.Card
 
-<RichTextEditor @bind-Value="htmlContent" Placeholder="Type and format text..." />
+<RichTextEditor
+    @bind-Value="htmlContent"
+    @bind-DeltaValue="deltaContent" />
 
-@if (!string.IsNullOrEmpty(htmlContent))
-{
-    <Card>
-        <CardHeader>
-            <CardTitle Class="text-sm">HTML Output</CardTitle>
-        </CardHeader>
-        <CardContent>
-            <pre class="text-xs bg-muted p-3 rounded-md overflow-auto">@htmlContent</pre>
-        </CardContent>
-    </Card>
-}
+<div class="mt-4 grid grid-cols-2 gap-4">
+    <div>
+        <h4>HTML Output</h4>
+        <pre class="text-xs bg-muted p-2 rounded">@htmlContent</pre>
+    </div>
+    <div>
+        <h4>Delta Output</h4>
+        <pre class="text-xs bg-muted p-2 rounded">@deltaContent</pre>
+    </div>
+</div>
 
 @code {
     private string? htmlContent;
+    private string? deltaContent;
+}
+```
+
+### Event Handling
+
+```razor
+<RichTextEditor
+    @bind-Value="content"
+    OnTextChange="HandleTextChange"
+    OnSelectionChange="HandleSelectionChange"
+    OnFocus="HandleFocus"
+    OnBlur="HandleBlur" />
+
+<p>Character count: @charCount</p>
+<p>Current format: @currentFormat</p>
+
+@code {
+    private string? content;
+    private int charCount;
+    private string currentFormat = "none";
+
+    private void HandleTextChange(TextChangeEventArgs args)
+    {
+        charCount = args.Length;
+    }
+
+    private void HandleSelectionChange(SelectionChangeEventArgs args)
+    {
+        if (args.Format != null)
+        {
+            var formats = new List<string>();
+            if (args.Format.ContainsKey("bold")) formats.Add("bold");
+            if (args.Format.ContainsKey("italic")) formats.Add("italic");
+            currentFormat = formats.Count > 0 ? string.Join(", ", formats) : "none";
+        }
+    }
+
+    private void HandleFocus() => Console.WriteLine("Editor focused");
+    private void HandleBlur() => Console.WriteLine("Editor blurred");
 }
 ```
 
@@ -200,6 +339,7 @@ Add to `_Imports.razor`:
             <RichTextEditor
                 @bind-Value="feedback"
                 Id="feedback-editor"
+                Toolbar="ToolbarPreset.Standard"
                 Placeholder="What's on your mind?" />
         </div>
     </CardContent>
@@ -224,51 +364,29 @@ Add to `_Imports.razor`:
 
 ## Toolbar Features
 
-The editor includes a comprehensive toolbar with the following options:
+### Standard Toolbar Layout
 
-### Font Size Dropdown
-- Small (12px)
-- Normal (14px)
-- Medium (18px)
-- Large (24px)
-- Extra Large (32px)
+| Section | Controls |
+|---------|----------|
+| Headers | Dropdown (Normal, H1, H2, H3) |
+| Text Style | Bold, Italic, Underline, Strikethrough |
+| Lists | Bullet list, Numbered list |
+| Links | Insert/Edit link (opens dialog) |
+| Blocks | Blockquote, Code block (Full preset only) |
 
-### Text Formatting Buttons
-| Button | Action | Keyboard Shortcut |
-|--------|--------|-------------------|
-| **B** | Bold | Ctrl+B |
-| *I* | Italic | Ctrl+I |
-| <u>U</u> | Underline | Ctrl+U |
-| ~~S~~ | Strikethrough | - |
+### Keyboard Shortcuts
 
-### List Buttons
-- Bullet list (unordered)
-- Numbered list (ordered)
-
-### Font Color Picker
-12 color palette:
-- Black, Dark Gray, Gray, Light Gray
-- Red, Orange, Yellow, Green
-- Blue, Indigo, Purple, Pink
-
-### Text Alignment Buttons
-- Align Left
-- Align Center
-- Align Right
-- Justify
-
-### Undo/Redo
 | Shortcut | Action |
 |----------|--------|
-| Ctrl+Z | Undo |
-| Ctrl+Y | Redo |
-| Ctrl+Shift+Z | Redo (alternative) |
+| Ctrl+B | Bold |
+| Ctrl+I | Italic |
+| Ctrl+U | Underline |
 
 ---
 
 ## HTML Output
 
-The editor generates semantic HTML tags:
+The editor generates semantic HTML using Quill's getSemanticHTML():
 
 | Formatting | HTML Output |
 |------------|-------------|
@@ -276,11 +394,14 @@ The editor generates semantic HTML tags:
 | Italic | `<em>text</em>` |
 | Underline | `<u>text</u>` |
 | Strikethrough | `<s>text</s>` |
-| Font Size | `<span style="font-size: 18px;">text</span>` |
-| Font Color | `<span style="color: #3B82F6;">text</span>` |
+| Header 1 | `<h1>text</h1>` |
+| Header 2 | `<h2>text</h2>` |
+| Header 3 | `<h3>text</h3>` |
 | Bullet List | `<ul><li>item</li></ul>` |
 | Numbered List | `<ol><li>item</li></ol>` |
-| Alignment | `<div style="text-align: center;">text</div>` |
+| Blockquote | `<blockquote>text</blockquote>` |
+| Code Block | `<pre class="ql-syntax">code</pre>` |
+| Link | `<a href="url">text</a>` |
 
 ---
 
@@ -319,24 +440,6 @@ The editor generates semantic HTML tags:
 }
 ```
 
-### Keyboard Navigation
-
-- **Tab**: Navigate between toolbar buttons
-- **Enter/Space**: Activate toolbar buttons
-- **Arrow keys**: Navigate within dropdowns
-- **Escape**: Close open dropdowns
-- **Ctrl+B/I/U**: Apply formatting
-- **Ctrl+Z/Y**: Undo/Redo
-
-### ARIA Attributes
-
-The editor uses:
-- `role="textbox"` on the content area
-- `aria-multiline="true"` to indicate multi-line input
-- `aria-label` for screen reader description
-- `aria-describedby` for help text association
-- `aria-invalid` for error states
-
 ---
 
 ## Common Patterns
@@ -360,6 +463,7 @@ The editor uses:
         <RichTextEditor
             Id="content"
             @bind-Value="content"
+            Toolbar="ToolbarPreset.Full"
             MinHeight="300px"
             Placeholder="Write your post..." />
     </div>
@@ -383,6 +487,7 @@ The editor uses:
 ```razor
 <RichTextEditor
     @bind-Value="comment"
+    Toolbar="ToolbarPreset.Simple"
     Height="100px"
     Placeholder="Write a comment..." />
 <div class="flex justify-end mt-2">
@@ -402,9 +507,53 @@ The editor uses:
 }
 ```
 
+### Programmatic Content Control
+
+```razor
+@using BlazorUI.Components.RichTextEditor
+@using BlazorUI.Components.Button
+
+<RichTextEditor @ref="editor" @bind-Value="content" />
+
+<div class="flex gap-2 mt-2">
+    <Button OnClick="InsertTemplate">Insert Template</Button>
+    <Button OnClick="ClearContent" Variant="ButtonVariant.Outline">Clear</Button>
+    <Button OnClick="FocusEditor" Variant="ButtonVariant.Ghost">Focus</Button>
+</div>
+
+@code {
+    private RichTextEditor? editor;
+    private string? content;
+
+    private async Task InsertTemplate()
+    {
+        await editor!.SetHtmlAsync("<h2>Template</h2><p>Start editing here...</p>");
+    }
+
+    private async Task ClearContent()
+    {
+        await editor!.SetHtmlAsync("");
+    }
+
+    private async Task FocusEditor()
+    {
+        await editor!.FocusAsync();
+    }
+}
+```
+
 ---
 
 ## Troubleshooting
+
+### Issue: Quill not loading
+
+**Solution:** Ensure Quill.js is loaded in your HTML head before the Blazor script:
+
+```html
+<link href="https://cdn.jsdelivr.net/npm/quill@2/dist/quill.core.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/quill@2/dist/quill.js"></script>
+```
 
 ### Issue: Content not updating
 
@@ -414,25 +563,13 @@ The editor uses:
 <RichTextEditor @bind-Value="content" />
 ```
 
-### Issue: Editor height not respecting MaxHeight
+### Issue: Toolbar buttons not responding
 
-**Solution:** Make sure you're not also setting `Height` which takes precedence:
+**Solution:** Check that the editor is not disabled and has focus. The toolbar state syncs with the current selection.
 
-```razor
-@* Correct - only MaxHeight *@
-<RichTextEditor MaxHeight="200px" />
+### Issue: Link dialog not appearing
 
-@* Incorrect - Height overrides MaxHeight *@
-<RichTextEditor MaxHeight="200px" Height="300px" />
-```
-
-### Issue: Placeholder not showing
-
-**Solution:** The placeholder only shows when the editor is completely empty. Check that `Value` is null or empty string.
-
-### Issue: Formatting lost on server round-trip
-
-**Solution:** Ensure you're storing and retrieving the full HTML string. The editor outputs HTML that should be preserved exactly.
+**Solution:** Select text first, then click the link button. Links can only be applied to selected text.
 
 ---
 
@@ -443,19 +580,21 @@ The editor uses:
 - **Input** - llms/components/input.txt (for single-line text)
 - **Label** - llms/components/label.txt (for accessibility)
 - **Field** - llms/components/field.txt (for form layouts)
+- **Dialog** - llms/components/dialog.txt (used for link input)
 
 ## Comparison with MarkdownEditor
 
 | Feature | RichTextEditor | MarkdownEditor |
 |---------|----------------|----------------|
 | Input Style | WYSIWYG | Plain text + Preview |
-| Output | HTML | Markdown |
-| Font Colors | Yes (12 colors) | No |
-| Font Sizes | Yes (5 sizes) | No |
-| Text Alignment | Yes | No |
-| Preview Tab | No (live preview) | Yes |
+| Output | HTML + Delta | Markdown |
+| Engine | Quill.js v2 | Custom |
+| Headers | H1-H3 | H1-H6 |
+| Code Blocks | Yes | Yes |
+| Blockquote | Yes | Yes |
+| Links | Dialog prompt | Markdown syntax |
 | Best For | Non-technical users | Developers |
 
 ---
 
-**Last Updated:** 2024-12-10
+**Last Updated:** 2026-01-23

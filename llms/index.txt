@@ -240,4 +240,4 @@ For multi-component usage examples and common patterns, see: **https://raw.githu
 
 ---
 
-**Last Updated:** 2026-01-22
+**Last Updated:** 2026-01-23
