@@ -45,13 +45,14 @@
     {
         if (MenuItem != null)
         {
+            MenuItem.CancelCloseTimer();
             MenuItem.IsOpen = true;
         }
     }
 
     private void HandleMouseLeave()
     {
-        // Content handles its own mouse leave
+        MenuItem?.StartCloseTimer();
     }
 
     /// <summary>

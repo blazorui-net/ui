@@ -38,16 +38,14 @@
     {
         if (MenuItem != null)
         {
+            MenuItem.CancelCloseTimer();
             MenuItem.IsOpen = true;
         }
     }
 
     private void HandleMouseLeave()
     {
-        if (MenuItem != null)
-        {
-            MenuItem.IsOpen = false;
-        }
+        MenuItem?.StartCloseTimer();
     }
 
     /// <summary>
