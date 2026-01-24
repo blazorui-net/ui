@@ -63,9 +63,9 @@ For installation and setup instructions, see: **https://raw.githubusercontent.co
 
 ---
 
-## Components (49 Components)
+## Components (50 Components)
 
-### Form Components (14)
+### Form Components (15)
 
 **Button** - Interactive button with multiple variants (default, destructive, outline, secondary, ghost, link) and sizes. - https://raw.githubusercontent.com/blazorui-net/ui/main/llms/components/button.txt
 
@@ -94,6 +94,8 @@ For installation and setup instructions, see: **https://raw.githubusercontent.co
 **Slider** - Range input for selecting numeric values within a range. - https://raw.githubusercontent.com/blazorui-net/ui/main/llms/components/slider.txt
 
 **Toggle** - Two-state button for toggleable options. - https://raw.githubusercontent.com/blazorui-net/ui/main/llms/components/toggle.txt
+
+**Rich Text Editor** - WYSIWYG rich text editor built on Quill.js v2 with custom Blazor toolbar and HTML/Delta output. - https://raw.githubusercontent.com/blazorui-net/ui/main/llms/components/rich-text-editor.txt
 
 ### Layout & Navigation Components (15)
 

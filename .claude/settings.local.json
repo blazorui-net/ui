@@ -46,7 +46,8 @@
       "Bash(done)",
       "WebFetch(domain:unsplash.com)",
       "WebFetch(domain:images.unsplash.com)",
-      "Bash(echo:*)"
+      "Bash(echo:*)",
+      "Bash(../../tools/tailwindcss.exe:*)"
     ],
     "deny": [],
     "ask": []
