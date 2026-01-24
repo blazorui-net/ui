@@ -220,14 +220,10 @@ public class SelectContext<TValue> : PrimitiveContextWithEvents<SelectState<TVal
         Items.Add(metadata);
 
         // If this item's value matches the currently selected value,
-        // update the DisplayText to show the proper display name instead of Value.ToString()
+        // update the DisplayText to show the proper display name
         if (displayText != null && EqualityComparer<TValue>.Default.Equals(State.Value, value))
         {
-            // Only update if DisplayText is null or was set to Value.ToString() fallback
-            if (State.DisplayText == null || State.DisplayText == value?.ToString())
-            {
-                UpdateState(state => state.DisplayText = displayText);
-            }
+            UpdateState(state => state.DisplayText = displayText);
         }
 
         return Items.Count - 1;

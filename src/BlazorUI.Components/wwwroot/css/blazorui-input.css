@@ -72,7 +72,7 @@
 
   /* Placeholder styling */
   [data-slot="rich-text-editor"] .ql-editor.ql-blank::before {
-    color: var(--muted-foreground);
+    color: var(--muted-foreground) !important;
     font-style: normal;
     left: 0.75rem;
     right: 0.75rem;
