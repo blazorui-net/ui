@@ -12,10 +12,11 @@
     <div @ref="_contentRef"
          class="@CssClass"
          role="menu"
-         tabindex="-1"
+         tabindex="@(IsKeyboardNavigationEnabled ? -1 : null)"
          data-state="@(MenuItem?.IsOpen == true ? "open" : "closed")"
          @onmouseenter="HandleMouseEnter"
-         @onmouseleave="HandleMouseLeave">
+         @onmouseleave="HandleMouseLeave"
+         @onclick="HandleClick">
         @ChildContent
     </div>
 }
@@ -51,57 +52,66 @@
         MenuItem?.RegisterContent(this);
     }
 
+    /// <summary>
+    /// Gets whether keyboard navigation is enabled on the parent menu.
+    /// </summary>
+    private bool IsKeyboardNavigationEnabled => MenuItem?.Menu?.EnableKeyboardNavigation == true;
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         var isOpen = MenuItem?.IsOpen == true;
 
-        // Load module if not loaded
-        if (isOpen && !_moduleLoaded)
+        // Only set up keyboard navigation if enabled
+        if (IsKeyboardNavigationEnabled)
         {
-            try
+            // Load module if not loaded
+            if (isOpen && !_moduleLoaded)
             {
-                _navModule = await JSRuntime.InvokeAsync<IJSObjectReference>(
-                    "import", "./_content/BlazorUI.Components/js/navigation-menu.js");
-                _moduleLoaded = true;
+                try
+                {
+                    _navModule = await JSRuntime.InvokeAsync<IJSObjectReference>(
+                        "import", "./_content/BlazorUI.Components/js/navigation-menu.js");
+                    _moduleLoaded = true;
+                }
+                catch
+                {
+                    // Module loading failed
+                }
             }
-            catch
-            {
-                // Module loading failed
-            }
-        }
 
-        // Set up keyboard navigation when menu opens
-        if (isOpen && !_wasOpen && _navModule != null)
-        {
-            try
+            // Set up keyboard navigation when menu opens
+            if (isOpen && !_wasOpen && _navModule != null)
             {
-                _dotNetRef = DotNetObjectReference.Create(this);
-                _keyboardCleanup = await _navModule.InvokeAsync<IJSObjectReference>(
-                    "setupKeyboardNavigation", _contentRef, _dotNetRef);
+                try
+                {
+                    _dotNetRef = DotNetObjectReference.Create(this);
+                    _keyboardCleanup = await _navModule.InvokeAsync<IJSObjectReference>(
+                        "setupKeyboardNavigation", _contentRef, _dotNetRef);
 
-                // Focus the container so it can receive keyboard events
-                await _navModule.InvokeVoidAsync("focusElement", _contentRef);
+                    // Focus the first item in the content
+                    await _navModule.InvokeVoidAsync("navigateFirst", _contentRef);
+                }
+                catch
+                {
+                    // Keyboard navigation setup failed
+                }
             }
-            catch
-            {
-                // Keyboard navigation setup failed
-            }
-        }
 
-        // Clean up keyboard navigation when menu closes
-        if (!isOpen && _wasOpen && _keyboardCleanup != null)
-        {
-            try
+            // Clean up keyboard navigation when menu closes
+            if (!isOpen && _wasOpen && _keyboardCleanup != null)
             {
-                await _keyboardCleanup.InvokeVoidAsync("dispose");
-                await _keyboardCleanup.DisposeAsync();
-                _keyboardCleanup = null;
-                _dotNetRef?.Dispose();
-                _dotNetRef = null;
-            }
-            catch
-            {
-                // Cleanup failed
+                try
+                {
+                    await _keyboardCleanup.InvokeVoidAsync("dispose");
+                    await _keyboardCleanup.DisposeAsync();
+                    _keyboardCleanup = null;
+                    _dotNetRef?.Dispose();
+                    _dotNetRef = null;
+                }
+                catch
+                {
+                    // Cleanup failed
+                }
             }
         }
 
@@ -161,12 +171,23 @@
         MenuItem?.StartCloseTimer();
     }
 
+    private void HandleClick()
+    {
+        // Close the menu immediately when any content is clicked
+        // This provides faster feedback than waiting for LocationChanged
+        if (MenuItem != null)
+        {
+            MenuItem.IsOpen = false;
+        }
+    }
+
     /// <summary>
     /// Gets the computed CSS classes for the content panel.
     /// </summary>
     private string CssClass => ClassNames.cn(
         "absolute left-0 top-full mt-1.5 w-max z-50",
         "rounded-md border bg-popover text-popover-foreground shadow-lg",
+        "outline-none ring-0 focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 focus-within:bg-popover",
         "data-[state=open]:animate-in data-[state=closed]:animate-out",
         "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
         "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",

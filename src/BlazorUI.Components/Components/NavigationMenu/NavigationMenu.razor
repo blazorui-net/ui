@@ -1,5 +1,8 @@
 @namespace BlazorUI.Components.NavigationMenu
 @using BlazorUI.Components.Utilities
+@using Microsoft.AspNetCore.Components.Routing
+@inject NavigationManager NavigationManager
+@implements IDisposable
 
 @*
     Navigation Menu component - primary site navigation.
@@ -16,6 +19,27 @@
     private string? _activeItem;
     private CancellationTokenSource? _closeTimerCts;
     private List<ElementReference> _triggerRefs = new();
+
+    protected override void OnInitialized()
+    {
+        NavigationManager.LocationChanged += OnLocationChanged;
+    }
+
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        // Close any open menu when navigation occurs
+        if (_activeItem != null)
+        {
+            _activeItem = null;
+            StateHasChanged();
+        }
+    }
+
+    public void Dispose()
+    {
+        NavigationManager.LocationChanged -= OnLocationChanged;
+        _closeTimerCts?.Dispose();
+    }
 
     /// <summary>
     /// The content to render inside the navigation menu.
@@ -35,6 +59,14 @@
     /// </summary>
     [Parameter(CaptureUnmatchedValues = true)]
     public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    /// <summary>
+    /// Enables keyboard navigation within dropdown menus.
+    /// When true, users can navigate items with arrow keys.
+    /// Default is false.
+    /// </summary>
+    [Parameter]
+    public bool EnableKeyboardNavigation { get; set; } = false;
 
     /// <summary>
     /// Gets or sets the currently active/open menu item.
