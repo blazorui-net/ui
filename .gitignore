@@ -31,17 +31,14 @@ tailwindcss.exe
 Thumbs.db
 NUL
 
-# DevFlow
-.devflow/snapshots/
-
 # Environment
 .env
 .env.local
 .env.*.local
 
+# Development Tools
 .playwright-mcp
 .devflow
 .claude
-
 DEV-TASKS.md
 .instructions
