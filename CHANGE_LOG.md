@@ -6,6 +6,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## 2026-01-25
+
+### Added
+- DisplayTextSelector parameter for Select component - allows deriving display text from the selected value without waiting for dropdown items to render
+
+### Changed
+- License changed from MIT to Apache 2.0 for BlazorUI.Components and BlazorUI.Primitives (icon libraries remain MIT)
+- Added NOTICE file with attribution requirements for derivative works
+
+---
+
 ## 2026-01-24
 
 ### Added
