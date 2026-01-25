@@ -14,6 +14,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ### Changed
 - License changed from MIT to Apache 2.0 for BlazorUI.Components and BlazorUI.Primitives (icon libraries remain MIT)
 - Added NOTICE file with attribution requirements for derivative works
+- Combobox and MultiSelect focus mechanism replaced with event-based approach using OnContentReady
+- MultiSelect search box styling now matches Combobox for visual consistency
 
 ---
 
