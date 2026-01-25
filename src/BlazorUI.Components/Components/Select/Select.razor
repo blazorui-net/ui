@@ -9,6 +9,7 @@
                  ValueChanged="@ValueChanged"
                  @bind-Open="IsOpen"
                  Disabled="Disabled"
+                 DisplayTextSelector="@DisplayTextSelector"
                  class="@CssClass">
     @ChildContent
 </BlazorUI.Primitives.Select.Select>
@@ -49,6 +50,15 @@
     /// </summary>
     [Parameter]
     public string? Class { get; set; }
+
+    /// <summary>
+    /// Optional function to derive display text from the selected value.
+    /// Use this when you have a pre-selected value and want to show its display text
+    /// without waiting for the dropdown items to render and register.
+    /// This keeps display text in sync automatically when the value changes.
+    /// </summary>
+    [Parameter]
+    public Func<TValue, string>? DisplayTextSelector { get; set; }
 
     /// <summary>
     /// Gets or sets the content to be rendered inside the select component.

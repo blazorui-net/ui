@@ -85,6 +85,15 @@
     [Parameter]
     public bool DefaultOpen { get; set; } = false;
 
+    /// <summary>
+    /// Optional function to derive display text from the selected value.
+    /// Use this when you have a pre-selected value and want to show its display text
+    /// without waiting for the dropdown items to render and register.
+    /// This keeps display text in sync automatically when the value changes.
+    /// </summary>
+    [Parameter]
+    public Func<TValue, string>? DisplayTextSelector { get; set; }
+
     protected override void OnInitialized()
     {
         // Initialize controllable state for value
@@ -98,8 +107,9 @@
         // Sync initial value to context
         _context.State.Value = _state.Value;
         _context.State.Disabled = Disabled;
-        // Set initial DisplayText (will be updated when items register with correct display text)
-        _context.State.DisplayText = _state.Value?.ToString();
+        // Set initial DisplayText - use DisplayTextSelector if provided, otherwise fall back to Value.ToString()
+        // (will be updated when items register with correct display text if dropdown is opened)
+        _context.State.DisplayText = GetDisplayText(_state.Value);
 
         // Subscribe to context value changes
         _context.OnValueChange = async (newValue) =>
@@ -132,8 +142,8 @@
             _state.ControlledValue = Value;
             _context.State.Value = Value;
             // Update DisplayText - try to look up from registered items first,
-            // fall back to Value.ToString() (RegisterItem will fix this when items register)
-            _context.State.DisplayText = _context.GetDisplayTextForValue(Value) ?? Value?.ToString();
+            // then use DisplayTextSelector if provided, finally fall back to Value.ToString()
+            _context.State.DisplayText = _context.GetDisplayTextForValue(Value) ?? GetDisplayText(Value);
         }
 
         // Handle controlled open state
@@ -241,6 +251,17 @@
         }
 
         StateHasChanged();
+    }
+
+    /// <summary>
+    /// Gets the display text for a value using the DisplayTextSelector if available,
+    /// otherwise falls back to Value.ToString().
+    /// </summary>
+    private string? GetDisplayText(TValue? value)
+    {
+        if (value == null) return null;
+        if (DisplayTextSelector != null) return DisplayTextSelector(value);
+        return value.ToString();
     }
 
     public async ValueTask DisposeAsync()
