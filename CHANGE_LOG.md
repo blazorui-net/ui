@@ -6,6 +6,26 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## 2026-01-26
+
+### Added
+- CommandVirtualizedGroup component for efficient rendering of large item lists using Blazor's Virtualize
+- Global search feature in demo header with Ctrl+K keyboard shortcut
+- OnKeyboardNavigationChanged event for coordinating focus state across components
+- OnFocusChanged and OnSearchChanged targeted events for O(1) performance updates
+
+### Changed
+- Command component now supports both regular CommandItem and virtualized groups
+- Keyboard navigation unified across regular items and virtualized groups with proper wrapping
+
+### Fixed
+- Command component performance improved from O(n) to O(1) re-renders on focus change
+- Hover/keyboard navigation conflict resolved - CSS hover suppressed during keyboard navigation
+- CommandItem no longer causes page jump on keyboard navigation (affected Combobox)
+- Scroll-into-view only triggers during keyboard navigation, not mouse hover
+
+---
+
 ## 2026-01-25
 
 ### Fixed
