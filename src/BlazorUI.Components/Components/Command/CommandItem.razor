@@ -161,8 +161,8 @@
             var wasFocused = _isFocused;
             _isFocused = _filteredIndex == newIndex;
 
-            // Scroll into view when becoming focused (keyboard navigation)
-            if (_isFocused && !wasFocused)
+            // Scroll into view only during keyboard navigation, not mouse hover
+            if (_isFocused && !wasFocused && Context?.IsKeyboardNavigating == true)
             {
                 _shouldScrollIntoView = true;
             }
@@ -178,9 +178,8 @@
             _shouldScrollIntoView = false;
             try
             {
-                // Use 'start' for first item to show group heading, 'nearest' for others
-                var scrollBlock = _filteredIndex == 0 ? "start" : "nearest";
-                await JS.InvokeVoidAsync("eval", $"document.getElementById('{_itemId}')?.scrollIntoView({{block: '{scrollBlock}', behavior: 'instant'}})");
+                // Use 'nearest' to scroll only if item is out of view, avoiding page jumps
+                await JS.InvokeVoidAsync("eval", $"document.getElementById('{_itemId}')?.scrollIntoView({{block: 'nearest', behavior: 'instant'}})");
             }
             catch
             {
