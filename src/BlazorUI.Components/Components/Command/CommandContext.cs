@@ -34,14 +34,42 @@ public class CommandItemMetadata
 }
 
 /// <summary>
+/// Interface for virtualized groups to participate in navigation.
+/// </summary>
+public interface IVirtualizedGroupHandler
+{
+    /// <summary>
+    /// Gets the number of visible items in this virtualized group.
+    /// </summary>
+    int VisibleItemCount { get; }
+
+    /// <summary>
+    /// Gets or sets the focused index within this group (-1 if not focused).
+    /// </summary>
+    int FocusedIndex { get; set; }
+
+    /// <summary>
+    /// Selects the currently focused item.
+    /// </summary>
+    Task SelectFocusedItemAsync();
+
+    /// <summary>
+    /// Notifies the group to re-render.
+    /// </summary>
+    void NotifyStateChanged();
+}
+
+/// <summary>
 /// Context for Command component and its children.
 /// Manages search query, item registration, filtering, and keyboard navigation.
 /// </summary>
 public class CommandContext
 {
     private readonly List<CommandItemMetadata> _items = new();
+    private readonly List<IVirtualizedGroupHandler> _virtualizedGroups = new();
     private string _searchQuery = string.Empty;
     private int _focusedIndex = -1;
+    private int _focusedVirtualizedGroupIndex = -1; // Which virtualized group has focus (-1 = regular items)
     private Func<CommandItemMetadata, string, bool>? _filterFunction;
     private bool _closeOnSelect = true;
     private bool _disabled;
@@ -51,6 +79,16 @@ public class CommandContext
     /// Event that is raised when the state changes.
     /// </summary>
     public event Action? OnStateChanged;
+
+    /// <summary>
+    /// Event that is raised when focus changes. Parameters are (previousIndex, newIndex).
+    /// </summary>
+    public event Action<int, int>? OnFocusChanged;
+
+    /// <summary>
+    /// Event that is raised when the search query changes.
+    /// </summary>
+    public event Action? OnSearchChanged;
 
     /// <summary>
     /// Gets or sets the callback invoked when an item is selected.
@@ -110,6 +148,30 @@ public class CommandContext
     public int FocusedIndex => _focusedIndex;
 
     /// <summary>
+    /// Gets the currently focused virtualized group index (-1 if focus is on regular items).
+    /// </summary>
+    public int FocusedVirtualizedGroupIndex => _focusedVirtualizedGroupIndex;
+
+    /// <summary>
+    /// Registers a virtualized group handler for navigation.
+    /// </summary>
+    public void RegisterVirtualizedGroup(IVirtualizedGroupHandler handler)
+    {
+        if (!_virtualizedGroups.Contains(handler))
+        {
+            _virtualizedGroups.Add(handler);
+        }
+    }
+
+    /// <summary>
+    /// Unregisters a virtualized group handler.
+    /// </summary>
+    public void UnregisterVirtualizedGroup(IVirtualizedGroupHandler handler)
+    {
+        _virtualizedGroups.Remove(handler);
+    }
+
+    /// <summary>
     /// Updates the search query and notifies subscribers.
     /// </summary>
     /// <param name="query">The new search query.</param>
@@ -119,6 +181,15 @@ public class CommandContext
         {
             _searchQuery = query;
             _focusedIndex = -1; // Reset focus when search changes
+            _focusedVirtualizedGroupIndex = -1; // Reset virtualized group focus
+
+            // Reset focus in all virtualized groups
+            foreach (var group in _virtualizedGroups)
+            {
+                group.FocusedIndex = -1;
+            }
+
+            OnSearchChanged?.Invoke();
             NotifyStateChanged();
         }
     }
@@ -237,41 +308,257 @@ public class CommandContext
     {
         if (_focusedIndex != index)
         {
+            var previousIndex = _focusedIndex;
             _focusedIndex = index;
-            NotifyStateChanged();
+            // Use targeted focus notification instead of global state change
+            OnFocusChanged?.Invoke(previousIndex, index);
         }
     }
 
     /// <summary>
-    /// Moves focus to the next/previous item.
+    /// Moves focus to the next/previous item, including virtualized groups.
     /// </summary>
     /// <param name="direction">1 for next, -1 for previous.</param>
     public void MoveFocus(int direction)
     {
-        var filteredItems = GetFilteredItems().Where(i => !i.Disabled).ToList();
-        if (filteredItems.Count == 0) return;
-
         var allFiltered = GetFilteredItems();
-        int currentIndex = _focusedIndex;
-        int newIndex = currentIndex;
+        var enabledFilteredItems = allFiltered.Where(i => !i.Disabled).ToList();
 
-        // Find next non-disabled item in filtered list
-        do
+        // Get virtualized groups that have visible items
+        var activeVirtualizedGroups = _virtualizedGroups.Where(g => g.VisibleItemCount > 0).ToList();
+
+        // Calculate total navigable items
+        int totalRegularItems = allFiltered.Count;
+        int totalVirtualizedItems = activeVirtualizedGroups.Sum(g => g.VisibleItemCount);
+
+        if (enabledFilteredItems.Count == 0 && totalVirtualizedItems == 0) return;
+
+        // Currently in a virtualized group?
+        if (_focusedVirtualizedGroupIndex >= 0)
         {
-            newIndex += direction;
+            // Validate the index is still valid (groups may have changed due to filtering)
+            if (_focusedVirtualizedGroupIndex >= activeVirtualizedGroups.Count)
+            {
+                _focusedVirtualizedGroupIndex = -1;
+                // Fall through to regular items handling
+            }
+            else
+            {
+                var currentGroup = activeVirtualizedGroups[_focusedVirtualizedGroupIndex];
+                int currentIndexInGroup = currentGroup.FocusedIndex;
+                int newIndexInGroup = currentIndexInGroup + direction;
+
+                if (newIndexInGroup >= 0 && newIndexInGroup < currentGroup.VisibleItemCount)
+                {
+                    // Stay within current group
+                    currentGroup.FocusedIndex = newIndexInGroup;
+                    currentGroup.NotifyStateChanged();
+                    return;
+                }
+                else if (direction > 0)
+                {
+                    // Moving forward - try next virtualized group or wrap to regular items
+                    currentGroup.FocusedIndex = -1;
+                    currentGroup.NotifyStateChanged();
+
+                    if (_focusedVirtualizedGroupIndex + 1 < activeVirtualizedGroups.Count)
+                    {
+                        // Move to next virtualized group
+                        _focusedVirtualizedGroupIndex++;
+                        var nextGroup = activeVirtualizedGroups[_focusedVirtualizedGroupIndex];
+                        nextGroup.FocusedIndex = 0;
+                        nextGroup.NotifyStateChanged();
+                    }
+                    else
+                    {
+                        // Wrap to first regular item (or first virtualized group if no regular items)
+                        _focusedVirtualizedGroupIndex = -1;
+                        if (enabledFilteredItems.Count > 0)
+                        {
+                            FocusFirstRegularItem();
+                        }
+                        else if (activeVirtualizedGroups.Count > 0)
+                        {
+                            // No regular items, wrap to first virtualized group
+                            _focusedVirtualizedGroupIndex = 0;
+                            var firstGroup = activeVirtualizedGroups[0];
+                            firstGroup.FocusedIndex = 0;
+                            firstGroup.NotifyStateChanged();
+                        }
+                    }
+                    return;
+                }
+                else
+                {
+                    // Moving backward - try previous virtualized group or go to regular items
+                    currentGroup.FocusedIndex = -1;
+                    currentGroup.NotifyStateChanged();
+
+                    if (_focusedVirtualizedGroupIndex > 0)
+                    {
+                        // Move to previous virtualized group (last item)
+                        _focusedVirtualizedGroupIndex--;
+                        var prevGroup = activeVirtualizedGroups[_focusedVirtualizedGroupIndex];
+                        prevGroup.FocusedIndex = prevGroup.VisibleItemCount - 1;
+                        prevGroup.NotifyStateChanged();
+                    }
+                    else
+                    {
+                        // Move to last regular item (or last virtualized group if no regular items)
+                        _focusedVirtualizedGroupIndex = -1;
+                        if (enabledFilteredItems.Count > 0)
+                        {
+                            FocusLastRegularItem();
+                        }
+                        else if (activeVirtualizedGroups.Count > 0)
+                        {
+                            // No regular items, wrap to last virtualized group
+                            _focusedVirtualizedGroupIndex = activeVirtualizedGroups.Count - 1;
+                            var lastGroup = activeVirtualizedGroups[_focusedVirtualizedGroupIndex];
+                            lastGroup.FocusedIndex = lastGroup.VisibleItemCount - 1;
+                            lastGroup.NotifyStateChanged();
+                        }
+                    }
+                    return;
+                }
+            }
+        }
+
+        // Currently in regular items
+        int currentIndex = _focusedIndex;
+        int newIndex = currentIndex + direction;
+
+        if (direction > 0)
+        {
+            // Moving forward
+            if (newIndex >= totalRegularItems)
+            {
+                // Move to first virtualized group if available
+                if (activeVirtualizedGroups.Count > 0)
+                {
+                    var previousIndex = _focusedIndex;
+                    _focusedIndex = -1;
+                    OnFocusChanged?.Invoke(previousIndex, -1);
+
+                    _focusedVirtualizedGroupIndex = 0;
+                    var firstGroup = activeVirtualizedGroups[0];
+                    firstGroup.FocusedIndex = 0;
+                    firstGroup.NotifyStateChanged();
+                    return;
+                }
+                else
+                {
+                    // Wrap to first regular item
+                    newIndex = 0;
+                }
+            }
+
+            // Skip disabled items
+            while (newIndex < totalRegularItems && allFiltered[newIndex].Disabled)
+            {
+                newIndex++;
+            }
+
+            if (newIndex >= totalRegularItems)
+            {
+                // All remaining items disabled, move to virtualized groups
+                if (activeVirtualizedGroups.Count > 0)
+                {
+                    var previousIndex = _focusedIndex;
+                    _focusedIndex = -1;
+                    OnFocusChanged?.Invoke(previousIndex, -1);
+
+                    _focusedVirtualizedGroupIndex = 0;
+                    var firstGroup = activeVirtualizedGroups[0];
+                    firstGroup.FocusedIndex = 0;
+                    firstGroup.NotifyStateChanged();
+                    return;
+                }
+                newIndex = 0;
+                while (newIndex < totalRegularItems && allFiltered[newIndex].Disabled) newIndex++;
+            }
+        }
+        else
+        {
+            // Moving backward
+            if (newIndex < 0)
+            {
+                // Move to last virtualized group if available
+                if (activeVirtualizedGroups.Count > 0)
+                {
+                    var previousIndex = _focusedIndex;
+                    _focusedIndex = -1;
+                    OnFocusChanged?.Invoke(previousIndex, -1);
+
+                    _focusedVirtualizedGroupIndex = activeVirtualizedGroups.Count - 1;
+                    var lastGroup = activeVirtualizedGroups[_focusedVirtualizedGroupIndex];
+                    lastGroup.FocusedIndex = lastGroup.VisibleItemCount - 1;
+                    lastGroup.NotifyStateChanged();
+                    return;
+                }
+                else
+                {
+                    // Wrap to last regular item
+                    newIndex = totalRegularItems - 1;
+                }
+            }
+
+            // Skip disabled items
+            while (newIndex >= 0 && allFiltered[newIndex].Disabled)
+            {
+                newIndex--;
+            }
 
             if (newIndex < 0)
-                newIndex = allFiltered.Count - 1;
-            else if (newIndex >= allFiltered.Count)
-                newIndex = 0;
+            {
+                // All preceding items disabled, move to virtualized groups
+                if (activeVirtualizedGroups.Count > 0)
+                {
+                    var previousIndex = _focusedIndex;
+                    _focusedIndex = -1;
+                    OnFocusChanged?.Invoke(previousIndex, -1);
 
-            // Avoid infinite loop
-            if (newIndex == currentIndex)
-                break;
+                    _focusedVirtualizedGroupIndex = activeVirtualizedGroups.Count - 1;
+                    var lastGroup = activeVirtualizedGroups[_focusedVirtualizedGroupIndex];
+                    lastGroup.FocusedIndex = lastGroup.VisibleItemCount - 1;
+                    lastGroup.NotifyStateChanged();
+                    return;
+                }
+                newIndex = totalRegularItems - 1;
+                while (newIndex >= 0 && allFiltered[newIndex].Disabled) newIndex--;
+            }
+        }
 
-        } while (newIndex >= 0 && newIndex < allFiltered.Count && allFiltered[newIndex].Disabled);
+        if (newIndex >= 0 && newIndex < totalRegularItems)
+        {
+            SetFocusedIndex(newIndex);
+        }
+    }
 
-        SetFocusedIndex(newIndex);
+    private void FocusFirstRegularItem()
+    {
+        var allFiltered = GetFilteredItems();
+        for (int i = 0; i < allFiltered.Count; i++)
+        {
+            if (!allFiltered[i].Disabled)
+            {
+                SetFocusedIndex(i);
+                return;
+            }
+        }
+    }
+
+    private void FocusLastRegularItem()
+    {
+        var allFiltered = GetFilteredItems();
+        for (int i = allFiltered.Count - 1; i >= 0; i--)
+        {
+            if (!allFiltered[i].Disabled)
+            {
+                SetFocusedIndex(i);
+                return;
+            }
+        }
     }
 
     /// <summary>
@@ -307,10 +594,22 @@ public class CommandContext
     }
 
     /// <summary>
-    /// Selects the currently focused item.
+    /// Selects the currently focused item (regular or virtualized).
     /// </summary>
     public async Task SelectFocusedItemAsync()
     {
+        // Check if focus is in a virtualized group
+        if (_focusedVirtualizedGroupIndex >= 0)
+        {
+            var activeGroups = _virtualizedGroups.Where(g => g.VisibleItemCount > 0).ToList();
+            if (_focusedVirtualizedGroupIndex < activeGroups.Count)
+            {
+                await activeGroups[_focusedVirtualizedGroupIndex].SelectFocusedItemAsync();
+                return;
+            }
+        }
+
+        // Regular item selection
         var filteredItems = GetFilteredItems();
         if (_focusedIndex >= 0 && _focusedIndex < filteredItems.Count)
         {

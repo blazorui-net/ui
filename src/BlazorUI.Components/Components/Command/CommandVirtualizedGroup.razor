@@ -1,0 +1,255 @@
+@namespace BlazorUI.Components.Command
+@typeparam TItem
+@implements IDisposable
+@implements IVirtualizedGroupHandler
+@inject IJSRuntime JS
+
+@* CommandVirtualizedGroup - A virtualized group for efficiently rendering large item collections *@
+<div class="@CssClass"
+     style="@(_hasVisibleItems ? null : "display: none")"
+     role="group"
+     aria-labelledby="@(string.IsNullOrWhiteSpace(Heading) ? null : $"command-group-{_id}")">
+    @if (!string.IsNullOrWhiteSpace(Heading))
+    {
+        <div id="@($"command-group-{_id}")"
+             class="px-2 py-1.5 text-xs font-medium text-muted-foreground">
+            @Heading
+            @if (_filteredItems != null && _totalCount > 0)
+            {
+                <span class="ml-1 opacity-70">(@_filteredItems.Count of @_totalCount)</span>
+            }
+        </div>
+    }
+
+    @if (_filteredItems != null && _filteredItems.Count > 0)
+    {
+        <Microsoft.AspNetCore.Components.Web.Virtualization.Virtualize
+            Items="_filteredItems"
+            Context="item"
+            ItemSize="32"
+            OverscanCount="5">
+            @{
+                var itemIndex = _filteredItems.IndexOf(item);
+            }
+            <div id="@GetItemId(itemIndex)"
+                 role="option"
+                 aria-selected="@(IsItemFocusedByIndex(itemIndex) ? "true" : "false")"
+                 data-focused="@(IsItemFocusedByIndex(itemIndex) ? "true" : "false")"
+                 @onclick="@(() => SelectItem(item))"
+                 @onmouseenter="@(() => FocusItemByIndex(itemIndex))"
+                 class="@GetItemCssClassByIndex(itemIndex)">
+                @ItemTemplate(item)
+            </div>
+        </Microsoft.AspNetCore.Components.Web.Virtualization.Virtualize>
+    }
+</div>
+
+@code {
+    [CascadingParameter]
+    public CommandContext? Context { get; set; }
+
+    /// <summary>
+    /// Gets or sets additional CSS classes to apply to the group container.
+    /// </summary>
+    [Parameter]
+    public string? Class { get; set; }
+
+    /// <summary>
+    /// Gets or sets the heading text for this group (optional).
+    /// </summary>
+    [Parameter]
+    public string? Heading { get; set; }
+
+    /// <summary>
+    /// Gets or sets the collection of items to display.
+    /// </summary>
+    [Parameter, EditorRequired]
+    public IReadOnlyList<TItem> Items { get; set; } = Array.Empty<TItem>();
+
+    /// <summary>
+    /// Gets or sets the template for rendering each item.
+    /// </summary>
+    [Parameter, EditorRequired]
+    public RenderFragment<TItem> ItemTemplate { get; set; } = default!;
+
+    /// <summary>
+    /// Gets or sets the function to extract the value from an item.
+    /// </summary>
+    [Parameter, EditorRequired]
+    public Func<TItem, string> ItemValue { get; set; } = default!;
+
+    /// <summary>
+    /// Gets or sets the function to extract search text from an item.
+    /// If not provided, ItemValue is used.
+    /// </summary>
+    [Parameter]
+    public Func<TItem, string>? ItemSearchText { get; set; }
+
+    /// <summary>
+    /// Gets or sets the maximum number of items to display after filtering.
+    /// Default is 100. Set to 0 for unlimited.
+    /// </summary>
+    [Parameter]
+    public int MaxDisplayCount { get; set; } = 100;
+
+    private readonly string _id = Guid.NewGuid().ToString("N");
+    private List<TItem>? _filteredItems;
+    private int _totalCount;
+    private bool _hasVisibleItems = true;
+    private int _focusedIndex = -1;
+    private bool _shouldScrollIntoView;
+
+    // IVirtualizedGroupHandler implementation
+    int IVirtualizedGroupHandler.VisibleItemCount => _filteredItems?.Count ?? 0;
+
+    int IVirtualizedGroupHandler.FocusedIndex
+    {
+        get => _focusedIndex;
+        set
+        {
+            if (_focusedIndex != value)
+            {
+                _focusedIndex = value;
+                _shouldScrollIntoView = value >= 0; // Scroll when focus is set via keyboard
+            }
+        }
+    }
+
+    void IVirtualizedGroupHandler.NotifyStateChanged() => StateHasChanged();
+
+    async Task IVirtualizedGroupHandler.SelectFocusedItemAsync()
+    {
+        if (_filteredItems != null && _focusedIndex >= 0 && _focusedIndex < _filteredItems.Count)
+        {
+            await SelectItem(_filteredItems[_focusedIndex]);
+        }
+    }
+
+    private string CssClass
+    {
+        get
+        {
+            var baseClasses = "overflow-hidden p-1 text-foreground";
+            return string.IsNullOrWhiteSpace(Class) ? baseClasses : $"{baseClasses} {Class}";
+        }
+    }
+
+    private string GetItemId(int index) => $"vgroup-{_id}-item-{index}";
+
+    protected override void OnInitialized()
+    {
+        if (Context != null)
+        {
+            Context.OnSearchChanged += HandleSearchChanged;
+            Context.RegisterVirtualizedGroup(this);
+        }
+        UpdateFilteredItems();
+    }
+
+    protected override void OnParametersSet()
+    {
+        // Re-filter if Items changed
+        UpdateFilteredItems();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (_shouldScrollIntoView && _focusedIndex >= 0)
+        {
+            _shouldScrollIntoView = false;
+            var elementId = GetItemId(_focusedIndex);
+            try
+            {
+                await JS.InvokeVoidAsync("eval", $"document.getElementById('{elementId}')?.scrollIntoView({{block: 'nearest', behavior: 'instant'}})");
+            }
+            catch
+            {
+                // Ignore JS errors during scroll
+            }
+        }
+    }
+
+    private void UpdateFilteredItems()
+    {
+        if (Items == null)
+        {
+            _filteredItems = new List<TItem>();
+            _totalCount = 0;
+            _hasVisibleItems = false;
+            return;
+        }
+
+        _totalCount = Items.Count;
+        var searchQuery = Context?.SearchQuery ?? "";
+
+        if (string.IsNullOrWhiteSpace(searchQuery))
+        {
+            // No search - show first MaxDisplayCount items
+            _filteredItems = MaxDisplayCount > 0
+                ? Items.Take(MaxDisplayCount).ToList()
+                : Items.ToList();
+        }
+        else
+        {
+            // Filter by search query
+            var searchTextFunc = ItemSearchText ?? ItemValue;
+            var filtered = Items
+                .Where(item => searchTextFunc(item).Contains(searchQuery, StringComparison.OrdinalIgnoreCase));
+
+            _filteredItems = MaxDisplayCount > 0
+                ? filtered.Take(MaxDisplayCount).ToList()
+                : filtered.ToList();
+        }
+
+        _hasVisibleItems = _filteredItems.Count > 0;
+    }
+
+    private void HandleSearchChanged()
+    {
+        UpdateFilteredItems();
+        _focusedIndex = -1;
+        StateHasChanged();
+    }
+
+    private bool IsItemFocusedByIndex(int index)
+    {
+        return _focusedIndex >= 0 && _focusedIndex == index;
+    }
+
+    private void FocusItemByIndex(int index)
+    {
+        if (index >= 0 && index != _focusedIndex)
+        {
+            _focusedIndex = index;
+            // Don't scroll on mouse hover
+            StateHasChanged();
+        }
+    }
+
+    private async Task SelectItem(TItem item)
+    {
+        if (Context != null)
+        {
+            var value = ItemValue(item);
+            if (Context.OnValueChange.HasDelegate)
+            {
+                await Context.OnValueChange.InvokeAsync(value);
+            }
+        }
+    }
+
+    private string GetItemCssClassByIndex(int index)
+    {
+        var isFocused = IsItemFocusedByIndex(index);
+        return $"relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-accent hover:text-accent-foreground{(isFocused ? " bg-accent text-accent-foreground" : "")}";
+    }
+
+    public void Dispose()
+    {
+        if (Context != null)
+        {
+            Context.OnSearchChanged -= HandleSearchChanged;
+            Context.UnregisterVirtualizedGroup(this);
+        }
+    }
+}
