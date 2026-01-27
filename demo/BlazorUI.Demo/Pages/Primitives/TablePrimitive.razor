@@ -2,6 +2,7 @@
 @using BlazorUI.Primitives.Services
 @using BlazorUI.Primitives.Table
 @using BlazorUI.Primitives.Popover
+@using BlazorUI.Primitives.DropdownMenu
 @using BlazorUI.Components.Button
 @using BlazorUI.Icons.Lucide.Components
 
@@ -43,6 +44,78 @@
                 </TableBody>
             </Table>
         </div>
+    </section>
+
+    @* Row Actions Example *@
+    <section class="space-y-4">
+        <div>
+            <h2 class="text-2xl font-semibold">Row Actions</h2>
+            <p class="text-sm text-muted-foreground">Table with an actions dropdown menu for each row</p>
+        </div>
+
+        <div class="rounded-md border">
+            <Table TData="Person" Data="@people" Class="w-full caption-bottom text-sm">
+                <TableHeader Class="[&_tr]:border-b">
+                    <TableRow TData="Person" Class="border-b transition-colors hover:bg-muted/50">
+                        <TableHeaderCell TData="Person" Class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Name</TableHeaderCell>
+                        <TableHeaderCell TData="Person" Class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Email</TableHeaderCell>
+                        <TableHeaderCell TData="Person" Class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Department</TableHeaderCell>
+                        <TableHeaderCell TData="Person" Class="h-12 px-4 text-right align-middle font-medium text-muted-foreground w-[70px]">Actions</TableHeaderCell>
+                    </TableRow>
+                </TableHeader>
+                <TableBody Class="[&_tr:last-child]:border-0">
+                    @foreach (var person in people)
+                    {
+                        <TableRow TData="Person" Class="border-b transition-colors hover:bg-muted/50">
+                            <TableCell Class="p-4 align-middle font-medium">@person.Name</TableCell>
+                            <TableCell Class="p-4 align-middle">@person.Email</TableCell>
+                            <TableCell Class="p-4 align-middle">@person.Department</TableCell>
+                            <TableCell Class="p-4 align-middle text-right">
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger>
+                                        <Button Variant="ButtonVariant.Ghost" Size="ButtonSize.Icon" Class="h-8 w-8" AriaLabel="Open menu">
+                                            <LucideIcon Name="ellipsis" Size="16" />
+                                        </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent Class="w-48 rounded-md border bg-popover p-1 text-popover-foreground shadow-md" Align="PopoverAlign.End">
+                                        <DropdownMenuLabel Class="px-2 py-1.5 text-sm font-semibold">Actions</DropdownMenuLabel>
+                                        <DropdownMenuSeparator Class="my-1 h-px bg-muted" />
+                                        <DropdownMenuItem Class="relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                                                          OnClick="@(() => HandleViewDetails(person))">
+                                            <LucideIcon Name="eye" Size="16" Class="mr-2" />
+                                            View details
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem Class="relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                                                          OnClick="@(() => HandleEdit(person))">
+                                            <LucideIcon Name="pencil" Size="16" Class="mr-2" />
+                                            Edit
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem Class="relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                                                          OnClick="@(() => HandleDuplicate(person))">
+                                            <LucideIcon Name="copy" Size="16" Class="mr-2" />
+                                            Duplicate
+                                        </DropdownMenuItem>
+                                        <DropdownMenuSeparator Class="my-1 h-px bg-muted" />
+                                        <DropdownMenuItem Class="relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors hover:bg-destructive hover:text-destructive-foreground focus:bg-destructive focus:text-destructive-foreground text-destructive"
+                                                          OnClick="@(() => HandleDelete(person))">
+                                            <LucideIcon Name="trash-2" Size="16" Class="mr-2" />
+                                            Delete
+                                        </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                            </TableCell>
+                        </TableRow>
+                    }
+                </TableBody>
+            </Table>
+        </div>
+
+        @if (!string.IsNullOrEmpty(actionMessage))
+        {
+            <div class="rounded-lg border bg-card p-4">
+                <p class="text-sm">@actionMessage</p>
+            </div>
+        }
     </section>
 
     @* Sortable Table Example *@
@@ -265,6 +338,7 @@
                             <TableHeaderCell TData="Person" Class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Email</TableHeaderCell>
                             <TableHeaderCell TData="Person" Class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Age</TableHeaderCell>
                             <TableHeaderCell TData="Person" Class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Department</TableHeaderCell>
+                            <TableHeaderCell TData="Person" Class="h-12 px-4 text-right align-middle font-medium text-muted-foreground w-[70px]">Actions</TableHeaderCell>
                         </TableRow>
                     </TableHeader>
                     <TableBody Class="[&_tr:last-child]:border-0">
@@ -286,6 +360,40 @@
                                 <TableCell Class="p-4 align-middle">@person.Email</TableCell>
                                 <TableCell Class="p-4 align-middle">@person.Age</TableCell>
                                 <TableCell Class="p-4 align-middle">@person.Department</TableCell>
+                                <TableCell Class="p-4 align-middle text-right" @onclick:stopPropagation="true">
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger>
+                                            <Button Variant="ButtonVariant.Ghost" Size="ButtonSize.Icon" Class="h-8 w-8" AriaLabel="Open menu">
+                                                <LucideIcon Name="ellipsis" Size="16" />
+                                            </Button>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent Class="w-48 rounded-md border bg-popover p-1 text-popover-foreground shadow-md" Align="PopoverAlign.End">
+                                            <DropdownMenuLabel Class="px-2 py-1.5 text-sm font-semibold">Actions</DropdownMenuLabel>
+                                            <DropdownMenuSeparator Class="my-1 h-px bg-muted" />
+                                            <DropdownMenuItem Class="relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                                                              OnClick="@(() => HandleViewDetails(person))">
+                                                <LucideIcon Name="eye" Size="16" Class="mr-2" />
+                                                View details
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem Class="relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                                                              OnClick="@(() => HandleEdit(person))">
+                                                <LucideIcon Name="pencil" Size="16" Class="mr-2" />
+                                                Edit
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem Class="relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                                                              OnClick="@(() => HandleDuplicate(person))">
+                                                <LucideIcon Name="copy" Size="16" Class="mr-2" />
+                                                Duplicate
+                                            </DropdownMenuItem>
+                                            <DropdownMenuSeparator Class="my-1 h-px bg-muted" />
+                                            <DropdownMenuItem Class="relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors hover:bg-destructive hover:text-destructive-foreground focus:bg-destructive focus:text-destructive-foreground text-destructive"
+                                                              OnClick="@(() => HandleDelete(person))">
+                                                <LucideIcon Name="trash-2" Size="16" Class="mr-2" />
+                                                Delete
+                                            </DropdownMenuItem>
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
+                                </TableCell>
                             </TableRow>
                         }
                     </TableBody>
@@ -1033,6 +1141,28 @@
 
     private bool selectAllChecked = false;
     private bool combinedSelectAllChecked = false;
+    private string actionMessage = "";
+
+    // Row action handlers
+    private void HandleViewDetails(Person person)
+    {
+        actionMessage = $"Viewing details for {person.Name}";
+    }
+
+    private void HandleEdit(Person person)
+    {
+        actionMessage = $"Editing {person.Name}";
+    }
+
+    private void HandleDuplicate(Person person)
+    {
+        actionMessage = $"Duplicating {person.Name}";
+    }
+
+    private void HandleDelete(Person person)
+    {
+        actionMessage = $"Deleting {person.Name}";
+    }
 
     // Filter input values
     private string nameFilter = "";

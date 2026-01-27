@@ -1,5 +1,6 @@
 using System.Text.Json;
 using BlazorUI.Components.Utilities;
+using Ganss.Xss;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 
@@ -36,6 +37,11 @@ public partial class RichTextEditor : ComponentBase, IAsyncDisposable
     private string? _linkUrlError;
     private bool _hasExistingLink;
     private EditorRange? _savedSelection;
+
+    /// <summary>
+    /// HTML sanitizer for XSS prevention. Thread-safe for static usage.
+    /// </summary>
+    private static readonly HtmlSanitizer Sanitizer = new();
 
     // === Parameters - Value Binding ===
 
@@ -218,10 +224,11 @@ public partial class RichTextEditor : ComponentBase, IAsyncDisposable
                 _editorRef, _dotNetRef, _editorId, options);
             _jsInitialized = true;
 
-            // Set initial content
+            // Set initial content (sanitized to prevent XSS)
             if (!string.IsNullOrEmpty(Value))
             {
-                await _jsModule.InvokeVoidAsync("setHtml", _editorId, Value);
+                var sanitized = Sanitizer.Sanitize(Value);
+                await _jsModule.InvokeVoidAsync("setHtml", _editorId, sanitized);
                 _lastKnownValue = Value;
             }
 
@@ -574,12 +581,14 @@ public partial class RichTextEditor : ComponentBase, IAsyncDisposable
 
     /// <summary>
     /// Sets the HTML content of the editor.
+    /// HTML is sanitized to prevent XSS attacks.
     /// </summary>
     public async Task SetHtmlAsync(string? html)
     {
         if (_jsModule != null && _jsInitialized)
         {
-            await _jsModule.InvokeVoidAsync("setHtml", _editorId, html ?? "");
+            var sanitized = string.IsNullOrEmpty(html) ? "" : Sanitizer.Sanitize(html);
+            await _jsModule.InvokeVoidAsync("setHtml", _editorId, sanitized);
         }
     }
 

@@ -65,6 +65,18 @@ public partial class DataTable<TData> : ComponentBase where TData : class
     private string _globalSearchValue = string.Empty;
     private int _columnsVersion = 0;
 
+    // ShouldRender tracking fields
+    private IEnumerable<TData>? _lastData;
+    private DataTableSelectionMode _lastSelectionMode;
+    private bool _lastIsLoading;
+    private int _lastColumnsVersion;
+    private string _lastGlobalSearchValue = string.Empty;
+    private int _selectionVersion = 0;
+    private int _lastSelectionVersion = 0;
+    private IReadOnlyCollection<TData>? _lastSelectedItems;
+    private int _paginationVersion = 0;
+    private int _lastPaginationVersion = 0;
+
     /// <summary>
     /// Gets or sets the data source for the table.
     /// </summary>
@@ -212,10 +224,29 @@ public partial class DataTable<TData> : ComponentBase where TData : class
     {
         _tableState.Pagination.PageSize = InitialPageSize;
         _tableState.Pagination.CurrentPage = 1;
+        // Set selection mode on the state so Select/Deselect methods work correctly
+        _tableState.Selection.Mode = GetPrimitiveSelectionMode();
     }
 
     protected override async Task OnParametersSetAsync()
     {
+        // Keep selection mode in sync with parameter
+        _tableState.Selection.Mode = GetPrimitiveSelectionMode();
+
+        // Sync SelectedItems parameter to internal state if changed externally
+        // Skip if SelectedItems is the same reference as our internal collection (shouldn't happen with the copy we make, but defensive)
+        if (!ReferenceEquals(SelectedItems, _lastSelectedItems) &&
+            !ReferenceEquals(SelectedItems, _tableState.Selection.SelectedItems))
+        {
+            _tableState.Selection.Clear();
+            foreach (var item in SelectedItems)
+            {
+                _tableState.Selection.Select(item);
+            }
+            _lastSelectedItems = SelectedItems;
+            _selectionVersion++;
+        }
+
         await ProcessDataAsync();
     }
 
@@ -412,7 +443,9 @@ public partial class DataTable<TData> : ComponentBase where TData : class
     {
         if (SelectedItemsChanged.HasDelegate)
         {
-            await SelectedItemsChanged.InvokeAsync(selectedItems);
+            // Pass a copy to avoid reference aliasing - if parent stores the reference
+            // and we later call Clear(), it would clear the parent's collection too
+            await SelectedItemsChanged.InvokeAsync(selectedItems.ToList().AsReadOnly());
         }
     }
 
@@ -435,6 +468,7 @@ public partial class DataTable<TData> : ComponentBase where TData : class
             _tableState.Selection.Clear();
         }
 
+        _selectionVersion++;  // Track selection change for ShouldRender
         await HandleSelectionChange(_tableState.Selection.SelectedItems);
         StateHasChanged();
     }
@@ -453,6 +487,7 @@ public partial class DataTable<TData> : ComponentBase where TData : class
             _tableState.Selection.Deselect(item);
         }
 
+        _selectionVersion++;  // Track selection change for ShouldRender
         await HandleSelectionChange(_tableState.Selection.SelectedItems);
         StateHasChanged();
     }
@@ -466,6 +501,19 @@ public partial class DataTable<TData> : ComponentBase where TData : class
             return false;
 
         return _processedData.All(item => _tableState.Selection.IsSelected(item));
+    }
+
+    /// <summary>
+    /// Checks if some (but not all) rows on the current page are selected.
+    /// Used for the indeterminate state of the select-all checkbox.
+    /// </summary>
+    private bool IsSomeSelected()
+    {
+        if (!_processedData.Any())
+            return false;
+
+        var selectedCount = _processedData.Count(item => _tableState.Selection.IsSelected(item));
+        return selectedCount > 0 && selectedCount < _processedData.Count();
     }
 
     /// <summary>
@@ -506,8 +554,9 @@ public partial class DataTable<TData> : ComponentBase where TData : class
     /// </summary>
     private async Task HandlePageChanged(int newPage)
     {
+        _paginationVersion++;  // Track pagination change for ShouldRender
         await ProcessDataAsync();
-        // StateHasChanged() not needed - Blazor auto-renders after async event handlers
+        StateHasChanged();
     }
 
     /// <summary>
@@ -515,7 +564,37 @@ public partial class DataTable<TData> : ComponentBase where TData : class
     /// </summary>
     private async Task HandlePageSizeChanged(int newPageSize)
     {
+        _paginationVersion++;  // Track pagination change for ShouldRender
         await ProcessDataAsync();
-        // StateHasChanged() not needed - Blazor auto-renders after async event handlers
+        StateHasChanged();
+    }
+
+    /// <summary>
+    /// Determines whether the component should re-render based on tracked state changes.
+    /// This optimization reduces unnecessary render cycles for complex tables.
+    /// </summary>
+    protected override bool ShouldRender()
+    {
+        var dataChanged = !ReferenceEquals(_lastData, Data);
+        var selectionModeChanged = _lastSelectionMode != SelectionMode;
+        var loadingChanged = _lastIsLoading != IsLoading;
+        var columnsChanged = _lastColumnsVersion != _columnsVersion;
+        var searchChanged = _lastGlobalSearchValue != _globalSearchValue;
+        var selectionChanged = _lastSelectionVersion != _selectionVersion;
+        var paginationChanged = _lastPaginationVersion != _paginationVersion;
+
+        if (dataChanged || selectionModeChanged || loadingChanged || columnsChanged || searchChanged || selectionChanged || paginationChanged)
+        {
+            _lastData = Data;
+            _lastSelectionMode = SelectionMode;
+            _lastIsLoading = IsLoading;
+            _lastColumnsVersion = _columnsVersion;
+            _lastGlobalSearchValue = _globalSearchValue;
+            _lastSelectionVersion = _selectionVersion;
+            _lastPaginationVersion = _paginationVersion;
+            return true;
+        }
+
+        return false;
     }
 }

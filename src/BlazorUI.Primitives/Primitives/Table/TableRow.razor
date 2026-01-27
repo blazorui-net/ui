@@ -7,7 +7,7 @@
     role="row"
     aria-selected="@(IsSelected ? "true" : "false")"
     tabindex="@(IsSelectable ? 0 : -1)"
-    class="@Class"
+    class="@ComputedClass"
     @onclick="HandleClick"
     @onkeydown="HandleKeyDown"
     @attributes="AdditionalAttributes">
@@ -50,6 +50,19 @@
     private bool IsSelected => Item != null && Context != null && Context.IsSelected(Item);
 
     private bool IsSelectable => Context != null && Context.SelectionMode != SelectionMode.None;
+
+    /// <summary>
+    /// Focus ring classes for keyboard navigation visibility.
+    /// Uses focus: instead of focus-visible: because programmatic focus via JS .focus()
+    /// doesn't always trigger focus-visible in browsers.
+    /// Includes relative positioning to ensure ring renders properly on tr elements.
+    /// </summary>
+    private const string FocusRingClasses = "relative focus:outline-none focus:ring-2 focus:ring-ring focus:ring-inset focus:z-10";
+
+    /// <summary>
+    /// Computed class that includes focus ring when row is selectable
+    /// </summary>
+    private string ComputedClass => IsSelectable ? $"{FocusRingClasses} {Class}" : Class ?? "";
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {

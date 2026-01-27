@@ -24,6 +24,13 @@ public partial class MultiSelect<TItem> : ComponentBase, IAsyncDisposable
     private bool _jsSetupDone = false;
     private bool _focusDone = false;
 
+    // ShouldRender tracking fields
+    private IEnumerable<TItem>? _lastItems;
+    private IEnumerable<string>? _lastValues;
+    private bool _lastIsOpen;
+    private string _lastSearchQuery = string.Empty;
+    private bool _lastDisabled;
+
     /// <summary>
     /// Gets or sets the cascaded EditContext from a parent EditForm.
     /// </summary>
@@ -542,6 +549,31 @@ public partial class MultiSelect<TItem> : ComponentBase, IAsyncDisposable
 
         _dotNetRef?.Dispose();
         _dotNetRef = null;
+    }
+
+    /// <summary>
+    /// Determines whether the component should re-render based on tracked state changes.
+    /// This optimization reduces unnecessary render cycles.
+    /// </summary>
+    protected override bool ShouldRender()
+    {
+        var itemsChanged = !ReferenceEquals(_lastItems, Items);
+        var valuesChanged = !ReferenceEquals(_lastValues, Values);
+        var openChanged = _lastIsOpen != _isOpen;
+        var searchChanged = _lastSearchQuery != _searchQuery;
+        var disabledChanged = _lastDisabled != Disabled;
+
+        if (itemsChanged || valuesChanged || openChanged || searchChanged || disabledChanged)
+        {
+            _lastItems = Items;
+            _lastValues = Values;
+            _lastIsOpen = _isOpen;
+            _lastSearchQuery = _searchQuery;
+            _lastDisabled = Disabled;
+            return true;
+        }
+
+        return false;
     }
 
     /// <summary>

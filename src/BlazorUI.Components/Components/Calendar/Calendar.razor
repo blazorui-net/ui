@@ -129,6 +129,13 @@
     private string[]? _cachedDayNames;
     private List<List<DateTime?>>? _cachedWeeks;
 
+    // ShouldRender tracking fields
+    private DateTime? _lastSelected;
+    private DateTime _lastDisplayDate;
+    private DateTime? _lastMinDate;
+    private DateTime? _lastMaxDate;
+    private bool _lastShowMonthYearDropdowns;
+
     /// <summary>
     /// The currently displayed month.
     /// </summary>
@@ -647,6 +654,31 @@
     }
 
     #endregion
+
+    /// <summary>
+    /// Determines whether the component should re-render based on tracked state changes.
+    /// This optimization reduces unnecessary render cycles.
+    /// </summary>
+    protected override bool ShouldRender()
+    {
+        var selectedChanged = _lastSelected != Selected;
+        var displayDateChanged = _lastDisplayDate != _displayDate;
+        var minDateChanged = _lastMinDate != MinDate;
+        var maxDateChanged = _lastMaxDate != MaxDate;
+        var dropdownsChanged = _lastShowMonthYearDropdowns != ShowMonthYearDropdowns;
+
+        if (selectedChanged || displayDateChanged || minDateChanged || maxDateChanged || dropdownsChanged)
+        {
+            _lastSelected = Selected;
+            _lastDisplayDate = _displayDate;
+            _lastMinDate = MinDate;
+            _lastMaxDate = MaxDate;
+            _lastShowMonthYearDropdowns = ShowMonthYearDropdowns;
+            return true;
+        }
+
+        return false;
+    }
 
     /// <summary>
     /// Gets the computed CSS classes for the calendar container.

@@ -60,9 +60,12 @@
                             @if (SelectionMode == DataTableSelectionMode.Multiple)
                             {
                                 <TableHeaderCell TData="TData" Class="h-12 px-4 text-left align-middle font-medium text-muted-foreground w-12" role="columnheader">
-                                    <Checkbox Checked="@IsAllSelected()"
-                                              CheckedChanged="@(async (bool isChecked) => await HandleSelectAllChanged(isChecked))"
-                                              AriaLabel="Select all rows on this page" />
+                                    <div @onclick:stopPropagation="true">
+                                        <Checkbox Checked="@IsAllSelected()"
+                                                  CheckedChanged="@(async (bool isChecked) => await HandleSelectAllChanged(isChecked))"
+                                                  Indeterminate="@IsSomeSelected()"
+                                                  AriaLabel="Select all rows on this page" />
+                                    </div>
                                 </TableHeaderCell>
                             }
                             @foreach (var column in _columns.Where(c => c.Visible))
@@ -111,9 +114,11 @@
                                 @if (SelectionMode == DataTableSelectionMode.Multiple)
                                 {
                                     <TableCell Class="p-4 align-middle w-12" role="gridcell">
-                                        <Checkbox Checked="@isSelected"
-                                                  CheckedChanged="@(async (bool isChecked) => await HandleRowSelectionChanged(item, isChecked))"
-                                                  AriaLabel="@($"Select this row")" />
+                                        <div @onclick:stopPropagation="true">
+                                            <Checkbox Checked="@isSelected"
+                                                      CheckedChanged="@(async (bool isChecked) => await HandleRowSelectionChanged(item, isChecked))"
+                                                      AriaLabel="@($"Select this row")" />
+                                        </div>
                                     </TableCell>
                                 }
                                 @foreach (var column in _columns.Where(c => c.Visible))

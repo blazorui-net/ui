@@ -4,7 +4,7 @@
  */
 
 /**
- * Prevents Space key from scrolling when a table row is focused.
+ * Prevents Space and Arrow keys from scrolling when a table row is focused.
  * Attaches a keydown listener in capture phase.
  * @param {HTMLElement} element - The row element to attach the handler to
  * @returns {Object} Object with dispose function for cleanup
@@ -13,8 +13,10 @@ export function preventSpaceKeyScroll(element) {
     if (!element) return { dispose: () => {} };
 
     const handleKeyDown = (e) => {
-        // Check both modern and legacy key identifiers
-        if (e.key === ' ' || e.keyCode === 32) {
+        // Prevent Space, ArrowUp, and ArrowDown from scrolling
+        if (e.key === ' ' || e.keyCode === 32 ||
+            e.key === 'ArrowUp' || e.keyCode === 38 ||
+            e.key === 'ArrowDown' || e.keyCode === 40) {
             e.preventDefault();
         }
     };

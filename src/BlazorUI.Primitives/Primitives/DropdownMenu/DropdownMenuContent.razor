@@ -115,6 +115,7 @@
     private IAsyncDisposable? _positioningCleanup;
     private bool _isInitialized = false;
     private bool _isPositioned = false;
+    private bool _disposed = false;
     private string _portalId = "";
     private TaskCompletionSource<bool>? _portalReadyTcs;
 
@@ -351,7 +352,8 @@
     [JSInvokable]
     public async Task HandleClickOutside()
     {
-        if (!Context.IsOpen) return;
+        // Guard against callbacks after disposal
+        if (_disposed || !Context.IsOpen) return;
 
         // Invoke custom handler if provided
         if (OnClickOutside.HasDelegate)
@@ -538,6 +540,9 @@
 
     public async ValueTask DisposeAsync()
     {
+        // Set disposed flag first to prevent JSInvokable callbacks during cleanup
+        _disposed = true;
+
         // Unsubscribe from portal ready events
         PortalService.OnPortalRendered -= HandlePortalRendered;
 
