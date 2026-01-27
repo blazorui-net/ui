@@ -720,7 +720,18 @@ public partial class RichTextEditor : ComponentBase, IAsyncDisposable
                 await _jsModule.InvokeVoidAsync("disposeEditor", _editorId);
                 await _jsModule.DisposeAsync();
             }
-            catch { }
+            catch (JSDisconnectedException)
+            {
+                // Expected during circuit disconnect in Blazor Server - safe to ignore
+            }
+            catch (ObjectDisposedException)
+            {
+                // Module already disposed - safe to ignore
+            }
+            catch (InvalidOperationException)
+            {
+                // JS interop not available (prerendering) - safe to ignore
+            }
         }
         _dotNetRef?.Dispose();
     }

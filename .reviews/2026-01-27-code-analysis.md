@@ -13,9 +13,9 @@ This report provides a comprehensive analysis of the BlazorUI Primitives and Com
 
 | Category | Critical | High | Medium | Low |
 |----------|----------|------|--------|-----|
-| Security | ~~3~~ 0 | ~~5~~ 2 | 4 | 3 |
+| Security | ~~3~~ 0 | ~~5~~ 2 | ~~4~~ 1 | 3 |
 | Performance | ~~1~~ 0 | ~~5~~ 0 | ~~8~~ 3 | 4 |
-| Best Practices | 0 | 0 | 4 | 12 |
+| Best Practices | 0 | 0 | ~~4~~ 1 | 12 |
 
 **Overall Assessment:** The codebase demonstrates professional-quality implementation with several areas requiring attention, particularly around JavaScript interop security and render optimization.
 
@@ -67,6 +67,17 @@ The following critical issues have been **FIXED**:
 | 2.2.9 DataTable Filtering | ✅ FIXED | Extracted MatchesSearch method, pre-filter filterable columns, cache search value |
 | 2.2.10 Sidebar Event Subscription | ✅ FIXED | Track subscribed context to avoid unsubscribe/resubscribe on every OnParametersSet |
 | 2.2.6 Calendar JS Module | ✅ FIXED | Cache element-utils.js module reference, implement IAsyncDisposable |
+
+**Security & Best Practices MEDIUM issues fixed (Round 5):**
+
+| Issue | Status | Fix Applied |
+|-------|--------|-------------|
+| 3.4 Missing Interface | ✅ FIXED | Created `IDropdownManagerService` interface for testability |
+| 1.1.6 Dropdown State Isolation | ✅ FIXED | Added input validation with `IsValidDropdownId()` to reject invalid characters |
+| 3.3 Null-Forgiving Operator | ✅ FIXED | Changed `UseControllableState.Value` to use null-coalescing with `_defaultValue` fallback |
+| 1.2.3 CSS Injection | ✅ FIXED | Added `IsValidClassName()` validation to TailwindMerge with dangerous pattern detection |
+| 3.2 Bare Catch Blocks | ✅ FIXED | Replaced bare catches with specific exception types (JSDisconnectedException, etc.) |
+| 1.2.4 JSInvokable Validation | ✅ FIXED | Added input validation to KeyboardShortcutService, Slider, and ResizablePanelGroup |
 
 ---
 
@@ -176,9 +187,12 @@ The following critical issues have been **FIXED**:
 
 ##### 1.1.6 Insufficient State Isolation in Dropdown Manager
 - **Severity:** MEDIUM
+- **Status:** ✅ **FIXED**
 - **File:** `src/BlazorUI.Primitives/Services/DropdownManagerService.cs`
 
 - **Description:** Single global lock tracks only one open dropdown; potential for state tampering if attacker controls dropdown IDs.
+
+- **Fix Applied:** Added input validation with `IsValidDropdownId()` method that rejects null, empty, or IDs containing invalid characters (only allows alphanumeric, hyphens, underscores, colons).
 
 #### LOW SEVERITY VULNERABILITIES
 
@@ -233,15 +247,24 @@ The following critical issues have been **FIXED**:
 
 ##### 1.2.3 CSS Injection Vulnerability in TailwindMerge
 - **Severity:** MEDIUM
+- **Status:** ✅ **FIXED**
 - **File:** `src/BlazorUI.Components/Utilities/TailwindMerge.cs` (Lines 189-253)
 
 - **Description:** Arbitrary CSS class strings passed to components are merged without sanitization.
 
+- **Fix Applied:** Added `IsValidClassName()` method that validates class names against a whitelist regex and rejects potentially dangerous patterns containing "expression", "javascript", "url(", or "import".
+
 ##### 1.2.4 JSInvokable Method Exposure
 - **Severity:** MEDIUM
+- **Status:** ✅ **FIXED**
 - **Files:** Multiple components with JSInvokable attributes
 
 - **Description:** JSInvokable methods accept data from JavaScript without input validation or rate limiting.
+
+- **Fix Applied:**
+  - `KeyboardShortcutService.HandleShortcutAsync`: Added null/length validation
+  - `Slider.UpdateValueFromPercentage`: Added NaN/Infinity checks and percentage clamping
+  - `ResizablePanelGroup.UpdatePanelSizes`: Added array size limit and NaN/Infinity filtering
 
 ---
 
@@ -501,17 +524,23 @@ The codebase demonstrates professional-quality implementation with strong adhere
 - **Description:** Core parameters could benefit from `[EditorRequired]` guidance.
 
 ##### 3.2 Bare Catch Blocks Without Logging
+- **Status:** ✅ **FIXED**
 - **File:** `src/BlazorUI.Components/Components/RichTextEditor/RichTextEditor.razor.cs` (Multiple locations)
 - **Description:** Multiple bare `catch { }` blocks without logging or error tracking.
+- **Fix Applied:** Replaced bare catches with specific exception types (`JSDisconnectedException`, `ObjectDisposedException`, `InvalidOperationException`) with comments explaining why they're safe to ignore.
 
 ##### 3.3 Force-Null-Forgiving Operator Usage
+- **Status:** ✅ **FIXED**
 - **File:** `src/BlazorUI.Primitives/Utilities/UseControllableState.cs` (Line 46)
 - **Code:** `public T Value => IsControlled ? ControlledValue! : _uncontrolledValue!;`
 - **Description:** Risk of NullReferenceException if both paths have null values.
+- **Fix Applied:** Changed to use null-coalescing with `_defaultValue` fallback: `return ControlledValue ?? _defaultValue;` and `return _uncontrolledValue ?? _defaultValue;`
 
 ##### 3.4 Missing Interface for DropdownManagerService
+- **Status:** ✅ **FIXED**
 - **File:** `src/BlazorUI.Primitives/Services/DropdownManagerService.cs`
 - **Description:** Service registered without interface, reducing testability.
+- **Fix Applied:** Created `IDropdownManagerService` interface with `RegisterOpen`, `Unregister`, and `IsOpen` methods. Service now implements this interface.
 
 #### Low Priority
 
@@ -615,4 +644,4 @@ The codebase demonstrates professional-quality implementation with strong adhere
 **Report Generated:** 2026-01-27
 **Analyzer:** Claude Code Analysis
 **Version:** 1.0
-**Last Updated:** 2026-01-27 (Round 4: MEDIUM priority fixes - RadioGroup caching, DataTable filtering, Sidebar subscription, Calendar JS module)
+**Last Updated:** 2026-01-27 (Round 5: Security & Best Practices MEDIUM fixes - IDropdownManagerService, input validation, CSS sanitization, specific exception handling)

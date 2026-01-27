@@ -96,6 +96,12 @@ public class KeyboardShortcutService : IKeyboardShortcutService
             return;
         }
 
+        // Input validation - reject obviously invalid inputs
+        if (string.IsNullOrWhiteSpace(normalizedKey) || normalizedKey.Length > 50)
+        {
+            return;
+        }
+
         if (_shortcuts.TryGetValue(normalizedKey, out var registration))
         {
             try

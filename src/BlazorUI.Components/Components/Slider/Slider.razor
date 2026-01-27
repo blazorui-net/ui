@@ -97,6 +97,13 @@
     {
         if (Disabled) return;
 
+        // Input validation - reject invalid values
+        if (double.IsNaN(percentage) || double.IsInfinity(percentage))
+            return;
+
+        // Clamp percentage to valid range
+        percentage = Math.Max(0, Math.Min(1, percentage));
+
         var newValue = Min + (percentage * (Max - Min));
         await SetValue(newValue);
     }

@@ -83,8 +83,20 @@
     [JSInvokable]
     public void UpdatePanelSizes(double[] newSizes)
     {
+        // Input validation
+        if (newSizes == null || newSizes.Length == 0)
+            return;
+
+        // Reject excessively large arrays (potential DoS)
+        if (newSizes.Length > 100)
+            return;
+
         for (int i = 0; i < newSizes.Length && i < _panelSizes.Count; i++)
         {
+            // Skip invalid values
+            if (double.IsNaN(newSizes[i]) || double.IsInfinity(newSizes[i]))
+                continue;
+
             // Apply min/max constraints
             var size = Math.Max(_panelMinSizes[i], Math.Min(_panelMaxSizes[i], newSizes[i]));
             _panelSizes[i] = size;

@@ -42,8 +42,19 @@ public class UseControllableState<T>
 
     /// <summary>
     /// Gets the current value, either controlled or uncontrolled.
+    /// Falls back to the default value if both controlled and uncontrolled values are null.
     /// </summary>
-    public T Value => IsControlled ? ControlledValue! : _uncontrolledValue!;
+    public T Value
+    {
+        get
+        {
+            if (IsControlled)
+            {
+                return ControlledValue ?? _defaultValue;
+            }
+            return _uncontrolledValue ?? _defaultValue;
+        }
+    }
 
     /// <summary>
     /// Sets the value, updating either controlled or uncontrolled state.

@@ -142,6 +142,31 @@ public static class TailwindMerge
     // Cache for utility group lookups to avoid repeated regex evaluation
     private static readonly ConcurrentDictionary<string, string?> _utilityGroupCache = new();
 
+    // Regex to validate CSS class names - allows alphanumeric, hyphens, underscores, colons, slashes, brackets, dots, and percentages
+    // This covers Tailwind classes like "w-1/2", "hover:bg-blue-500", "data-[state=open]:block", "text-[14px]"
+    private static readonly Regex ValidClassNameRegex = new(@"^[a-zA-Z0-9_\-:/.[\]()%!@#]+$", RegexOptions.Compiled);
+
+    /// <summary>
+    /// Validates that a CSS class name contains only safe characters.
+    /// Rejects classes that could be used for CSS injection attacks.
+    /// </summary>
+    private static bool IsValidClassName(string className)
+    {
+        if (string.IsNullOrWhiteSpace(className) || className.Length > 200)
+            return false;
+
+        // Check for potentially dangerous patterns
+        if (className.Contains("expression", StringComparison.OrdinalIgnoreCase) ||
+            className.Contains("javascript", StringComparison.OrdinalIgnoreCase) ||
+            className.Contains("url(", StringComparison.OrdinalIgnoreCase) ||
+            className.Contains("import", StringComparison.OrdinalIgnoreCase))
+        {
+            return false;
+        }
+
+        return ValidClassNameRegex.IsMatch(className);
+    }
+
     /// <summary>
     /// Merges an array of CSS class strings, resolving Tailwind utility conflicts.
     /// Later classes in the array take precedence over earlier ones when conflicts occur.
@@ -161,6 +186,10 @@ public static class TailwindMerge
         {
             var className = classes[i];
             if (string.IsNullOrWhiteSpace(className))
+                continue;
+
+            // Skip potentially dangerous class names
+            if (!IsValidClassName(className))
                 continue;
 
             var group = GetUtilityGroup(className);

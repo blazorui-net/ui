@@ -1,4 +1,5 @@
 @namespace BlazorUI.Primitives.Services
+@using Microsoft.JSInterop
 @implements IAsyncDisposable
 @inject IPortalService PortalService
 @inject IJSRuntime JSRuntime
@@ -36,9 +37,13 @@
                 _portalModule = await JSRuntime.InvokeAsync<IJSObjectReference>(
                     "import", "./_content/BlazorUI.Primitives/js/primitives/portal.js");
             }
-            catch
+            catch (JSDisconnectedException)
             {
-                // Ignore errors during prerendering
+                // Expected during circuit disconnect in Blazor Server
+            }
+            catch (InvalidOperationException)
+            {
+                // JS interop not available during prerendering - safe to ignore
             }
         }
 
