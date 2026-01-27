@@ -21,12 +21,12 @@
                 {
                     @foreach (var value in SelectedValues.Take(MaxDisplayTags))
                     {
-                        <Badge Variant="BadgeVariant.Secondary" Class="gap-1">
+                        <Badge @key="value" Variant="BadgeVariant.Secondary" Class="gap-1">
                             @GetDisplayText(value)
                             <button type="button"
                                     class="@TagRemoveButtonCssClass"
                                     aria-label="@($"Remove {GetDisplayText(value)}")"
-                                    @onclick="@(() => RemoveValue(value))"
+                                    @onclick="GetRemoveHandler(value)"
                                     @onclick:stopPropagation="true">
                                 <LucideIcon Name="x" Size="12" Class="h-3 w-3" />
                             </button>
@@ -132,9 +132,10 @@
                         var displayText = DisplaySelector(item);
                         var isSelected = IsSelected(item);
 
-                        <div role="option"
+                        <div @key="itemValue"
+                             role="option"
                              aria-selected="@isSelected.ToString().ToLower()"
-                             @onclick="@(() => HandleToggle(item))"
+                             @onclick="GetToggleHandler(item)"
                              @onclick:stopPropagation="true"
                              class="@ItemCssClass">
                             <Checkbox Checked="@isSelected"

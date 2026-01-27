@@ -38,6 +38,13 @@ public partial class RichTextEditor : ComponentBase, IAsyncDisposable
     private bool _hasExistingLink;
     private EditorRange? _savedSelection;
 
+    // === ShouldRender Tracking ===
+    private string? _lastValue;
+    private bool _lastDisabled;
+    private bool _lastReadOnly;
+    private bool _lastLinkDialogOpen;
+    private bool _formatStateChanged;
+
     /// <summary>
     /// HTML sanitizer for XSS prevention. Thread-safe for static usage.
     /// </summary>
@@ -362,7 +369,33 @@ public partial class RichTextEditor : ComponentBase, IAsyncDisposable
 
         _headerLevel = GetFormatString(format, "header");
 
+        // Mark format state as changed for ShouldRender optimization
+        _formatStateChanged = true;
         StateHasChanged();
+    }
+
+    /// <summary>
+    /// Determines whether the component should re-render based on tracked state changes.
+    /// This optimization reduces unnecessary render cycles from bidirectional binding.
+    /// </summary>
+    protected override bool ShouldRender()
+    {
+        var valueChanged = _lastValue != Value;
+        var disabledChanged = _lastDisabled != Disabled;
+        var readOnlyChanged = _lastReadOnly != ReadOnly;
+        var dialogChanged = _lastLinkDialogOpen != _linkDialogOpen;
+
+        if (valueChanged || disabledChanged || readOnlyChanged || dialogChanged || _formatStateChanged)
+        {
+            _lastValue = Value;
+            _lastDisabled = Disabled;
+            _lastReadOnly = ReadOnly;
+            _lastLinkDialogOpen = _linkDialogOpen;
+            _formatStateChanged = false;
+            return true;
+        }
+
+        return false;
     }
 
     private async Task HandleHeaderChangeAsync(string? value)

@@ -68,10 +68,23 @@ public static class TableDataExtensions
         var dataList = data as IList<TData> ?? data.ToList();
         pagination.TotalItems = dataList.Count;
 
-        // Return the page slice
-        return dataList
-            .Skip(pagination.StartIndex)
-            .Take(pagination.PageSize);
+        // Use GetRange for List<T> to avoid iterator overhead, otherwise use Skip/Take
+        if (dataList is List<TData> list)
+        {
+            var startIndex = Math.Min(pagination.StartIndex, list.Count);
+            var count = Math.Min(pagination.PageSize, list.Count - startIndex);
+            return count > 0 ? list.GetRange(startIndex, count) : Array.Empty<TData>();
+        }
+
+        // Fallback for IList<T> - use indexer for better performance than Skip/Take
+        var start = Math.Min(pagination.StartIndex, dataList.Count);
+        var take = Math.Min(pagination.PageSize, dataList.Count - start);
+        var result = new TData[take];
+        for (var i = 0; i < take; i++)
+        {
+            result[i] = dataList[start + i];
+        }
+        return result;
     }
 
     /// <summary>

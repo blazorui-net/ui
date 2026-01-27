@@ -31,6 +31,10 @@ public partial class MultiSelect<TItem> : ComponentBase, IAsyncDisposable
     private string _lastSearchQuery = string.Empty;
     private bool _lastDisabled;
 
+    // Cached event handlers to avoid allocations on every render
+    private readonly Dictionary<string, Func<Task>> _toggleHandlerCache = new();
+    private readonly Dictionary<string, Func<Task>> _removeHandlerCache = new();
+
     /// <summary>
     /// Gets or sets the cascaded EditContext from a parent EditForm.
     /// </summary>
@@ -247,6 +251,12 @@ public partial class MultiSelect<TItem> : ComponentBase, IAsyncDisposable
         // Filter out null items for safety
         Items = Items?.Where(item => item != null) ?? Enumerable.Empty<TItem>();
 
+        // Clear handler caches when Items reference changes to avoid stale delegates
+        if (!ReferenceEquals(_lastItems, Items))
+        {
+            _toggleHandlerCache.Clear();
+        }
+
         // Initialize EditContext integration if available
         if (CascadedEditContext != null && ValuesExpression != null)
         {
@@ -420,6 +430,33 @@ public partial class MultiSelect<TItem> : ComponentBase, IAsyncDisposable
         }
 
         await UpdateValues(currentValues);
+    }
+
+    /// <summary>
+    /// Gets a cached toggle handler for the specified item to avoid delegate allocations.
+    /// </summary>
+    private Func<Task> GetToggleHandler(TItem item)
+    {
+        var key = ValueSelector(item);
+        if (!_toggleHandlerCache.TryGetValue(key, out var handler))
+        {
+            handler = () => HandleToggle(item);
+            _toggleHandlerCache[key] = handler;
+        }
+        return handler;
+    }
+
+    /// <summary>
+    /// Gets a cached remove handler for the specified value to avoid delegate allocations.
+    /// </summary>
+    private Func<Task> GetRemoveHandler(string value)
+    {
+        if (!_removeHandlerCache.TryGetValue(value, out var handler))
+        {
+            handler = () => RemoveValue(value);
+            _removeHandlerCache[value] = handler;
+        }
+        return handler;
     }
 
     /// <summary>
