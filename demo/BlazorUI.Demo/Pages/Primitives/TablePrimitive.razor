@@ -4,15 +4,20 @@
 @using BlazorUI.Primitives.Popover
 @using BlazorUI.Primitives.DropdownMenu
 @using BlazorUI.Components.Button
+@using BlazorUI.Components.Kbd
 @using BlazorUI.Icons.Lucide.Components
 
-<div class="container mx-auto p-6 space-y-8">
-    <div class="space-y-2">
-        <h1 class="text-3xl font-bold">Table Primitive</h1>
-        <p class="text-muted-foreground">
-            A headless table primitive with sorting, pagination, and selection capabilities. Inspired by Radix UI.
+<PageTitle>Table Primitive - BlazorUI</PageTitle>
+
+<div class="space-y-8 max-w-7xl">
+    <div class="space-y-3">
+        <h1 class="text-4xl font-bold tracking-tight">Table Primitive</h1>
+        <p class="text-xl text-muted-foreground">
+            Headless, unstyled table primitive with sorting, pagination, and selection capabilities.
         </p>
     </div>
+
+    <div class="space-y-6">
 
     @* Basic Table Example *@
     <section class="space-y-4">
@@ -316,13 +321,23 @@
     <section class="space-y-4">
         <div>
             <h2 class="text-2xl font-semibold">Selectable Table (Multi-Select)</h2>
-            <p class="text-sm text-muted-foreground">Click rows or checkboxes to select. Click header checkbox to select/deselect all.</p>
+            <p class="text-sm text-muted-foreground">Click rows or checkboxes to select. Click header checkbox to select/deselect all. Use arrow keys to navigate and Enter/Space to select.</p>
+        </div>
+
+        <div class="flex items-center gap-2 mb-2">
+            <input type="checkbox"
+                   id="enableKeyboardNav"
+                   checked="@enableKeyboardNavigation"
+                   @onchange="@((e) => enableKeyboardNavigation = (bool)(e.Value ?? true))"
+                   class="h-4 w-4 rounded border-gray-300 text-primary focus:ring-2 focus:ring-primary" />
+            <label for="enableKeyboardNav" class="text-sm font-medium">Enable keyboard navigation</label>
         </div>
 
         <div class="space-y-4">
             <div class="rounded-md border">
                 <Table TData="Person" Data="@people" @bind-State="@selectableTableState"
                        SelectionMode="SelectionMode.Multiple"
+                       EnableKeyboardNavigation="@enableKeyboardNavigation"
                        OnSelectionChange="@HandleSelectionChange"
                        Class="w-full caption-bottom text-sm">
                     <TableHeader Class="[&_tr]:border-b">
@@ -1071,61 +1086,175 @@
         </div>
     </section>
 
-    @* Implementation Status *@
-    <section class="space-y-4">
-        <h2 class="text-2xl font-semibold">Implementation Status</h2>
-        <div class="grid gap-4 md:grid-cols-2">
-            <div class="rounded-lg border bg-green-50 dark:bg-green-950 p-4">
-                <h3 class="font-semibold text-green-900 dark:text-green-100 mb-2">✅ Phase 1 Complete (MVP)</h3>
-                <ul class="text-sm space-y-1 text-green-800 dark:text-green-200">
-                    <li>• Core table state management</li>
-                    <li>• Radix UI component wrapper pattern</li>
-                    <li>• Single-column sorting (developer-controlled)</li>
-                    <li>• Pagination with page size selection</li>
-                    <li>• Row selection (single & multi-select)</li>
-                    <li>• Column-level filtering (developer-controlled)</li>
-                    <li>• Global search filtering</li>
-                    <li>• Keyboard navigation (Enter/Space)</li>
-                    <li>• ARIA attributes (aria-sort, aria-selected)</li>
-                    <li>• Controlled/uncontrolled modes</li>
-                    <li>• Three-state sort toggle</li>
-                </ul>
+        <section class="space-y-4">
+            <div class="space-y-2">
+                <h2 class="text-2xl font-semibold">Accessibility Features</h2>
+                <p class="text-muted-foreground">
+                    Built-in accessibility features following WAI-ARIA design patterns.
+                </p>
             </div>
-            <div class="rounded-lg border bg-yellow-50 dark:bg-yellow-950 p-4">
-                <h3 class="font-semibold text-yellow-900 dark:text-yellow-100 mb-2">🚧 Coming in Phase 2</h3>
-                <ul class="text-sm space-y-1 text-yellow-800 dark:text-yellow-200">
-                    <li>• Multi-column sorting with priority</li>
-                    <li>• Column visibility toggle</li>
-                    <li>• Column resizing</li>
-                </ul>
+
+            <div class="rounded-lg border p-6 space-y-3 bg-muted/50">
+                <div>
+                    <h3 class="font-semibold mb-2">ARIA Attributes</h3>
+                    <ul class="space-y-2 text-sm text-muted-foreground">
+                        <li class="flex items-start gap-2">
+                            <span class="text-green-600 dark:text-green-400">✓</span>
+                            <span><code class="text-xs bg-muted px-1 py-0.5 rounded">role="grid"</code> for screen readers</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-green-600 dark:text-green-400">✓</span>
+                            <span><code class="text-xs bg-muted px-1 py-0.5 rounded">aria-sort</code> indicates column sort direction</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-green-600 dark:text-green-400">✓</span>
+                            <span><code class="text-xs bg-muted px-1 py-0.5 rounded">aria-selected</code> indicates row selection state</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-green-600 dark:text-green-400">✓</span>
+                            <span><code class="text-xs bg-muted px-1 py-0.5 rounded">aria-rowcount</code> for total row count</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-green-600 dark:text-green-400">✓</span>
+                            <span>Focusable rows with visible focus indicator</span>
+                        </li>
+                    </ul>
+                </div>
             </div>
-            <div class="rounded-lg border bg-blue-50 dark:bg-blue-950 p-4">
-                <h3 class="font-semibold text-blue-900 dark:text-blue-100 mb-2">🔮 Phase 3 & Beyond</h3>
-                <ul class="text-sm space-y-1 text-blue-800 dark:text-blue-200">
-                    <li>• Column pinning (left/right)</li>
-                    <li>• Column reordering (drag & drop)</li>
-                    <li>• Row expansion/grouping</li>
-                    <li>• Virtual scrolling</li>
-                    <li>• Row pinning (top/bottom)</li>
-                    <li>• Faceted filtering</li>
-                    <li>• Server-side data handling</li>
-                    <li>• Export to CSV/Excel/JSON</li>
-                </ul>
+        </section>
+
+        <section class="space-y-4">
+            <div class="space-y-2">
+                <h2 class="text-2xl font-semibold">Keyboard Shortcuts</h2>
+                <p class="text-muted-foreground">
+                    Navigate and interact with the table using keyboard.
+                </p>
             </div>
-            <div class="rounded-lg border bg-purple-50 dark:bg-purple-950 p-4">
-                <h3 class="font-semibold text-purple-900 dark:text-purple-100 mb-2">🎯 Headless Design</h3>
-                <ul class="text-sm space-y-1 text-purple-800 dark:text-purple-200">
-                    <li>• Complete markup control</li>
-                    <li>• No built-in styles</li>
-                    <li>• Tailwind CSS compatible</li>
-                    <li>• Component wrapper pattern (Radix UI)</li>
-                    <li>• Type-safe with generics</li>
-                    <li>• Event-driven architecture</li>
-                    <li>• Developer-controlled sorting</li>
-                </ul>
+
+            <div class="rounded-lg border p-6 space-y-3 bg-muted/50">
+                <div class="grid gap-3">
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm font-medium">Navigate to next row</span>
+                        <Kbd>ArrowDown</Kbd>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm font-medium">Navigate to previous row</span>
+                        <Kbd>ArrowUp</Kbd>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm font-medium">Toggle row selection</span>
+                        <Kbd>Enter / Space</Kbd>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm font-medium">Sort column</span>
+                        <span class="text-sm text-muted-foreground">Click header</span>
+                    </div>
+                </div>
             </div>
-        </div>
-    </section>
+        </section>
+
+        <section class="space-y-4">
+            <div class="space-y-2">
+                <h2 class="text-2xl font-semibold">API Reference</h2>
+                <p class="text-muted-foreground">
+                    Component properties and parameters.
+                </p>
+            </div>
+
+            <div class="space-y-4">
+                <div class="rounded-lg border p-4">
+                    <h3 class="font-semibold mb-3">Table</h3>
+                    <div class="space-y-3 text-sm">
+                        <div>
+                            <code class="text-xs bg-muted px-1 py-0.5 rounded">Data</code>
+                            <p class="text-muted-foreground mt-1">
+                                <strong>Type:</strong> <code>IEnumerable&lt;TData&gt;</code><br/>
+                                The data source for the table.
+                            </p>
+                        </div>
+                        <div>
+                            <code class="text-xs bg-muted px-1 py-0.5 rounded">State</code>
+                            <p class="text-muted-foreground mt-1">
+                                <strong>Type:</strong> <code>TableState&lt;TData&gt;?</code><br/>
+                                The table state for controlled mode. Use with @@bind-State for two-way binding.
+                            </p>
+                        </div>
+                        <div>
+                            <code class="text-xs bg-muted px-1 py-0.5 rounded">SelectionMode</code>
+                            <p class="text-muted-foreground mt-1">
+                                <strong>Type:</strong> <code>SelectionMode</code><br/>
+                                <strong>Default:</strong> <code>None</code><br/>
+                                The selection mode: None, Single, or Multiple.
+                            </p>
+                        </div>
+                        <div>
+                            <code class="text-xs bg-muted px-1 py-0.5 rounded">EnableKeyboardNavigation</code>
+                            <p class="text-muted-foreground mt-1">
+                                <strong>Type:</strong> <code>bool</code><br/>
+                                <strong>Default:</strong> <code>true</code><br/>
+                                Enables keyboard navigation for table rows (arrow keys to navigate, Enter/Space to select).
+                            </p>
+                        </div>
+                        <div>
+                            <code class="text-xs bg-muted px-1 py-0.5 rounded">ManualPagination</code>
+                            <p class="text-muted-foreground mt-1">
+                                <strong>Type:</strong> <code>bool</code><br/>
+                                <strong>Default:</strong> <code>false</code><br/>
+                                When true, the table will not automatically set TotalItems.
+                            </p>
+                        </div>
+                        <div>
+                            <code class="text-xs bg-muted px-1 py-0.5 rounded">OnSelectionChange</code>
+                            <p class="text-muted-foreground mt-1">
+                                <strong>Type:</strong> <code>EventCallback&lt;IReadOnlyCollection&lt;TData&gt;&gt;</code><br/>
+                                Callback invoked when the selection changes.
+                            </p>
+                        </div>
+                        <div>
+                            <code class="text-xs bg-muted px-1 py-0.5 rounded">OnSortChange</code>
+                            <p class="text-muted-foreground mt-1">
+                                <strong>Type:</strong> <code>EventCallback&lt;(string, SortDirection)&gt;</code><br/>
+                                Callback invoked when sorting changes.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="rounded-lg border p-4">
+                    <h3 class="font-semibold mb-3">TableRow</h3>
+                    <div class="space-y-3 text-sm">
+                        <div>
+                            <code class="text-xs bg-muted px-1 py-0.5 rounded">Item</code>
+                            <p class="text-muted-foreground mt-1">
+                                <strong>Type:</strong> <code>TData?</code><br/>
+                                The data item for this row. Required for selection to work.
+                            </p>
+                        </div>
+                        <div>
+                            <code class="text-xs bg-muted px-1 py-0.5 rounded">Class</code>
+                            <p class="text-muted-foreground mt-1">
+                                <strong>Type:</strong> <code>string?</code><br/>
+                                Additional CSS classes to apply to the row.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="rounded-lg border p-4">
+                    <h3 class="font-semibold mb-3">TableHeaderCell</h3>
+                    <div class="space-y-3 text-sm">
+                        <div>
+                            <code class="text-xs bg-muted px-1 py-0.5 rounded">ColumnId</code>
+                            <p class="text-muted-foreground mt-1">
+                                <strong>Type:</strong> <code>string?</code><br/>
+                                The column identifier. When provided, clicking the header toggles sorting.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
 </div>
 
 @code {
@@ -1142,6 +1271,7 @@
     private bool selectAllChecked = false;
     private bool combinedSelectAllChecked = false;
     private string actionMessage = "";
+    private bool enableKeyboardNavigation = true;
 
     // Row action handlers
     private void HandleViewDetails(Person person)

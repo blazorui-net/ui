@@ -6,7 +6,7 @@
 <tr @ref="_elementRef"
     role="row"
     aria-selected="@(IsSelected ? "true" : "false")"
-    tabindex="@(IsSelectable ? 0 : -1)"
+    tabindex="@(IsKeyboardNavigable ? 0 : -1)"
     class="@ComputedClass"
     @onclick="HandleClick"
     @onkeydown="HandleKeyDown"
@@ -51,6 +51,8 @@
 
     private bool IsSelectable => Context != null && Context.SelectionMode != SelectionMode.None;
 
+    private bool IsKeyboardNavigable => IsSelectable && Context != null && Context.EnableKeyboardNavigation;
+
     /// <summary>
     /// Focus ring classes for keyboard navigation visibility.
     /// Uses focus: instead of focus-visible: because programmatic focus via JS .focus()
@@ -60,13 +62,13 @@
     private const string FocusRingClasses = "relative focus:outline-none focus:ring-2 focus:ring-ring focus:ring-inset focus:z-10";
 
     /// <summary>
-    /// Computed class that includes focus ring when row is selectable
+    /// Computed class that includes focus ring when row is keyboard navigable
     /// </summary>
-    private string ComputedClass => IsSelectable ? $"{FocusRingClasses} {Class}" : Class ?? "";
+    private string ComputedClass => IsKeyboardNavigable ? $"{FocusRingClasses} {Class}" : Class ?? "";
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender && IsSelectable && !_spaceKeyHandlerAttached)
+        if (firstRender && IsKeyboardNavigable && !_spaceKeyHandlerAttached)
         {
             try
             {
@@ -97,25 +99,31 @@
 
     private async Task HandleKeyDown(KeyboardEventArgs e)
     {
-        if (!IsSelectable) return;
-
-        switch (e.Key)
+        // Arrow key navigation only works when keyboard navigation is enabled
+        if (IsKeyboardNavigable)
         {
-            case "Enter":
-            case " ":
-                if (Item != null)
-                {
+            switch (e.Key)
+            {
+                case "ArrowUp":
+                    await MoveFocusToPreviousRow();
+                    return;
+
+                case "ArrowDown":
+                    await MoveFocusToNextRow();
+                    return;
+            }
+        }
+
+        // Enter/Space selection works when row is selectable (even without keyboard nav)
+        if (IsSelectable && Item != null)
+        {
+            switch (e.Key)
+            {
+                case "Enter":
+                case " ":
                     Context.ToggleRowSelection(Item);
-                }
-                break;
-
-            case "ArrowUp":
-                await MoveFocusToPreviousRow();
-                break;
-
-            case "ArrowDown":
-                await MoveFocusToNextRow();
-                break;
+                    break;
+            }
         }
     }
 

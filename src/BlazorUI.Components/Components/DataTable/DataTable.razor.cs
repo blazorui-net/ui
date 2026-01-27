@@ -119,6 +119,14 @@ public partial class DataTable<TData> : ComponentBase where TData : class
     public bool IsLoading { get; set; }
 
     /// <summary>
+    /// Gets or sets whether keyboard navigation is enabled for table rows.
+    /// When true, rows can be navigated with arrow keys and selected with Enter/Space.
+    /// Default is true.
+    /// </summary>
+    [Parameter]
+    public bool EnableKeyboardNavigation { get; set; } = true;
+
+    /// <summary>
     /// Gets or sets the available page size options.
     /// Default is [5, 10, 20, 50, 100].
     /// </summary>

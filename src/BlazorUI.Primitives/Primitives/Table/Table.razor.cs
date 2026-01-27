@@ -109,6 +109,13 @@ public partial class Table<TData> : ComponentBase, IDisposable where TData : cla
     public bool ManualPagination { get; set; } = false;
 
     /// <summary>
+    /// When true, enables keyboard navigation for table rows (arrow keys to navigate, Enter/Space to select).
+    /// Default is true.
+    /// </summary>
+    [Parameter]
+    public bool EnableKeyboardNavigation { get; set; } = true;
+
+    /// <summary>
     /// Gets whether the table is in controlled mode.
     /// </summary>
     private bool IsControlled => State != null;
@@ -140,7 +147,8 @@ public partial class Table<TData> : ComponentBase, IDisposable where TData : cla
     {
         _context = new TableContext<TData>(EffectiveState)
         {
-            SelectionMode = SelectionMode
+            SelectionMode = SelectionMode,
+            EnableKeyboardNavigation = EnableKeyboardNavigation
         };
 
         SyncSelectionMode();
@@ -266,6 +274,7 @@ public partial class Table<TData> : ComponentBase, IDisposable where TData : cla
     {
         // Update context with new parameters
         _context.SelectionMode = SelectionMode;
+        _context.EnableKeyboardNavigation = EnableKeyboardNavigation;
 
         // Sync SelectionMode to the actual TableState
         SyncSelectionMode();
