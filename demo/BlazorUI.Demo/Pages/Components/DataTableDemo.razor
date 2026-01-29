@@ -68,9 +68,13 @@
             <div class="p-4 bg-muted rounded-md">
                 <p class="text-sm font-medium">Selected: @selectedPeople.Count people</p>
                 <div class="flex flex-wrap gap-2 mt-2">
-                    @foreach (var person in selectedPeople)
+                    @foreach (var person in selectedPeople.Take(20))
                     {
                         <Badge>@person.Name</Badge>
+                    }
+                    @if (selectedPeople.Count > 20)
+                    {
+                        <Badge Variant="BadgeVariant.Secondary">+@(selectedPeople.Count - 20) more</Badge>
                     }
                 </div>
             </div>
@@ -385,8 +389,8 @@
 
     protected override void OnInitialized()
     {
-        // Generate 500 sample records using MockDataService
-        people = MockDataService.GeneratePersons(500);
+        // Generate 5000 sample records using MockDataService
+        people = MockDataService.GeneratePersons(5000);
     }
 
     private void ShowDetails(Person person)

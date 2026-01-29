@@ -59,9 +59,10 @@ public partial class DataTable<TData> : ComponentBase where TData : class
     }
 
     private List<ColumnData> _columns = new();
+    private List<ColumnData> _visibleColumns = new();
     private TableState<TData> _tableState = new();
-    private IEnumerable<TData> _processedData = Array.Empty<TData>();
-    private IEnumerable<TData> _filteredData = Array.Empty<TData>();
+    private List<TData> _processedData = new();
+    private List<TData> _filteredData = new();
     private string _globalSearchValue = string.Empty;
     private int _columnsVersion = 0;
     private bool _selectAllDropdownOpen = false;
@@ -287,6 +288,7 @@ public partial class DataTable<TData> : ComponentBase where TData : class
         };
 
         _columns.Add(columnData);
+        UpdateVisibleColumnsCache();
     }
 
     /// <summary>
@@ -302,20 +304,23 @@ public partial class DataTable<TData> : ComponentBase where TData : class
             data = await PreprocessData(data);
         }
 
-        // 2. Apply filtering (column filters + global search)
-        _filteredData = ApplyFiltering(data);
+        // 2. Apply filtering (column filters + global search) - materialize to List for O(1) Count
+        _filteredData = ApplyFiltering(data).ToList();
 
         // 3. Apply sorting
         var sortedData = ApplySorting(_filteredData);
 
-        // 4. Update pagination total items BEFORE pagination
-        _tableState.Pagination.TotalItems = sortedData.Count();
+        // 4. Update pagination total items BEFORE pagination (now O(1) since _filteredData is List)
+        _tableState.Pagination.TotalItems = _filteredData.Count;
 
         // 5. Apply pagination
         _processedData = sortedData
             .Skip(_tableState.Pagination.StartIndex)
             .Take(_tableState.Pagination.PageSize)
             .ToList();
+
+        // 6. Update visible columns cache
+        UpdateVisibleColumnsCache();
     }
 
     /// <summary>
@@ -434,11 +439,23 @@ public partial class DataTable<TData> : ComponentBase where TData : class
         {
             column.Visible = visible;
 
+            // Update visible columns cache
+            UpdateVisibleColumnsCache();
+
             // Increment version to signal change without list recreation
             _columnsVersion++;
 
             StateHasChanged();
         }
+    }
+
+    /// <summary>
+    /// Updates the cached list of visible columns.
+    /// Called when columns change or visibility is toggled.
+    /// </summary>
+    private void UpdateVisibleColumnsCache()
+    {
+        _visibleColumns = _columns.Where(c => c.Visible).ToList();
     }
 
     /// <summary>
@@ -460,7 +477,7 @@ public partial class DataTable<TData> : ComponentBase where TData : class
     /// </summary>
     private bool ShouldShowSelectAllPrompt()
     {
-        return _tableState.Pagination.TotalItems > _processedData.Count();
+        return _tableState.Pagination.TotalItems > _processedData.Count;
     }
 
     /// <summary>
@@ -468,7 +485,7 @@ public partial class DataTable<TData> : ComponentBase where TData : class
     /// </summary>
     private int GetTotalFilteredItemCount()
     {
-        return _filteredData.Count();
+        return _filteredData.Count;
     }
 
     /// <summary>
@@ -522,10 +539,7 @@ public partial class DataTable<TData> : ComponentBase where TData : class
     /// </summary>
     private async Task HandleSelectAllItems()
     {
-        foreach (var item in _filteredData)
-        {
-            _tableState.Selection.Select(item);
-        }
+        _tableState.Selection.SelectAll(_filteredData);
         _selectAllDropdownOpen = false;
         _selectionVersion++;
         await HandleSelectionChange(_tableState.Selection.SelectedItems);
@@ -568,7 +582,7 @@ public partial class DataTable<TData> : ComponentBase where TData : class
     /// </summary>
     private bool IsAllSelected()
     {
-        if (!_processedData.Any())
+        if (_processedData.Count == 0)
             return false;
 
         return _processedData.All(item => _tableState.Selection.IsSelected(item));
@@ -577,14 +591,29 @@ public partial class DataTable<TData> : ComponentBase where TData : class
     /// <summary>
     /// Checks if some (but not all) rows on the current page are selected.
     /// Used for the indeterminate state of the select-all checkbox.
+    /// Uses early-exit for efficiency - stops as soon as we know the answer.
     /// </summary>
     private bool IsSomeSelected()
     {
-        if (!_processedData.Any())
+        if (_processedData.Count == 0)
             return false;
 
-        var selectedCount = _processedData.Count(item => _tableState.Selection.IsSelected(item));
-        return selectedCount > 0 && selectedCount < _processedData.Count();
+        bool foundSelected = false;
+        bool foundUnselected = false;
+
+        foreach (var item in _processedData)
+        {
+            if (_tableState.Selection.IsSelected(item))
+                foundSelected = true;
+            else
+                foundUnselected = true;
+
+            // Early exit: as soon as we find both a selected and unselected item, we know it's "some"
+            if (foundSelected && foundUnselected)
+                return true;
+        }
+
+        return false;
     }
 
     /// <summary>
