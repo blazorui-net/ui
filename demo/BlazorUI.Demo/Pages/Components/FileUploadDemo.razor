@@ -1,0 +1,178 @@
+@page "/components/file-upload"
+@using BlazorUI.Components.FileUpload
+
+<PageTitle>FileUpload Component - BlazorUI</PageTitle>
+
+<div class="space-y-8 max-w-4xl">
+    <div>
+        <div class="space-y-3">
+            <h1 class="text-4xl font-bold tracking-tight">FileUpload Component</h1>
+            <p class="text-xl text-muted-foreground">
+                A file upload component with drag-and-drop, image previews, and file validation.
+            </p>
+        </div>
+    </div>
+
+    <!-- Basic Example -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Basic Example</h2>
+            <p class="text-sm text-muted-foreground">
+                Drag and drop files or click to browse.
+            </p>
+        </div>
+        <FileUpload @bind-Files="_basicFiles" />
+        <p class="text-sm text-muted-foreground">
+            Files: @(_basicFiles?.Count ?? 0)
+        </p>
+    </div>
+
+    <!-- Multiple Files -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Multiple Files</h2>
+            <p class="text-sm text-muted-foreground">
+                Upload up to 5 files at once.
+            </p>
+        </div>
+        <FileUpload @bind-Files="_multipleFiles" Multiple="true" MaxFileCount="5" />
+        <p class="text-sm text-muted-foreground">
+            Files: @(_multipleFiles?.Count ?? 0) / 5
+        </p>
+    </div>
+
+    <!-- Images Only -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Images Only</h2>
+            <p class="text-sm text-muted-foreground">
+                Only accepts image files with preview.
+            </p>
+        </div>
+        <FileUpload @bind-Files="_imageFiles"
+                    Multiple="true"
+                    Accept="image/*"
+                    MaxFileCount="4" />
+    </div>
+
+    <!-- Documents -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Documents Only</h2>
+            <p class="text-sm text-muted-foreground">
+                Accepts PDF, Word, and Excel files.
+            </p>
+        </div>
+        <FileUpload @bind-Files="_docFiles"
+                    Multiple="true"
+                    Accept=".pdf,.doc,.docx,.xls,.xlsx"
+                    MaxFileSize="@(20 * 1024 * 1024)" />
+    </div>
+
+    <!-- Custom Size Limit -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Small Files (1MB limit)</h2>
+            <p class="text-sm text-muted-foreground">
+                Files larger than 1MB will be rejected.
+            </p>
+        </div>
+        <FileUpload @bind-Files="_smallFiles"
+                    Multiple="true"
+                    MaxFileSize="@(1 * 1024 * 1024)"
+                    OnValidationError="HandleValidationError" />
+        @if (!string.IsNullOrEmpty(_lastError))
+        {
+            <p class="text-sm text-destructive">Last error: @_lastError</p>
+        }
+    </div>
+
+    <!-- No Preview -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Without Image Preview</h2>
+            <p class="text-sm text-muted-foreground">
+                Image previews are disabled.
+            </p>
+        </div>
+        <FileUpload @bind-Files="_noPreviewFiles" Multiple="true" ShowPreview="false" />
+    </div>
+
+    <!-- Single File -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Single File</h2>
+            <p class="text-sm text-muted-foreground">
+                Only one file at a time.
+            </p>
+        </div>
+        <FileUpload @bind-Files="_singleFile" Multiple="false" />
+    </div>
+
+    <!-- Disabled -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Disabled</h2>
+        </div>
+        <FileUpload Disabled="true" />
+    </div>
+
+    <!-- API Reference -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">API Reference</h2>
+        </div>
+        <div class="border rounded-lg p-6 space-y-4">
+            <div>
+                <h3 class="font-mono text-sm font-semibold mb-2">FileUpload Parameters</h3>
+                <div class="space-y-2 text-sm">
+                    <p><strong>Files:</strong> <code class="bg-muted px-1 py-0.5 rounded">IReadOnlyList&lt;FileUploadItem&gt;?</code> - Selected files</p>
+                    <p><strong>Multiple:</strong> <code class="bg-muted px-1 py-0.5 rounded">bool</code> - Allow multiple files. Default: false</p>
+                    <p><strong>Accept:</strong> <code class="bg-muted px-1 py-0.5 rounded">string?</code> - Accepted types (e.g., "image/*,.pdf")</p>
+                    <p><strong>MaxFileSize:</strong> <code class="bg-muted px-1 py-0.5 rounded">long</code> - Max file size in bytes. Default: 10MB</p>
+                    <p><strong>MaxFileCount:</strong> <code class="bg-muted px-1 py-0.5 rounded">int</code> - Max number of files. Default: 10</p>
+                    <p><strong>ShowPreview:</strong> <code class="bg-muted px-1 py-0.5 rounded">bool</code> - Show image previews. Default: true</p>
+                    <p><strong>Disabled:</strong> <code class="bg-muted px-1 py-0.5 rounded">bool</code> - Disables the upload</p>
+                    <p><strong>OnValidationError:</strong> <code class="bg-muted px-1 py-0.5 rounded">EventCallback&lt;FileValidationError&gt;</code> - Validation error callback</p>
+                    <p><strong>DropzoneContent:</strong> <code class="bg-muted px-1 py-0.5 rounded">RenderFragment?</code> - Custom dropzone content</p>
+                </div>
+            </div>
+            <div>
+                <h3 class="font-mono text-sm font-semibold mb-2">FileUploadItem Properties</h3>
+                <div class="space-y-2 text-sm">
+                    <p><strong>File:</strong> <code class="bg-muted px-1 py-0.5 rounded">IBrowserFile</code> - The browser file reference</p>
+                    <p><strong>Name:</strong> <code class="bg-muted px-1 py-0.5 rounded">string</code> - File name</p>
+                    <p><strong>Size:</strong> <code class="bg-muted px-1 py-0.5 rounded">long</code> - File size in bytes</p>
+                    <p><strong>ContentType:</strong> <code class="bg-muted px-1 py-0.5 rounded">string</code> - MIME type</p>
+                    <p><strong>FormattedSize:</strong> <code class="bg-muted px-1 py-0.5 rounded">string</code> - Human-readable size</p>
+                    <p><strong>IsImage:</strong> <code class="bg-muted px-1 py-0.5 rounded">bool</code> - Whether file is an image</p>
+                    <p><strong>PreviewUrl:</strong> <code class="bg-muted px-1 py-0.5 rounded">string?</code> - Data URL for preview</p>
+                </div>
+            </div>
+            <div>
+                <h3 class="font-mono text-sm font-semibold mb-2">Validation Error Types</h3>
+                <div class="space-y-2 text-sm">
+                    <p><strong>FileTooLarge:</strong> File exceeds size limit</p>
+                    <p><strong>InvalidType:</strong> File type not accepted</p>
+                    <p><strong>TooManyFiles:</strong> Max file count exceeded</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private IReadOnlyList<FileUploadItem>? _basicFiles;
+    private IReadOnlyList<FileUploadItem>? _multipleFiles;
+    private IReadOnlyList<FileUploadItem>? _imageFiles;
+    private IReadOnlyList<FileUploadItem>? _docFiles;
+    private IReadOnlyList<FileUploadItem>? _smallFiles;
+    private IReadOnlyList<FileUploadItem>? _noPreviewFiles;
+    private IReadOnlyList<FileUploadItem>? _singleFile;
+    private string? _lastError;
+
+    private void HandleValidationError(FileValidationError error)
+    {
+        _lastError = error.Message;
+    }
+}

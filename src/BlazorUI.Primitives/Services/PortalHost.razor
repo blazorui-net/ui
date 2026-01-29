@@ -19,7 +19,6 @@
 
 @code {
     private HashSet<string> _renderedThisCycle = new();
-    private HashSet<string> _lastPortalKeys = new();
     private IJSObjectReference? _portalModule;
 
     protected override void OnInitialized()
@@ -28,19 +27,15 @@
     }
 
     /// <summary>
-    /// Handles portal changes with optimization to avoid unnecessary re-renders.
-    /// Only triggers StateHasChanged if the portal keys actually changed.
+    /// Handles portal changes by triggering a re-render.
+    /// Always re-renders to ensure content updates are reflected (not just key changes).
     /// </summary>
     private void HandlePortalsChanged()
     {
-        var currentKeys = PortalService.GetPortals().Select(p => p.Key).ToHashSet();
-
-        // Only re-render if portals actually changed
-        if (!currentKeys.SetEquals(_lastPortalKeys))
-        {
-            _lastPortalKeys = currentKeys;
-            StateHasChanged();
-        }
+        // Always re-render when any portal change is signaled.
+        // The previous optimization (only re-render if keys changed) prevented
+        // content updates for existing portals like ColorPicker and TimePicker.
+        InvokeAsync(StateHasChanged);
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)

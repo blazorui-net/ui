@@ -133,12 +133,13 @@
     {
         base.OnParametersSet();
 
-        // Refresh portal to re-render with updated ChildContent
+        // Re-register portal with updated ChildContent to ensure content updates are reflected
         // Now safe because GetInitialStyle() includes the stored position,
         // so re-renders won't lose the position styling
         if (_isInitialized && Context.IsOpen && !string.IsNullOrEmpty(_portalId))
         {
-            PortalService.RefreshPortal(_portalId);
+            // Re-register with the new RenderFragment to capture updated ChildContent
+            PortalService.RegisterPortal(_portalId, RenderPopoverContent());
         }
     }
 

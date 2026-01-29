@@ -1,0 +1,405 @@
+@namespace BlazorUI.Components.TimePicker
+@using BlazorUI.Components.Utilities
+@using BlazorUI.Components.Button
+@using BlazorUI.Components.Popover
+@using BlazorUI.Icons.Lucide.Components
+@using BlazorUI.Primitives.Services
+
+<Popover @bind-Open="_isOpen">
+    <PopoverTrigger AsChild="true">
+        <Button Variant="ButtonVariant.Outline"
+                Class="@ButtonCssClass"
+                Disabled="@Disabled">
+            <LucideIcon Name="clock" Class="mr-2 h-4 w-4" />
+            @if (Value.HasValue)
+            {
+                <span>@FormatTime(Value.Value)</span>
+            }
+            else
+            {
+                <span class="text-muted-foreground">@Placeholder</span>
+            }
+        </Button>
+    </PopoverTrigger>
+    <PopoverContent Class="w-auto p-4" Align="@PopoverAlign.Start">
+        <div class="flex flex-col gap-4">
+            <div class="flex items-center gap-2">
+                <!-- Hour Column -->
+                <div class="flex flex-col items-center">
+                    <span class="text-xs text-muted-foreground mb-1">Hour</span>
+                    <div class="flex flex-col items-center border rounded-md">
+                        <button type="button"
+                                class="@ScrollButtonClass"
+                                @onclick="IncrementHour"
+                                disabled="@Disabled">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4">
+                                <path d="m18 15-6-6-6 6"/>
+                            </svg>
+                        </button>
+                        <span class="w-12 h-10 flex items-center justify-center text-lg font-medium tabular-nums">
+                            @DisplayHour.ToString("D2")
+                        </span>
+                        <button type="button"
+                                class="@ScrollButtonClass"
+                                @onclick="DecrementHour"
+                                disabled="@Disabled">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4">
+                                <path d="m6 9 6 6 6-6"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <span class="text-2xl font-medium mt-5">:</span>
+
+                <!-- Minute Column -->
+                <div class="flex flex-col items-center">
+                    <span class="text-xs text-muted-foreground mb-1">Min</span>
+                    <div class="flex flex-col items-center border rounded-md">
+                        <button type="button"
+                                class="@ScrollButtonClass"
+                                @onclick="IncrementMinute"
+                                disabled="@Disabled">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4">
+                                <path d="m18 15-6-6-6 6"/>
+                            </svg>
+                        </button>
+                        <span class="w-12 h-10 flex items-center justify-center text-lg font-medium tabular-nums">
+                            @CurrentMinute.ToString("D2")
+                        </span>
+                        <button type="button"
+                                class="@ScrollButtonClass"
+                                @onclick="DecrementMinute"
+                                disabled="@Disabled">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4">
+                                <path d="m6 9 6 6 6-6"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                @if (ShowSeconds)
+                {
+                    <span class="text-2xl font-medium mt-5">:</span>
+
+                    <!-- Second Column -->
+                    <div class="flex flex-col items-center">
+                        <span class="text-xs text-muted-foreground mb-1">Sec</span>
+                        <div class="flex flex-col items-center border rounded-md">
+                            <button type="button"
+                                    class="@ScrollButtonClass"
+                                    @onclick="IncrementSecond"
+                                    disabled="@Disabled">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4">
+                                    <path d="m18 15-6-6-6 6"/>
+                                </svg>
+                            </button>
+                            <span class="w-12 h-10 flex items-center justify-center text-lg font-medium tabular-nums">
+                                @CurrentSecond.ToString("D2")
+                            </span>
+                            <button type="button"
+                                    class="@ScrollButtonClass"
+                                    @onclick="DecrementSecond"
+                                    disabled="@Disabled">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4">
+                                    <path d="m6 9 6 6 6-6"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                }
+
+                @if (Format == TimeFormat.Hour12)
+                {
+                    <!-- AM/PM Toggle -->
+                    <div class="flex flex-col items-center ml-2">
+                        <span class="text-xs text-muted-foreground mb-1">&nbsp;</span>
+                        <div class="flex flex-col border rounded-md overflow-hidden">
+                            <button type="button"
+                                    class="@GetAmPmButtonClass(true)"
+                                    @onclick="() => SetAmPm(true)"
+                                    disabled="@Disabled">
+                                AM
+                            </button>
+                            <button type="button"
+                                    class="@GetAmPmButtonClass(false)"
+                                    @onclick="() => SetAmPm(false)"
+                                    disabled="@Disabled">
+                                PM
+                            </button>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex justify-between gap-2">
+                <button type="button"
+                        class="flex-1 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-8 px-3"
+                        disabled="@Disabled"
+                        @onclick="SetNow">
+                    Now
+                </button>
+                <button type="button"
+                        class="flex-1 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-8 px-3"
+                        disabled="@(Disabled || !Value.HasValue)"
+                        @onclick="Clear">
+                    Clear
+                </button>
+            </div>
+        </div>
+    </PopoverContent>
+</Popover>
+
+@code {
+    private bool _isOpen;
+    private int _internalHour = 12;
+    private int _internalMinute = 0;
+    private int _internalSecond = 0;
+    private bool _isAm = true;
+
+    /// <summary>
+    /// The selected time value.
+    /// </summary>
+    [Parameter]
+    public TimeSpan? Value { get; set; }
+
+    /// <summary>
+    /// Callback when the selected time changes.
+    /// </summary>
+    [Parameter]
+    public EventCallback<TimeSpan?> ValueChanged { get; set; }
+
+    /// <summary>
+    /// The time format (12-hour or 24-hour).
+    /// </summary>
+    [Parameter]
+    public TimeFormat Format { get; set; } = TimeFormat.Hour12;
+
+    /// <summary>
+    /// Whether to show the seconds selector.
+    /// </summary>
+    [Parameter]
+    public bool ShowSeconds { get; set; }
+
+    /// <summary>
+    /// The minute step interval.
+    /// </summary>
+    [Parameter]
+    public int MinuteStep { get; set; } = 1;
+
+    /// <summary>
+    /// The minimum allowed time.
+    /// </summary>
+    [Parameter]
+    public TimeSpan? MinTime { get; set; }
+
+    /// <summary>
+    /// The maximum allowed time.
+    /// </summary>
+    [Parameter]
+    public TimeSpan? MaxTime { get; set; }
+
+    /// <summary>
+    /// Placeholder text when no time is selected.
+    /// </summary>
+    [Parameter]
+    public string Placeholder { get; set; } = "Select time";
+
+    /// <summary>
+    /// Whether the time picker is disabled.
+    /// </summary>
+    [Parameter]
+    public bool Disabled { get; set; }
+
+    /// <summary>
+    /// Additional CSS classes for the trigger button.
+    /// </summary>
+    [Parameter]
+    public string? Class { get; set; }
+
+    private int CurrentHour => Value?.Hours ?? _internalHour;
+    private int CurrentMinute => Value?.Minutes ?? _internalMinute;
+    private int CurrentSecond => Value?.Seconds ?? _internalSecond;
+
+    private int DisplayHour
+    {
+        get
+        {
+            if (Format == TimeFormat.Hour24)
+                return CurrentHour;
+
+            var hour = CurrentHour % 12;
+            return hour == 0 ? 12 : hour;
+        }
+    }
+
+    private bool IsAm => CurrentHour < 12;
+
+    protected override void OnParametersSet()
+    {
+        if (Value.HasValue)
+        {
+            _internalHour = Value.Value.Hours;
+            _internalMinute = Value.Value.Minutes;
+            _internalSecond = Value.Value.Seconds;
+            _isAm = Value.Value.Hours < 12;
+        }
+        else
+        {
+            // Set appropriate default based on format
+            _internalHour = Format == TimeFormat.Hour24 ? 0 : 12;
+            _internalMinute = 0;
+            _internalSecond = 0;
+            _isAm = true;
+        }
+    }
+
+    private string FormatTime(TimeSpan time)
+    {
+        if (Format == TimeFormat.Hour24)
+        {
+            // TimeSpan uses lowercase 'hh' for hours, not 'HH' (which is for DateTime)
+            return ShowSeconds
+                ? time.ToString(@"hh\:mm\:ss")
+                : time.ToString(@"hh\:mm");
+        }
+        else
+        {
+            var hour = time.Hours % 12;
+            if (hour == 0) hour = 12;
+            var amPm = time.Hours < 12 ? "AM" : "PM";
+
+            return ShowSeconds
+                ? $"{hour:D2}:{time.Minutes:D2}:{time.Seconds:D2} {amPm}"
+                : $"{hour:D2}:{time.Minutes:D2} {amPm}";
+        }
+    }
+
+    private async Task UpdateValue()
+    {
+        var newTime = new TimeSpan(_internalHour, _internalMinute, _internalSecond);
+
+        // Apply constraints
+        if (MinTime.HasValue && newTime < MinTime.Value)
+            newTime = MinTime.Value;
+        if (MaxTime.HasValue && newTime > MaxTime.Value)
+            newTime = MaxTime.Value;
+
+        Value = newTime;
+        await ValueChanged.InvokeAsync(newTime);
+        StateHasChanged();
+    }
+
+    private async Task IncrementHour()
+    {
+        if (Format == TimeFormat.Hour24)
+        {
+            _internalHour = (_internalHour + 1) % 24;
+        }
+        else
+        {
+            var hour12 = _internalHour % 12;
+            hour12 = (hour12 + 1) % 12;
+            _internalHour = _isAm ? hour12 : hour12 + 12;
+            if (_internalHour == 12 && _isAm) _internalHour = 0;
+            if (_internalHour == 0 && !_isAm) _internalHour = 12;
+        }
+        await UpdateValue();
+    }
+
+    private async Task DecrementHour()
+    {
+        if (Format == TimeFormat.Hour24)
+        {
+            _internalHour = (_internalHour - 1 + 24) % 24;
+        }
+        else
+        {
+            var hour12 = _internalHour % 12;
+            hour12 = (hour12 - 1 + 12) % 12;
+            _internalHour = _isAm ? hour12 : hour12 + 12;
+            if (_internalHour == 12 && _isAm) _internalHour = 0;
+            if (_internalHour == 0 && !_isAm) _internalHour = 12;
+        }
+        await UpdateValue();
+    }
+
+    private async Task IncrementMinute()
+    {
+        _internalMinute = (_internalMinute + MinuteStep) % 60;
+        await UpdateValue();
+    }
+
+    private async Task DecrementMinute()
+    {
+        _internalMinute = (_internalMinute - MinuteStep + 60) % 60;
+        await UpdateValue();
+    }
+
+    private async Task IncrementSecond()
+    {
+        _internalSecond = (_internalSecond + 1) % 60;
+        await UpdateValue();
+    }
+
+    private async Task DecrementSecond()
+    {
+        _internalSecond = (_internalSecond - 1 + 60) % 60;
+        await UpdateValue();
+    }
+
+    private async Task SetAmPm(bool isAm)
+    {
+        _isAm = isAm;
+        if (isAm && _internalHour >= 12)
+            _internalHour -= 12;
+        else if (!isAm && _internalHour < 12)
+            _internalHour += 12;
+
+        await UpdateValue();
+    }
+
+    private async Task SetNow()
+    {
+        var now = DateTime.Now.TimeOfDay;
+        _internalHour = now.Hours;
+        _internalMinute = (now.Minutes / MinuteStep) * MinuteStep;
+        _internalSecond = ShowSeconds ? now.Seconds : 0;
+        _isAm = _internalHour < 12;
+        await UpdateValue();
+        StateHasChanged();
+    }
+
+    private async Task Clear()
+    {
+        Value = null;
+        // Reset to appropriate default based on format
+        _internalHour = Format == TimeFormat.Hour24 ? 0 : 12;
+        _internalMinute = 0;
+        _internalSecond = 0;
+        _isAm = true;
+        await ValueChanged.InvokeAsync(null);
+        StateHasChanged();
+    }
+
+    private string ButtonCssClass => ClassNames.cn(
+        "w-[180px] justify-start text-left font-normal",
+        !Value.HasValue ? "text-muted-foreground" : null,
+        Disabled ? "opacity-50 pointer-events-none" : null,
+        Class
+    );
+
+    private string ScrollButtonClass => ClassNames.cn(
+        "w-12 h-8 flex items-center justify-center",
+        "hover:bg-accent hover:text-accent-foreground",
+        "transition-colors",
+        "disabled:opacity-50 disabled:cursor-not-allowed"
+    );
+
+    private string GetAmPmButtonClass(bool isAm) => ClassNames.cn(
+        "w-12 h-10 text-sm font-medium transition-colors",
+        (isAm == IsAm) ? "bg-primary text-primary-foreground" : "hover:bg-accent hover:text-accent-foreground",
+        "disabled:opacity-50 disabled:cursor-not-allowed"
+    );
+}

@@ -1,0 +1,195 @@
+@page "/components/range-slider"
+@using BlazorUI.Components.RangeSlider
+
+<PageTitle>RangeSlider Component - BlazorUI</PageTitle>
+
+<div class="space-y-8 max-w-4xl">
+    <div>
+        <div class="space-y-3">
+            <h1 class="text-4xl font-bold tracking-tight">RangeSlider Component</h1>
+            <p class="text-xl text-muted-foreground">
+                A dual-handle slider for selecting a range of values with keyboard navigation and optional tooltips.
+            </p>
+        </div>
+    </div>
+
+    <!-- Basic Example -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Basic Example</h2>
+            <p class="text-sm text-muted-foreground">
+                Select a range by dragging the two handles.
+            </p>
+        </div>
+        <div class="w-[60%]">
+            <RangeSlider @bind-Value="_basicValue" />
+        </div>
+        <p class="text-sm text-muted-foreground">Range: @_basicValue.Start - @_basicValue.End</p>
+    </div>
+
+    <!-- With Tooltips -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">With Tooltips</h2>
+            <p class="text-sm text-muted-foreground">
+                Shows value tooltips above each handle.
+            </p>
+        </div>
+        <div class="w-[60%] pt-8">
+            <RangeSlider @bind-Value="_tooltipValue" ShowTooltips="true" />
+        </div>
+        <p class="text-sm text-muted-foreground">Range: @_tooltipValue.Start - @_tooltipValue.End</p>
+    </div>
+
+    <!-- Custom Range -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Custom Range</h2>
+            <p class="text-sm text-muted-foreground">
+                Custom min/max values (0-1000).
+            </p>
+        </div>
+        <div class="w-[60%]">
+            <RangeSlider @bind-Value="_customRange" Min="0" Max="1000" Step="10" />
+        </div>
+        <p class="text-sm text-muted-foreground">Range: @_customRange.Start - @_customRange.End (step: 10)</p>
+    </div>
+
+    <!-- With Minimum Gap -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Minimum Gap</h2>
+            <p class="text-sm text-muted-foreground">
+                Handles must be at least 20 units apart.
+            </p>
+        </div>
+        <div class="w-[60%]">
+            <RangeSlider @bind-Value="_minGapValue" MinRange="20" />
+        </div>
+        <p class="text-sm text-muted-foreground">Range: @_minGapValue.Start - @_minGapValue.End (min gap: 20)</p>
+    </div>
+
+    <!-- With Tick Marks -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">With Tick Marks</h2>
+            <p class="text-sm text-muted-foreground">
+                Shows tick marks at specified positions.
+            </p>
+        </div>
+        <div class="w-[60%] pb-4">
+            <RangeSlider @bind-Value="_tickValue"
+                         ShowTickMarks="true"
+                         TickValues="@(new double[] { 0, 25, 50, 75, 100 })" />
+        </div>
+        <p class="text-sm text-muted-foreground">Range: @_tickValue.Start - @_tickValue.End</p>
+    </div>
+
+    <!-- Price Range -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Price Range Filter</h2>
+            <p class="text-sm text-muted-foreground">
+                Common use case: filtering by price range.
+            </p>
+        </div>
+        <div class="w-[60%] pt-8">
+            <RangeSlider @bind-Value="_priceRange"
+                         Min="0"
+                         Max="500"
+                         Step="10"
+                         ShowTooltips="true"
+                         FormatValueFunc="@(v => $"${v:F0}")" />
+        </div>
+        <p class="text-sm text-muted-foreground">Price: $@_priceRange.Start - $@_priceRange.End</p>
+    </div>
+
+    <!-- Default Values -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">With Default Values</h2>
+            <p class="text-sm text-muted-foreground">
+                Uncontrolled slider with initial values.
+            </p>
+        </div>
+        <div class="w-[60%]">
+            <RangeSlider DefaultStart="10" DefaultEnd="90" />
+        </div>
+    </div>
+
+    <!-- Disabled -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Disabled</h2>
+            <p class="text-sm text-muted-foreground">
+                A disabled range slider.
+            </p>
+        </div>
+        <div class="w-[60%]">
+            <RangeSlider Value="@((25.0, 75.0))" Disabled="true" />
+        </div>
+    </div>
+
+    <!-- Keyboard Navigation -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Keyboard Navigation</h2>
+            <p class="text-sm text-muted-foreground">
+                Tab to focus handles, use arrow keys to adjust. Each handle can be controlled independently.
+            </p>
+        </div>
+        <div class="w-[60%]">
+            <RangeSlider @bind-Value="_keyboardValue"
+                         StartLabel="Minimum value"
+                         EndLabel="Maximum value" />
+        </div>
+        <p class="text-sm text-muted-foreground">
+            Range: @_keyboardValue.Start - @_keyboardValue.End (Tab to focus, arrows to adjust)
+        </p>
+    </div>
+
+    <!-- API Reference -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">API Reference</h2>
+        </div>
+        <div class="border rounded-lg p-6 space-y-4">
+            <div>
+                <h3 class="font-mono text-sm font-semibold mb-2">RangeSlider Parameters</h3>
+                <div class="space-y-2 text-sm">
+                    <p><strong>Value:</strong> <code class="bg-muted px-1 py-0.5 rounded">(double Start, double End)</code> - Current range value</p>
+                    <p><strong>Min:</strong> <code class="bg-muted px-1 py-0.5 rounded">double</code> - Minimum value. Default: 0</p>
+                    <p><strong>Max:</strong> <code class="bg-muted px-1 py-0.5 rounded">double</code> - Maximum value. Default: 100</p>
+                    <p><strong>Step:</strong> <code class="bg-muted px-1 py-0.5 rounded">double</code> - Step increment. Default: 1</p>
+                    <p><strong>MinRange:</strong> <code class="bg-muted px-1 py-0.5 rounded">double</code> - Minimum gap between handles. Default: 0</p>
+                    <p><strong>ShowTooltips:</strong> <code class="bg-muted px-1 py-0.5 rounded">bool</code> - Show value tooltips. Default: false</p>
+                    <p><strong>ShowTickMarks:</strong> <code class="bg-muted px-1 py-0.5 rounded">bool</code> - Show tick marks. Default: false</p>
+                    <p><strong>TickValues:</strong> <code class="bg-muted px-1 py-0.5 rounded">double[]?</code> - Custom tick positions</p>
+                    <p><strong>FormatValueFunc:</strong> <code class="bg-muted px-1 py-0.5 rounded">Func&lt;double, string&gt;?</code> - Custom value formatter</p>
+                    <p><strong>Disabled:</strong> <code class="bg-muted px-1 py-0.5 rounded">bool</code> - Disables the slider</p>
+                </div>
+            </div>
+            <div>
+                <h3 class="font-mono text-sm font-semibold mb-2">Keyboard Navigation</h3>
+                <div class="space-y-2 text-sm">
+                    <p><strong>Tab:</strong> Move focus between handles</p>
+                    <p><strong>Arrow Left/Down:</strong> Decrease value by step</p>
+                    <p><strong>Arrow Right/Up:</strong> Increase value by step</p>
+                    <p><strong>Page Up/Down:</strong> Increase/decrease by 10%</p>
+                    <p><strong>Home:</strong> Move to minimum (start) or start value (end)</p>
+                    <p><strong>End:</strong> Move to end value (start) or maximum (end)</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private (double Start, double End) _basicValue = (25, 75);
+    private (double Start, double End) _tooltipValue = (30, 70);
+    private (double Start, double End) _customRange = (200, 800);
+    private (double Start, double End) _minGapValue = (30, 70);
+    private (double Start, double End) _tickValue = (25, 75);
+    private (double Start, double End) _priceRange = (50, 350);
+    private (double Start, double End) _keyboardValue = (20, 80);
+}

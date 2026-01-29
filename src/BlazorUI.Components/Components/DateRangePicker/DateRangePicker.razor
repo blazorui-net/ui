@@ -1,0 +1,220 @@
+@namespace BlazorUI.Components.DateRangePicker
+@using BlazorUI.Components.Utilities
+@using BlazorUI.Components.Button
+@using BlazorUI.Components.Popover
+@using BlazorUI.Icons.Lucide.Components
+@using BlazorUI.Primitives.Services
+
+<Popover @bind-Open="_isOpen">
+    <PopoverTrigger AsChild="true">
+        <Button Variant="ButtonVariant.Outline"
+                Class="@ButtonCssClass"
+                Disabled="@Disabled">
+            <LucideIcon Name="calendar" Class="mr-2 h-4 w-4" />
+            @if (Value != null)
+            {
+                <span>@FormatRange(Value)</span>
+            }
+            else
+            {
+                <span class="text-muted-foreground">@Placeholder</span>
+            }
+        </Button>
+    </PopoverTrigger>
+    <PopoverContent Class="w-auto p-0" Align="@PopoverAlign.Start">
+        <div class="flex flex-col">
+            @if (ShowPresets)
+            {
+                <div class="flex border-b">
+                    <div class="flex flex-col gap-1 p-3 border-r min-w-[140px]">
+                        <span class="text-xs font-medium text-muted-foreground mb-1">Quick Select</span>
+                        @foreach (var preset in GetAvailablePresets())
+                        {
+                            var capturedPreset = preset;
+                            <button type="button"
+                                    class="@GetPresetButtonClass(capturedPreset)"
+                                    @onclick="@(() => ApplyPreset(capturedPreset))">
+                                @GetPresetLabel(capturedPreset)
+                            </button>
+                        }
+                    </div>
+                    <div class="flex-1">
+                        @* Inline Calendars *@
+                        <div class="@(ShowTwoMonths ? "flex" : "")">
+                            @* First Calendar *@
+                            <div class="p-3">
+                                <div class="flex items-center justify-between mb-3">
+                                    <button type="button"
+                                            class="inline-flex items-center justify-center h-7 w-7 rounded-md border border-input bg-transparent hover:bg-accent hover:text-accent-foreground opacity-50 hover:opacity-100"
+                                            @onclick="PreviousMonth">
+                                        <LucideIcon Name="chevron-left" Class="h-4 w-4" />
+                                    </button>
+                                    <span class="text-sm font-medium">@GetMonthName(_displayMonth1.Month) @_displayMonth1.Year</span>
+                                    @if (!ShowTwoMonths)
+                                    {
+                                        <button type="button"
+                                                class="inline-flex items-center justify-center h-7 w-7 rounded-md border border-input bg-transparent hover:bg-accent hover:text-accent-foreground opacity-50 hover:opacity-100"
+                                                @onclick="NextMonth">
+                                            <LucideIcon Name="chevron-right" Class="h-4 w-4" />
+                                        </button>
+                                    }
+                                    else
+                                    {
+                                        <div class="w-7"></div>
+                                    }
+                                </div>
+                                @RenderMonthGridInline(_displayMonth1)
+                            </div>
+
+                            @if (ShowTwoMonths)
+                            {
+                                @* Second Calendar *@
+                                <div class="p-3 border-l">
+                                    <div class="flex items-center justify-between mb-3">
+                                        <div class="w-7"></div>
+                                        <span class="text-sm font-medium">@GetMonthName(_displayMonth2.Month) @_displayMonth2.Year</span>
+                                        <button type="button"
+                                                class="inline-flex items-center justify-center h-7 w-7 rounded-md border border-input bg-transparent hover:bg-accent hover:text-accent-foreground opacity-50 hover:opacity-100"
+                                                @onclick="NextMonth">
+                                            <LucideIcon Name="chevron-right" Class="h-4 w-4" />
+                                        </button>
+                                    </div>
+                                    @RenderMonthGridInline(_displayMonth2)
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+            else
+            {
+                @* Calendars without presets *@
+                <div class="@(ShowTwoMonths ? "flex" : "")">
+                    @* First Calendar *@
+                    <div class="p-3">
+                        <div class="flex items-center justify-between mb-3">
+                            <button type="button"
+                                    class="inline-flex items-center justify-center h-7 w-7 rounded-md border border-input bg-transparent hover:bg-accent hover:text-accent-foreground opacity-50 hover:opacity-100"
+                                    @onclick="PreviousMonth">
+                                <LucideIcon Name="chevron-left" Class="h-4 w-4" />
+                            </button>
+                            <span class="text-sm font-medium">@GetMonthName(_displayMonth1.Month) @_displayMonth1.Year</span>
+                            @if (!ShowTwoMonths)
+                            {
+                                <button type="button"
+                                        class="inline-flex items-center justify-center h-7 w-7 rounded-md border border-input bg-transparent hover:bg-accent hover:text-accent-foreground opacity-50 hover:opacity-100"
+                                        @onclick="NextMonth">
+                                    <LucideIcon Name="chevron-right" Class="h-4 w-4" />
+                                </button>
+                            }
+                            else
+                            {
+                                <div class="w-7"></div>
+                            }
+                        </div>
+                        @RenderMonthGridInline(_displayMonth1)
+                    </div>
+
+                    @if (ShowTwoMonths)
+                    {
+                        @* Second Calendar *@
+                        <div class="p-3 border-l">
+                            <div class="flex items-center justify-between mb-3">
+                                <div class="w-7"></div>
+                                <span class="text-sm font-medium">@GetMonthName(_displayMonth2.Month) @_displayMonth2.Year</span>
+                                <button type="button"
+                                        class="inline-flex items-center justify-center h-7 w-7 rounded-md border border-input bg-transparent hover:bg-accent hover:text-accent-foreground opacity-50 hover:opacity-100"
+                                        @onclick="NextMonth">
+                                    <LucideIcon Name="chevron-right" Class="h-4 w-4" />
+                                </button>
+                            </div>
+                            @RenderMonthGridInline(_displayMonth2)
+                        </div>
+                    }
+                </div>
+            }
+
+            <div class="flex items-center justify-between p-3 border-t">
+                <div class="text-sm text-muted-foreground">
+                    @if (_selectionStart.HasValue && !_selectionEnd.HasValue)
+                    {
+                        <span>Select end date</span>
+                    }
+                    else if (_selectionStart.HasValue && _selectionEnd.HasValue)
+                    {
+                        var days = Math.Abs((_selectionEnd.Value - _selectionStart.Value).Days) + 1;
+                        <span>@days day(s) selected</span>
+                    }
+                </div>
+                <div class="flex gap-2">
+                    <button type="button"
+                            class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-8 px-3"
+                            disabled="@(Value == null && !_selectionStart.HasValue)"
+                            @onclick="Clear">
+                        Clear
+                    </button>
+                    <button type="button"
+                            class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-8 px-3"
+                            disabled="@(!CanApply)"
+                            @onclick="Apply">
+                        Apply
+                    </button>
+                </div>
+            </div>
+        </div>
+    </PopoverContent>
+</Popover>
+
+@code {
+    private RenderFragment RenderMonthGridInline(DateTime monthDate) => __builder =>
+    {
+        var weeks = GetWeeksInMonth(monthDate);
+        <table class="w-full border-collapse">
+            <thead>
+                <tr class="flex">
+                    @foreach (var dayName in DayNames)
+                    {
+                        <th class="text-muted-foreground w-9 font-normal text-[0.8rem]">@dayName</th>
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var week in weeks)
+                {
+                    <tr class="flex w-full mt-2">
+                        @foreach (var day in week)
+                        {
+                            @if (day.HasValue)
+                            {
+                                var dateValue = day.Value;
+                                var isDisabled = IsDateDisabled(dateValue) || dateValue.Month != monthDate.Month;
+                                var isInRange = IsInRange(dateValue);
+                                var isRangeStart = IsRangeStart(dateValue);
+                                var isRangeEnd = IsRangeEnd(dateValue);
+                                var isToday = dateValue.Date == DateTime.Today;
+
+                                <td class="@GetCellClass(day, isInRange, isRangeStart, isRangeEnd)">
+                                    <button type="button"
+                                            class="@GetDayClass(dateValue, isDisabled, isInRange, isRangeStart, isRangeEnd, isToday)"
+                                            disabled="@isDisabled"
+                                            @onclick="@(() => HandleDateClick(dateValue))">
+                                        @dateValue.Day
+                                    </button>
+                                </td>
+                            }
+                            else
+                            {
+                                <td class="h-9 w-9 text-center text-sm p-0"></td>
+                            }
+                        }
+                    </tr>
+                }
+            </tbody>
+        </table>
+    };
+
+    private void HandleDateClick(DateTime date)
+    {
+        SelectDate(date);
+    }
+}
