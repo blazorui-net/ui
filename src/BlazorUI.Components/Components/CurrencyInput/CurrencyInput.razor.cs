@@ -161,28 +161,28 @@ public partial class CurrencyInput : ComponentBase
     }
 
     private string ContainerClass => ClassNames.cn(
-        "flex items-center",
+        "flex items-center rounded-md overflow-hidden",
+        "focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 focus-within:ring-offset-background",
         Disabled ? "opacity-50" : null
     );
 
     private string CssClass => ClassNames.cn(
-        "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base",
-        "ring-offset-background",
+        "flex h-10 w-full border border-input bg-background px-3 py-2 text-base",
         "placeholder:text-muted-foreground",
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+        "focus-visible:outline-none",
         "disabled:cursor-not-allowed disabled:opacity-50",
-        "aria-[invalid=true]:border-destructive aria-[invalid=true]:ring-destructive",
+        "aria-[invalid=true]:border-destructive",
         "transition-colors",
         "md:text-sm",
         "text-right tabular-nums",
-        ShowSymbol && Currency.SymbolBefore ? "rounded-l-none border-l-0" : null,
-        ShowSymbol && !Currency.SymbolBefore ? "rounded-r-none border-r-0" : null,
+        ShowSymbol && Currency.SymbolBefore ? "border-l-0" : "rounded-l-md",
+        ShowSymbol && !Currency.SymbolBefore ? "border-r-0" : "rounded-r-md",
         Class
     );
 
     private string SymbolClass => ClassNames.cn(
         "flex h-10 items-center justify-center px-3 border border-input bg-muted text-muted-foreground text-sm",
-        Currency.SymbolBefore ? "rounded-l-md border-r-0" : "rounded-r-md border-l-0",
+        Currency.SymbolBefore ? "border-r-0" : "border-l-0",
         Disabled ? "opacity-50" : null
     );
 

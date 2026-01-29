@@ -153,28 +153,27 @@ public partial class NumericInput<TValue> : ComponentBase where TValue : struct,
 
     private string ContainerClass => ClassNames.cn(
         "flex items-center",
-        ShowButtons ? "relative" : null
+        ShowButtons ? "rounded-md overflow-hidden focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 focus-within:ring-offset-background" : null
     );
 
     private string CssClass => ClassNames.cn(
-        "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base",
-        "ring-offset-background",
+        "flex h-10 w-full border border-input bg-background px-3 py-2 text-base",
         "placeholder:text-muted-foreground",
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+        ShowButtons ? "focus-visible:outline-none" : "rounded-md ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
         "disabled:cursor-not-allowed disabled:opacity-50",
-        "aria-[invalid=true]:border-destructive aria-[invalid=true]:ring-destructive",
+        "aria-[invalid=true]:border-destructive",
         "transition-colors",
         "md:text-sm",
-        ShowButtons ? "pr-8 rounded-r-none" : null,
+        ShowButtons ? "pr-8 border-r-0" : null,
         Class
     );
 
     private string ButtonClass => ClassNames.cn(
         "flex items-center justify-center w-8 h-5 border border-input bg-background",
         "hover:bg-accent hover:text-accent-foreground",
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+        "focus-visible:outline-none",
         "disabled:cursor-not-allowed disabled:opacity-50",
-        "first:rounded-tr-md first:border-b-0 last:rounded-br-md",
+        "first:border-b-0",
         "transition-colors"
     );
 
