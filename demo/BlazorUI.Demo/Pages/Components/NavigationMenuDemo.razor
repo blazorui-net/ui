@@ -1,6 +1,8 @@
 @page "/components/navigation-menu"
 @using BlazorUI.Components.NavigationMenu
+@using BlazorUI.Components.ResponsiveNav
 @using BlazorUI.Components.Separator
+@using BlazorUI.Icons.Lucide.Components
 
 <PageTitle>Navigation Menu Component - BlazorUI</PageTitle>
 
@@ -14,12 +16,102 @@
         </div>
     </div>
 
+    <!-- Responsive Example -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Responsive Navigation</h2>
+            <p class="text-sm text-muted-foreground">
+                Resize the browser window to see the navigation switch between desktop and mobile modes.
+                On mobile (below 768px), a hamburger icon appears and the navigation moves to a slide-out sheet.
+            </p>
+        </div>
+        <div class="border rounded-lg overflow-visible">
+            <ResponsiveNavProvider>
+                <header class="flex items-center justify-between p-4 bg-background rounded-lg">
+                    <!-- Logo (always visible) -->
+                    <a href="/" class="font-bold text-lg shrink-0">BlazorUI</a>
+
+                    <!-- Desktop navigation (hidden on mobile) -->
+                    <NavigationMenu Class="hidden md:flex">
+                        <NavigationMenuList>
+                            <NavigationMenuItem Value="resp-getting-started">
+                                <NavigationMenuTrigger>Getting started</NavigationMenuTrigger>
+                                <NavigationMenuContent>
+                                    <div class="grid gap-3 p-4 w-[400px]">
+                                        <div class="p-3 rounded-lg hover:bg-accent">
+                                            <a href="#" class="block font-medium mb-1">Introduction</a>
+                                            <p class="text-sm text-muted-foreground">Re-usable components built using Blazor.</p>
+                                        </div>
+                                        <div class="p-3 rounded-lg hover:bg-accent">
+                                            <a href="#" class="block font-medium mb-1">Installation</a>
+                                            <p class="text-sm text-muted-foreground">How to install and get started.</p>
+                                        </div>
+                                    </div>
+                                </NavigationMenuContent>
+                            </NavigationMenuItem>
+                            <NavigationMenuItem>
+                                <NavigationMenuLink Href="/components">Components</NavigationMenuLink>
+                            </NavigationMenuItem>
+                            <NavigationMenuItem>
+                                <NavigationMenuLink Href="/primitives">Primitives</NavigationMenuLink>
+                            </NavigationMenuItem>
+                        </NavigationMenuList>
+                    </NavigationMenu>
+
+                    <!-- Right side icons (always visible) -->
+                    <div class="flex items-center gap-2">
+                        <!-- Search button -->
+                        <button type="button" class="inline-flex items-center justify-center rounded-md p-2 text-muted-foreground hover:bg-accent hover:text-accent-foreground">
+                            <LucideIcon Name="search" Size="20" />
+                            <span class="sr-only">Search</span>
+                        </button>
+
+                        <!-- Notifications bell -->
+                        <button type="button" class="relative inline-flex items-center justify-center rounded-md p-2 text-muted-foreground hover:bg-accent hover:text-accent-foreground">
+                            <LucideIcon Name="bell" Size="20" />
+                            <span class="absolute top-1 right-1 h-2 w-2 rounded-full bg-red-500"></span>
+                            <span class="sr-only">Notifications</span>
+                        </button>
+
+                        <!-- Sign In (desktop only) -->
+                        <a href="#" class="hidden md:inline-flex text-sm text-muted-foreground hover:text-foreground px-2">Sign In</a>
+
+                        <!-- Mobile hamburger (right-aligned) -->
+                        <ResponsiveNavTrigger />
+                    </div>
+                </header>
+
+                <ResponsiveNavContent>
+                    <nav class="flex flex-col space-y-4">
+                        <span class="text-sm font-medium text-muted-foreground">Getting started</span>
+                        <div class="pl-4 space-y-2 border-l">
+                            <a href="#" class="block text-sm hover:text-primary">Introduction</a>
+                            <a href="#" class="block text-sm hover:text-primary">Installation</a>
+                        </div>
+                        <a href="/components" class="text-lg font-medium hover:text-primary">Components</a>
+                        <a href="/primitives" class="text-lg font-medium hover:text-primary">Primitives</a>
+                        <Separator />
+                        <a href="#" class="text-sm text-muted-foreground hover:text-primary">Sign In</a>
+                    </nav>
+                </ResponsiveNavContent>
+            </ResponsiveNavProvider>
+        </div>
+        <div class="border rounded-lg p-4 bg-muted/50">
+            <p class="text-sm text-muted-foreground">
+                <strong>Tip:</strong> Wrap your header with <code class="text-xs bg-background px-1 py-0.5 rounded">ResponsiveNavProvider</code>,
+                add <code class="text-xs bg-background px-1 py-0.5 rounded">ResponsiveNavTrigger</code> for the hamburger menu,
+                and use <code class="text-xs bg-background px-1 py-0.5 rounded">ResponsiveNavContent</code> for the mobile sheet content.
+                Add <code class="text-xs bg-background px-1 py-0.5 rounded">Class="hidden md:flex"</code> to your NavigationMenu to hide it on mobile.
+            </p>
+        </div>
+    </div>
+
     <!-- Basic Example -->
     <div class="space-y-4">
         <div class="space-y-2">
             <h2 class="text-2xl font-semibold">Basic Example</h2>
             <p class="text-sm text-muted-foreground">
-                A navigation menu with dropdown items.
+                A navigation menu with dropdown items (desktop-only, no responsive behavior).
             </p>
         </div>
         <div class="border rounded-lg p-4">
