@@ -35,10 +35,16 @@ const cleanupRegistry = new Map();
 let cleanupIdCounter = 0;
 
 /**
- * Lazy loads Floating UI from CDN with local fallback
+ * Lazy loads Floating UI from preloaded global or CDN with fallback
  */
 async function loadFloatingUI() {
     if (floatingUI) return floatingUI;
+
+    // Check for preloaded global first (from App.razor script)
+    if (window.FloatingUIDOM) {
+        floatingUI = window.FloatingUIDOM;
+        return floatingUI;
+    }
 
     try {
         // Try CDN first
