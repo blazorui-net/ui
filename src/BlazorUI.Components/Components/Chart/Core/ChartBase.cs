@@ -199,13 +199,18 @@ public abstract class ChartBase<TItem> : ComponentBase where TItem : class
         options.Legend = new Legend
         {
             Show = ShowLegend && LegendPosition != LegendPosition.Hidden,
-            Position = GetApexLegendPosition()
+            Position = GetApexLegendPosition(),
+            Labels = new LegendLabels
+            {
+                Colors = "var(--foreground)"
+            }
         };
 
-        // Tooltip
+        // Tooltip - use cssClass for theme-aware styling
         options.Tooltip = new ApexCharts.Tooltip
         {
-            Enabled = ShowTooltip
+            Enabled = ShowTooltip,
+            CssClass = "blazorui-chart-tooltip"
         };
 
         // Data labels
