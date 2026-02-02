@@ -1,0 +1,172 @@
+@namespace BlazorBlueprint.Components.MultiSelect
+@typeparam TItem
+@using BlazorBlueprint.Components.Popover
+@using BlazorBlueprint.Components.Badge
+@using BlazorBlueprint.Components.Separator
+@using BlazorBlueprint.Primitives.Services
+@using BlazorBlueprint.Primitives.Checkbox
+@using BlazorBlueprint.Icons.Lucide.Components
+
+<div class="@ContainerClass">
+    <Popover Open="_isOpen" OpenChanged="HandleOpenChanged">
+        <PopoverTrigger role="combobox"
+                        aria-expanded="@_isOpen.ToString().ToLower()"
+                        aria-controls="@($"{Id}-listbox")"
+                        aria-haspopup="listbox"
+                        aria-multiselectable="true"
+                        disabled="@Disabled"
+                        class="@TriggerCssClass">
+            <div class="flex flex-wrap items-center gap-1 flex-1 min-w-0">
+                @if (HasSelectedItems)
+                {
+                    @foreach (var value in SelectedValues.Take(MaxDisplayTags))
+                    {
+                        <Badge @key="value" Variant="BadgeVariant.Secondary" Class="gap-1">
+                            @GetDisplayText(value)
+                            <button type="button"
+                                    class="@TagRemoveButtonCssClass"
+                                    aria-label="@($"Remove {GetDisplayText(value)}")"
+                                    @onclick="GetRemoveHandler(value)"
+                                    @onclick:stopPropagation="true">
+                                <LucideIcon Name="x" Size="12" Class="h-3 w-3" />
+                            </button>
+                        </Badge>
+                    }
+                    @if (OverflowCount > 0)
+                    {
+                        <span class="text-xs text-muted-foreground">+@OverflowCount more</span>
+                    }
+                }
+                else
+                {
+                    <span class="text-muted-foreground">@Placeholder</span>
+                }
+            </div>
+            <div class="flex items-center gap-1 ml-2">
+                @if (HasSelectedItems)
+                {
+                    <button type="button"
+                            class="rounded-sm opacity-70 hover:opacity-100 focus:outline-none focus:ring-1 focus:ring-ring"
+                            aria-label="Clear all"
+                            @onclick="ClearAll"
+                            @onclick:stopPropagation="true">
+                        <LucideIcon Name="x" Size="14" Class="h-3.5 w-3.5" />
+                    </button>
+                }
+                <LucideIcon Name="chevron-down" Size="16" Class="h-4 w-4 shrink-0 opacity-50" />
+            </div>
+        </PopoverTrigger>
+
+        <PopoverContent Side="@PopoverSide.Bottom"
+                        Align="@PopoverAlign.Start"
+                        CloseOnClickOutside="@AutoClose"
+                        CloseOnEscape="false"
+                        OnClickOutside="@GetClickOutsideHandler()"
+                        OnContentReady="@HandleContentReady"
+                        MatchTriggerWidth="@MatchTriggerWidth"
+                        Class="@(MatchTriggerWidth ? "!p-0" : $"{PopoverWidth} !p-0")">
+            @* Search input section - matches CommandInput styling *@
+            <div class="flex items-center border-b border-border px-3">
+                <svg xmlns="http://www.w3.org/2000/svg"
+                     width="24"
+                     height="24"
+                     viewBox="0 0 24 24"
+                     fill="none"
+                     stroke="currentColor"
+                     stroke-width="2"
+                     stroke-linecap="round"
+                     stroke-linejoin="round"
+                     class="mr-2 h-4 w-4 shrink-0 opacity-50">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <path d="m21 21-4.35-4.35"></path>
+                </svg>
+                <input @ref="_searchInputRef"
+                       id="@($"{Id}-search")"
+                       type="text"
+                       placeholder="@SearchPlaceholder"
+                       value="@_searchQuery"
+                       @oninput="HandleSearchInput"
+                       @onkeydown="HandleSearchKeyDown"
+                       class="flex h-11 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 ml-2" />
+            </div>
+
+            @* Items list section *@
+            <div id="@($"{Id}-listbox")" role="listbox" aria-multiselectable="true" class="max-h-[300px] overflow-y-auto p-1">
+                @if (!HasFilteredItems)
+                {
+                    <div class="py-6 text-center text-sm text-muted-foreground">@EmptyMessage</div>
+                }
+                else
+                {
+                    @* Select All option *@
+                    @if (ShowSelectAll)
+                    {
+                        var selectAllState = GetSelectAllState();
+                        <div role="option"
+                             aria-selected="@(selectAllState == SelectAllState.All ? "true" : "false")"
+                             @onclick="HandleSelectAllToggle"
+                             @onclick:stopPropagation="true"
+                             class="@ItemCssClass">
+                            <Checkbox Checked="@(selectAllState == SelectAllState.All)"
+                                      Indeterminate="@(selectAllState == SelectAllState.Indeterminate)"
+                                      class="@CheckboxCssClass"
+                                      AriaLabel="@SelectAllLabel">
+                                @if (selectAllState == SelectAllState.All)
+                                {
+                                    <LucideIcon Name="check" Size="14" Class="h-3.5 w-3.5 stroke-current" />
+                                }
+                                else if (selectAllState == SelectAllState.Indeterminate)
+                                {
+                                    <LucideIcon Name="minus" Size="14" Class="h-3.5 w-3.5 stroke-current" />
+                                }
+                            </Checkbox>
+                            <span class="font-medium">@SelectAllLabel</span>
+                        </div>
+                        <Separator Decorative="false" Class="my-1" />
+                    }
+
+                    @* Individual items *@
+                    @foreach (var item in FilteredItems)
+                    {
+                        var itemValue = ValueSelector(item);
+                        var displayText = DisplaySelector(item);
+                        var isSelected = IsSelected(item);
+
+                        <div @key="itemValue"
+                             role="option"
+                             aria-selected="@isSelected.ToString().ToLower()"
+                             @onclick="GetToggleHandler(item)"
+                             @onclick:stopPropagation="true"
+                             class="@ItemCssClass">
+                            <Checkbox Checked="@isSelected"
+                                      class="@CheckboxCssClass"
+                                      AriaLabel="@displayText">
+                                @if (isSelected)
+                                {
+                                    <LucideIcon Name="check" Size="14" Class="h-3.5 w-3.5 stroke-current" />
+                                }
+                            </Checkbox>
+                            <span>@displayText</span>
+                        </div>
+                    }
+                }
+            </div>
+
+            @* Footer section *@
+            <div class="flex items-center justify-between border-t p-2">
+                <button type="button"
+                        class="text-xs text-muted-foreground hover:text-foreground transition-colors"
+                        @onclick="ClearAll"
+                        @onclick:stopPropagation="true">
+                    @ClearLabel
+                </button>
+                <button type="button"
+                        class="text-xs text-muted-foreground hover:text-foreground transition-colors"
+                        @onclick="Close"
+                        @onclick:stopPropagation="true">
+                    @CloseLabel
+                </button>
+            </div>
+        </PopoverContent>
+    </Popover>
+</div>

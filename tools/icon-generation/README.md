@@ -1,16 +1,16 @@
 # Icon Generation Tools
 
-This folder contains the source data used to generate the C# icon data files for BlazorUI's icon libraries.
+This folder contains the source data used to generate the C# icon data files for BlazorBlueprint's icon libraries.
 
 ## Overview
 
-BlazorUI provides three icon library packages, each wrapping a popular open-source icon set:
+BlazorBlueprint provides three icon library packages, each wrapping a popular open-source icon set:
 
 | Package | Icon Set | Icons | License | Source |
 |---------|----------|-------|---------|--------|
-| `BlazorUI.Icons.Lucide` | [Lucide](https://lucide.dev/) | 1,640+ | ISC | [GitHub](https://github.com/lucide-icons/lucide) |
-| `BlazorUI.Icons.Heroicons` | [Heroicons](https://heroicons.com/) | 1,288 | MIT | [GitHub](https://github.com/tailwindlabs/heroicons) |
-| `BlazorUI.Icons.Feather` | [Feather](https://feathericons.com/) | 286 | MIT | [GitHub](https://github.com/feathericons/feather) |
+| `BlazorBlueprint.Icons.Lucide` | [Lucide](https://lucide.dev/) | 1,640+ | ISC | [GitHub](https://github.com/lucide-icons/lucide) |
+| `BlazorBlueprint.Icons.Heroicons` | [Heroicons](https://heroicons.com/) | 1,288 | MIT | [GitHub](https://github.com/tailwindlabs/heroicons) |
+| `BlazorBlueprint.Icons.Feather` | [Feather](https://feathericons.com/) | 286 | MIT | [GitHub](https://github.com/feathericons/feather) |
 
 ## Folder Structure
 
@@ -22,7 +22,7 @@ tools/icon-generation/
     └── heroicons.json       # Heroicons in Iconify JSON format
 ```
 
-**Note:** Lucide icons use a `lucide.json` file located directly in `src/BlazorUI.Icons.Lucide/`.
+**Note:** Lucide icons use a `lucide.json` file located directly in `src/BlazorBlueprint.Icons.Lucide/`.
 
 ## Data Format
 
@@ -38,27 +38,27 @@ Each icon library has its own generation script that converts the JSON data into
 
 | Icon Library | Script | Output |
 |--------------|--------|--------|
-| Lucide | `src/BlazorUI.Icons.Lucide/GenerateIconData.ps1` | `Data/LucideIconData.cs` |
-| Heroicons | `src/BlazorUI.Icons.Heroicons/generate-icon-data.js` | `Data/HeroIconData.cs` |
-| Feather | `src/BlazorUI.Icons.Feather/generate-icon-data.js` | `Data/FeatherIconData.cs` |
+| Lucide | `src/BlazorBlueprint.Icons.Lucide/GenerateIconData.ps1` | `Data/LucideIconData.cs` |
+| Heroicons | `src/BlazorBlueprint.Icons.Heroicons/generate-icon-data.js` | `Data/HeroIconData.cs` |
+| Feather | `src/BlazorBlueprint.Icons.Feather/generate-icon-data.js` | `Data/FeatherIconData.cs` |
 
 ### Running the Scripts
 
 **Lucide (PowerShell):**
 ```powershell
-cd src/BlazorUI.Icons.Lucide
+cd src/BlazorBlueprint.Icons.Lucide
 ./GenerateIconData.ps1
 ```
 
 **Heroicons (Node.js):**
 ```bash
-cd src/BlazorUI.Icons.Heroicons
+cd src/BlazorBlueprint.Icons.Heroicons
 node generate-icon-data.js
 ```
 
 **Feather (Node.js):**
 ```bash
-cd src/BlazorUI.Icons.Feather
+cd src/BlazorBlueprint.Icons.Feather
 node generate-icon-data.js
 ```
 
@@ -67,7 +67,7 @@ node generate-icon-data.js
 To update to a newer version of an icon set:
 
 1. **Download the latest Iconify JSON** from the icon set's repository or [Iconify](https://github.com/iconify/icon-sets)
-2. **Replace the JSON file** in `tools/icon-generation/data/` (or `src/BlazorUI.Icons.Lucide/` for Lucide)
+2. **Replace the JSON file** in `tools/icon-generation/data/` (or `src/BlazorBlueprint.Icons.Lucide/` for Lucide)
 3. **Run the generation script** for that icon library
 4. **Test** that the icons render correctly
 5. **Commit** the updated JSON and generated C# files

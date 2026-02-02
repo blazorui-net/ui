@@ -1,0 +1,115 @@
+@namespace BlazorBlueprint.Primitives.Sheet
+@using BlazorBlueprint.Primitives.Utilities
+
+@*
+    SheetClose provides a button to close the sheet.
+    Can be used multiple times within a sheet (e.g., X button, Cancel button, etc.)
+*@
+
+@if (AsChild)
+{
+    @* When AsChild is true, pass trigger context to child for it to handle *@
+    <CascadingValue Value="TriggerContext" Name="TriggerContext">
+        @ChildContent
+    </CascadingValue>
+}
+else
+{
+    <button type="button"
+            @onclick="HandleClick"
+            @onkeydown="HandleKeyDown"
+            @attributes="AdditionalAttributes">
+        @ChildContent
+    </button>
+}
+
+@code {
+    [CascadingParameter]
+    private SheetContext Context { get; set; } = null!;
+
+    /// <summary>
+    /// The content to display inside the close button.
+    /// </summary>
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>
+    /// When true, the close does not render its own button element.
+    /// Instead, it passes trigger behavior via TriggerContext to child components.
+    /// Use this when you want a custom component (like Button) to act as the close button.
+    /// </summary>
+    [Parameter]
+    public bool AsChild { get; set; } = false;
+
+    /// <summary>
+    /// Additional attributes to apply to the close button element.
+    /// </summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    /// <summary>
+    /// Custom click handler. Called after the sheet is closed.
+    /// </summary>
+    [Parameter]
+    public EventCallback<MouseEventArgs> OnClick { get; set; }
+
+    /// <summary>
+    /// Whether to prevent the default close behavior.
+    /// When true, only the OnClick handler is invoked.
+    /// Default is false (sheet closes on click).
+    /// </summary>
+    [Parameter]
+    public bool PreventClose { get; set; } = false;
+
+    /// <summary>
+    /// Context passed to child components when AsChild is true.
+    /// For close buttons, we only provide Close (not Toggle) so the Button
+    /// knows this is a close-only action.
+    /// </summary>
+    private TriggerContext TriggerContext => new()
+    {
+        IsOpen = Context.IsOpen,
+        // Note: Toggle is intentionally null - this tells Button it's a close-only button
+        Close = () => Context.Close()
+    };
+
+    protected override void OnInitialized()
+    {
+        if (Context == null)
+        {
+            throw new InvalidOperationException(
+                "SheetClose must be used within a Sheet component. " +
+                "Ensure SheetClose is a child of a Sheet component.");
+        }
+    }
+
+    private async Task HandleClick(MouseEventArgs args)
+    {
+        if (!PreventClose)
+        {
+            Context.Close();
+        }
+
+        if (OnClick.HasDelegate)
+        {
+            await OnClick.InvokeAsync(args);
+        }
+    }
+
+    private async Task HandleKeyDown(KeyboardEventArgs args)
+    {
+        // Support Enter and Space for accessibility
+        if (args.Key == "Enter" || args.Key == " ")
+        {
+            if (!PreventClose)
+            {
+                Context.Close();
+            }
+
+            if (OnClick.HasDelegate)
+            {
+                await OnClick.InvokeAsync(new MouseEventArgs());
+            }
+        }
+    }
+}

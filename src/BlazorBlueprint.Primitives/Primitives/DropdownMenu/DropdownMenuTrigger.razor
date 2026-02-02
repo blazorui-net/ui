@@ -1,0 +1,191 @@
+@namespace BlazorBlueprint.Primitives.DropdownMenu
+@using BlazorBlueprint.Primitives.Utilities
+
+@* DropdownMenu trigger - opens the dropdown menu when clicked *@
+@if (AsChild)
+{
+    @* When AsChild is true, pass trigger context to child for it to handle *@
+    <CascadingValue Value="TriggerContext" Name="TriggerContext">
+        @ChildContent
+    </CascadingValue>
+}
+else
+{
+    <button type="button"
+            id="@Context.TriggerId"
+            @ref="@_triggerRef"
+            @onclick="HandleClick"
+            @onkeydown="HandleKeyDown"
+            @attributes="AdditionalAttributes"
+            aria-haspopup="menu"
+            aria-expanded="@Context.IsOpen.ToString().ToLower()"
+            aria-controls="@Context.ContentId">
+        @ChildContent
+    </button>
+}
+
+@code {
+    [CascadingParameter]
+    private DropdownMenuContext Context { get; set; } = null!;
+
+    private ElementReference _triggerRef;
+
+    /// <summary>
+    /// The content to display inside the trigger button.
+    /// </summary>
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>
+    /// When true, the trigger does not render its own button element.
+    /// Instead, it passes trigger behavior via TriggerContext to child components.
+    /// The child component must consume TriggerContext and apply click/aria behavior.
+    /// </summary>
+    [Parameter]
+    public bool AsChild { get; set; } = false;
+
+    /// <summary>
+    /// Additional attributes to apply to the trigger button element.
+    /// </summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    /// <summary>
+    /// Custom click handler. If provided, this is called in addition to the default toggle behavior.
+    /// </summary>
+    [Parameter]
+    public EventCallback<MouseEventArgs> OnClick { get; set; }
+
+    /// <summary>
+    /// Whether the trigger is disabled.
+    /// Default is false.
+    /// </summary>
+    [Parameter]
+    public bool Disabled { get; set; } = false;
+
+    /// <summary>
+    /// Whether to use custom click handling. When true, only OnClick is invoked.
+    /// Default is false (dropdown menu opens on click).
+    /// </summary>
+    [Parameter]
+    public bool CustomClickHandling { get; set; } = false;
+
+    /// <summary>
+    /// Stores the trigger element reference when using AsChild pattern.
+    /// </summary>
+    private ElementReference? _asChildTriggerRef;
+
+    /// <summary>
+    /// Context passed to child components when AsChild is true.
+    /// </summary>
+    private TriggerContext TriggerContext => new()
+    {
+        TriggerId = Context.TriggerId,
+        IsOpen = Context.IsOpen,
+        Toggle = () => Context.Toggle(_asChildTriggerRef),
+        Open = () => Context.Open(_asChildTriggerRef),
+        Close = () => Context.Close(),
+        AriaHasPopup = "menu",
+        AriaControls = Context.ContentId,
+        OnKeyDown = HandleKeyDownAsync,
+        SetTriggerElement = (ElementReference el) => _asChildTriggerRef = el
+    };
+
+    private async Task HandleClick(MouseEventArgs args)
+    {
+        if (Disabled) return;
+
+        if (CustomClickHandling && OnClick.HasDelegate)
+        {
+            // Custom handling only
+            await OnClick.InvokeAsync(args);
+        }
+        else
+        {
+            // Default: toggle dropdown menu and store trigger element for positioning
+            Context.Toggle(_triggerRef);
+
+            // Also invoke custom handler if provided
+            if (OnClick.HasDelegate)
+            {
+                await OnClick.InvokeAsync(args);
+            }
+        }
+    }
+
+    private void HandleKeyDown(KeyboardEventArgs args)
+    {
+        if (Disabled) return;
+
+        // Enter or Space to toggle
+        if (args.Key == "Enter" || args.Key == " ")
+        {
+            Context.Toggle(_triggerRef);
+        }
+        // Arrow Down to open and focus first item
+        else if (args.Key == "ArrowDown" && !Context.IsOpen)
+        {
+            Context.Open(_triggerRef);
+            Context.SetFocusedIndex(0);
+        }
+        // Arrow Up to open and focus last item
+        else if (args.Key == "ArrowUp" && !Context.IsOpen)
+        {
+            Context.Open(_triggerRef);
+            // Will be set to last item by DropdownMenuContent
+            Context.SetFocusedIndex(-1);
+        }
+    }
+
+    private Task HandleKeyDownAsync(KeyboardEventArgs args)
+    {
+        if (Disabled) return Task.CompletedTask;
+
+        // Enter or Space to toggle
+        if (args.Key == "Enter" || args.Key == " ")
+        {
+            Context.Toggle(_asChildTriggerRef);
+        }
+        // Arrow Down to open and focus first item
+        else if (args.Key == "ArrowDown" && !Context.IsOpen)
+        {
+            Context.Open(_asChildTriggerRef);
+            Context.SetFocusedIndex(0);
+        }
+        // Arrow Up to open and focus last item
+        else if (args.Key == "ArrowUp" && !Context.IsOpen)
+        {
+            Context.Open(_asChildTriggerRef);
+            Context.SetFocusedIndex(-1);
+        }
+        return Task.CompletedTask;
+    }
+
+    protected override void OnInitialized()
+    {
+        if (Context == null)
+        {
+            throw new InvalidOperationException(
+                "DropdownMenuTrigger must be used within a DropdownMenu component. " +
+                "Ensure DropdownMenuTrigger is a child of a DropdownMenu component.");
+        }
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        // Proactively set the trigger element reference so it's available
+        // even when the dropdown is opened programmatically (via @bind-Open)
+        // This runs after every render to ensure the reference stays current
+        if (!AsChild)
+        {
+            Context.SetTriggerElement(_triggerRef);
+        }
+        else if (_asChildTriggerRef.HasValue)
+        {
+            // When using AsChild pattern, the child component (e.g., Button) sets
+            // _asChildTriggerRef via TriggerContext.SetTriggerElement. We need to
+            // propagate this to the context so Content can position relative to it.
+            Context.SetTriggerElement(_asChildTriggerRef.Value);
+        }
+    }
+}

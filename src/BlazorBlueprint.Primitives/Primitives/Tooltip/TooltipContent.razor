@@ -1,0 +1,176 @@
+@namespace BlazorBlueprint.Primitives.Tooltip
+@using BlazorBlueprint.Primitives.Floating
+@using BlazorBlueprint.Primitives.Services
+@implements IAsyncDisposable
+
+@*
+    TooltipContent is the content container for the tooltip.
+    Uses FloatingPortal for portal/positioning infrastructure.
+    Maintains ARIA attributes for accessibility.
+*@
+
+@if (Context.IsOpen && Context.State.TriggerElement.HasValue)
+{
+    <FloatingPortal IsOpen="true"
+                    AnchorElement="@Context.State.TriggerElement"
+                    PortalId="@_portalId"
+                    Side="@EffectiveSide"
+                    Align="@EffectiveAlign"
+                    Offset="@Offset"
+                    Strategy="absolute"
+                    ZIndex="50"
+                    OnReady="@HandleFloatingReady">
+        @RenderTooltipContent()
+    </FloatingPortal>
+}
+
+@code {
+    [CascadingParameter]
+    private TooltipContext Context { get; set; } = null!;
+
+    /// <summary>
+    /// The content to render inside the tooltip.
+    /// </summary>
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>
+    /// Additional attributes to apply to the content container.
+    /// </summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    /// <summary>
+    /// Preferred side for positioning.
+    /// If not set, uses the Placement from the parent Tooltip context.
+    /// Default is Top.
+    /// </summary>
+    [Parameter]
+    public PopoverSide? Side { get; set; }
+
+    /// <summary>
+    /// Alignment relative to trigger.
+    /// If not set, uses the Placement from the parent Tooltip context.
+    /// Default is Center.
+    /// </summary>
+    [Parameter]
+    public PopoverAlign? Align { get; set; }
+
+    /// <summary>
+    /// Offset distance from the trigger element in pixels.
+    /// Default is 8.
+    /// </summary>
+    [Parameter]
+    public int Offset { get; set; } = 8;
+
+    private string _portalId = "";
+
+    /// <summary>
+    /// Gets the effective side for positioning.
+    /// Uses the explicit Side parameter if set, otherwise derives from context's Placement.
+    /// </summary>
+    private PopoverSide EffectiveSide
+    {
+        get
+        {
+            // If Side was explicitly set, use it
+            if (Side.HasValue)
+            {
+                return Side.Value;
+            }
+
+            // Otherwise, derive from context's Placement
+            var placement = Context?.Placement ?? "top";
+            var basePlacement = placement.Split('-')[0];
+
+            return basePlacement switch
+            {
+                "top" => PopoverSide.Top,
+                "bottom" => PopoverSide.Bottom,
+                "left" => PopoverSide.Left,
+                "right" => PopoverSide.Right,
+                _ => PopoverSide.Top
+            };
+        }
+    }
+
+    /// <summary>
+    /// Gets the effective alignment for positioning.
+    /// Uses the explicit Align parameter if set, otherwise derives from context's Placement.
+    /// </summary>
+    private PopoverAlign EffectiveAlign
+    {
+        get
+        {
+            // If Align was explicitly set, use it
+            if (Align.HasValue)
+            {
+                return Align.Value;
+            }
+
+            // Otherwise, derive from context's Placement
+            var placement = Context?.Placement ?? "top";
+            var parts = placement.Split('-');
+
+            if (parts.Length < 2)
+            {
+                return PopoverAlign.Center;
+            }
+
+            return parts[1] switch
+            {
+                "start" => PopoverAlign.Start,
+                "end" => PopoverAlign.End,
+                _ => PopoverAlign.Center
+            };
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        if (Context == null)
+        {
+            throw new InvalidOperationException(
+                "TooltipContent must be used within a Tooltip component. " +
+                "Ensure TooltipContent is a child of a Tooltip component.");
+        }
+
+        _portalId = $"tooltip-portal-{Context.TooltipId}";
+
+        // Subscribe to context changes
+        Context.OnStateChanged += HandleContextStateChanged;
+    }
+
+    private RenderFragment RenderTooltipContent() => __builder =>
+    {
+        <div id="@Context.TooltipId"
+             role="tooltip"
+             @attributes="AdditionalAttributes"
+             data-state="open">
+            @ChildContent
+        </div>
+    };
+
+    private Task HandleFloatingReady()
+    {
+        // Tooltip doesn't need any special setup after positioning
+        // (no click-outside or keyboard handling)
+        return Task.CompletedTask;
+    }
+
+    private void HandleContextStateChanged()
+    {
+        // When tooltip state changes, trigger re-render
+        _ = InvokeAsync(StateHasChanged);
+    }
+
+    public ValueTask DisposeAsync()
+    {
+        if (Context != null)
+        {
+            Context.OnStateChanged -= HandleContextStateChanged;
+        }
+
+        return ValueTask.CompletedTask;
+    }
+}

@@ -1,0 +1,427 @@
+@namespace BlazorBlueprint.Components.RangeSlider
+@using Microsoft.JSInterop
+@inject IJSRuntime JS
+@implements IAsyncDisposable
+
+<div @ref="_trackRef"
+     class="@CssClass"
+     tabindex="-1">
+    @* Track background *@
+    <div class="relative h-2 w-full grow overflow-hidden rounded-full bg-secondary">
+        @* Active range track *@
+        <div class="absolute h-full bg-primary"
+             style="left: @(StartPercentage)%; width: @(EndPercentage - StartPercentage)%;">
+        </div>
+    </div>
+
+    @* Start Thumb *@
+    <div data-thumb="start"
+         role="slider"
+         aria-label="@(StartLabel ?? "Range start")"
+         aria-valuemin="@Min"
+         aria-valuemax="@Max"
+         aria-valuenow="@StartValue"
+         aria-disabled="@Disabled"
+         tabindex="@(Disabled ? -1 : 0)"
+         class="@StartThumbClass"
+         style="left: @(StartPercentage)%;"
+         @onmousedown="@(e => StartThumbDrag(e))"
+         @onkeydown="@(e => HandleStartKeyDown(e))">
+        @if (ShowTooltips)
+        {
+            <div class="@TooltipClass">@FormatValue(StartValue)</div>
+        }
+    </div>
+
+    @* End Thumb *@
+    <div data-thumb="end"
+         role="slider"
+         aria-label="@(EndLabel ?? "Range end")"
+         aria-valuemin="@Min"
+         aria-valuemax="@Max"
+         aria-valuenow="@EndValue"
+         aria-disabled="@Disabled"
+         tabindex="@(Disabled ? -1 : 0)"
+         class="@EndThumbClass"
+         style="left: @(EndPercentage)%;"
+         @onmousedown="@(e => EndThumbDrag(e))"
+         @onkeydown="@(e => HandleEndKeyDown(e))">
+        @if (ShowTooltips)
+        {
+            <div class="@TooltipClass">@FormatValue(EndValue)</div>
+        }
+    </div>
+
+    @* Tick marks *@
+    @if (ShowTickMarks && TickValues != null)
+    {
+        @foreach (var tick in TickValues)
+        {
+            var tickPercent = ((tick - Min) / (Max - Min)) * 100;
+            <div class="absolute top-4 w-0.5 h-2 bg-muted-foreground/30"
+                 style="left: @(tickPercent)%; transform: translateX(-50%);">
+            </div>
+        }
+    }
+</div>
+
+@code {
+    private ElementReference _trackRef;
+    private IJSObjectReference? _jsModule;
+    private DotNetObjectReference<RangeSlider>? _dotNetRef;
+    private string _sliderId = Guid.NewGuid().ToString("N");
+    private bool _jsInitialized;
+
+    private double _internalStart;
+    private double _internalEnd;
+
+    /// <summary>
+    /// Gets or sets the range value as a tuple (Start, End).
+    /// </summary>
+    [Parameter]
+    public (double Start, double End) Value { get; set; }
+
+    /// <summary>
+    /// Callback when the value changes.
+    /// </summary>
+    [Parameter]
+    public EventCallback<(double Start, double End)> ValueChanged { get; set; }
+
+    /// <summary>
+    /// Gets or sets the default start value.
+    /// </summary>
+    [Parameter]
+    public double DefaultStart { get; set; } = 25;
+
+    /// <summary>
+    /// Gets or sets the default end value.
+    /// </summary>
+    [Parameter]
+    public double DefaultEnd { get; set; } = 75;
+
+    /// <summary>
+    /// Gets or sets the minimum value.
+    /// </summary>
+    [Parameter]
+    public double Min { get; set; } = 0;
+
+    /// <summary>
+    /// Gets or sets the maximum value.
+    /// </summary>
+    [Parameter]
+    public double Max { get; set; } = 100;
+
+    /// <summary>
+    /// Gets or sets the step increment.
+    /// </summary>
+    [Parameter]
+    public double Step { get; set; } = 1;
+
+    /// <summary>
+    /// Gets or sets the minimum gap between the two thumbs.
+    /// </summary>
+    [Parameter]
+    public double MinRange { get; set; } = 0;
+
+    /// <summary>
+    /// Gets or sets whether the slider is disabled.
+    /// </summary>
+    [Parameter]
+    public bool Disabled { get; set; }
+
+    /// <summary>
+    /// Gets or sets the orientation.
+    /// </summary>
+    [Parameter]
+    public RangeSliderOrientation Orientation { get; set; } = RangeSliderOrientation.Horizontal;
+
+    /// <summary>
+    /// Gets or sets whether to show value tooltips.
+    /// </summary>
+    [Parameter]
+    public bool ShowTooltips { get; set; }
+
+    /// <summary>
+    /// Gets or sets whether to show tick marks.
+    /// </summary>
+    [Parameter]
+    public bool ShowTickMarks { get; set; }
+
+    /// <summary>
+    /// Gets or sets custom tick values.
+    /// </summary>
+    [Parameter]
+    public double[]? TickValues { get; set; }
+
+    /// <summary>
+    /// Gets or sets additional CSS classes.
+    /// </summary>
+    [Parameter]
+    public string? Class { get; set; }
+
+    /// <summary>
+    /// Gets or sets the ARIA label for the start thumb.
+    /// </summary>
+    [Parameter]
+    public string? StartLabel { get; set; }
+
+    /// <summary>
+    /// Gets or sets the ARIA label for the end thumb.
+    /// </summary>
+    [Parameter]
+    public string? EndLabel { get; set; }
+
+    /// <summary>
+    /// Gets or sets a custom value formatter.
+    /// </summary>
+    [Parameter]
+    public Func<double, string>? FormatValueFunc { get; set; }
+
+    private bool IsControlled => ValueChanged.HasDelegate;
+    private double StartValue => IsControlled ? Value.Start : _internalStart;
+    private double EndValue => IsControlled ? Value.End : _internalEnd;
+    private double StartPercentage => ((StartValue - Min) / (Max - Min)) * 100;
+    private double EndPercentage => ((EndValue - Min) / (Max - Min)) * 100;
+
+    protected override void OnInitialized()
+    {
+        _internalStart = DefaultStart;
+        _internalEnd = DefaultEnd;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && !Disabled)
+        {
+            await InitializeJsAsync();
+        }
+    }
+
+    private async Task InitializeJsAsync()
+    {
+        if (_jsInitialized) return;
+
+        try
+        {
+            _jsModule = await JS.InvokeAsync<IJSObjectReference>("import",
+                "./_content/BlazorBlueprint.Components/js/range-slider.js");
+            _dotNetRef = DotNetObjectReference.Create(this);
+            await _jsModule.InvokeVoidAsync("initializeRangeSlider", _trackRef, _dotNetRef, _sliderId);
+            _jsInitialized = true;
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Failed to initialize range slider JS: {ex.Message}");
+        }
+    }
+
+    private async Task StartThumbDrag(MouseEventArgs e)
+    {
+        if (Disabled || _jsModule == null) return;
+        await _jsModule.InvokeVoidAsync("startDrag", _sliderId, "start");
+    }
+
+    private async Task EndThumbDrag(MouseEventArgs e)
+    {
+        if (Disabled || _jsModule == null) return;
+        await _jsModule.InvokeVoidAsync("startDrag", _sliderId, "end");
+    }
+
+    [JSInvokable]
+    public async Task UpdateValueFromPercentage(double percentage, string thumb)
+    {
+        if (Disabled) return;
+
+        if (double.IsNaN(percentage) || double.IsInfinity(percentage))
+            return;
+
+        percentage = Math.Max(0, Math.Min(1, percentage));
+        var newValue = Min + (percentage * (Max - Min));
+        newValue = Math.Round(newValue / Step) * Step;
+        newValue = Math.Max(Min, Math.Min(Max, newValue));
+
+        if (thumb == "start")
+        {
+            await SetStartValue(newValue);
+        }
+        else
+        {
+            await SetEndValue(newValue);
+        }
+    }
+
+    [JSInvokable]
+    public async Task HandleTrackClick(double percentage)
+    {
+        if (Disabled) return;
+
+        if (double.IsNaN(percentage) || double.IsInfinity(percentage))
+            return;
+
+        percentage = Math.Max(0, Math.Min(1, percentage));
+        var clickValue = Min + (percentage * (Max - Min));
+
+        // Determine which thumb is closer
+        var distToStart = Math.Abs(clickValue - StartValue);
+        var distToEnd = Math.Abs(clickValue - EndValue);
+
+        if (distToStart <= distToEnd)
+        {
+            await UpdateValueFromPercentage(percentage, "start");
+        }
+        else
+        {
+            await UpdateValueFromPercentage(percentage, "end");
+        }
+    }
+
+    private async Task SetStartValue(double value)
+    {
+        // Enforce MinRange and don't cross end
+        var maxStart = EndValue - MinRange;
+        value = Math.Min(value, maxStart);
+        value = Math.Max(Min, value);
+
+        if (IsControlled)
+        {
+            await ValueChanged.InvokeAsync((value, EndValue));
+        }
+        else
+        {
+            _internalStart = value;
+            StateHasChanged();
+        }
+    }
+
+    private async Task SetEndValue(double value)
+    {
+        // Enforce MinRange and don't cross start
+        var minEnd = StartValue + MinRange;
+        value = Math.Max(value, minEnd);
+        value = Math.Min(Max, value);
+
+        if (IsControlled)
+        {
+            await ValueChanged.InvokeAsync((StartValue, value));
+        }
+        else
+        {
+            _internalEnd = value;
+            StateHasChanged();
+        }
+    }
+
+    private async Task HandleStartKeyDown(KeyboardEventArgs e)
+    {
+        if (Disabled) return;
+
+        var largeStep = (Max - Min) / 10;
+
+        switch (e.Key)
+        {
+            case "ArrowRight":
+            case "ArrowUp":
+                await SetStartValue(StartValue + Step);
+                break;
+            case "ArrowLeft":
+            case "ArrowDown":
+                await SetStartValue(StartValue - Step);
+                break;
+            case "PageUp":
+                await SetStartValue(StartValue + largeStep);
+                break;
+            case "PageDown":
+                await SetStartValue(StartValue - largeStep);
+                break;
+            case "Home":
+                await SetStartValue(Min);
+                break;
+            case "End":
+                await SetStartValue(EndValue - MinRange);
+                break;
+        }
+    }
+
+    private async Task HandleEndKeyDown(KeyboardEventArgs e)
+    {
+        if (Disabled) return;
+
+        var largeStep = (Max - Min) / 10;
+
+        switch (e.Key)
+        {
+            case "ArrowRight":
+            case "ArrowUp":
+                await SetEndValue(EndValue + Step);
+                break;
+            case "ArrowLeft":
+            case "ArrowDown":
+                await SetEndValue(EndValue - Step);
+                break;
+            case "PageUp":
+                await SetEndValue(EndValue + largeStep);
+                break;
+            case "PageDown":
+                await SetEndValue(EndValue - largeStep);
+                break;
+            case "Home":
+                await SetEndValue(StartValue + MinRange);
+                break;
+            case "End":
+                await SetEndValue(Max);
+                break;
+        }
+    }
+
+    private string FormatValue(double value)
+    {
+        if (FormatValueFunc != null)
+            return FormatValueFunc(value);
+
+        return value.ToString("F0");
+    }
+
+    private string CssClass => BlazorBlueprint.Components.Utilities.ClassNames.cn(
+        "relative flex w-full touch-none select-none items-center",
+        Disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer",
+        Class
+    );
+
+    private string ThumbBaseClass => BlazorBlueprint.Components.Utilities.ClassNames.cn(
+        "absolute block h-5 w-5 rounded-full border-2 border-primary bg-background ring-offset-background transition-colors",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+        "disabled:pointer-events-none disabled:opacity-50",
+        "-translate-x-1/2 top-1/2 -translate-y-1/2",
+        Disabled ? "" : "cursor-grab active:cursor-grabbing"
+    );
+
+    private string StartThumbClass => BlazorBlueprint.Components.Utilities.ClassNames.cn(
+        ThumbBaseClass,
+        "z-10"
+    );
+
+    private string EndThumbClass => BlazorBlueprint.Components.Utilities.ClassNames.cn(
+        ThumbBaseClass,
+        "z-20"
+    );
+
+    private string TooltipClass => BlazorBlueprint.Components.Utilities.ClassNames.cn(
+        "absolute -top-8 left-1/2 -translate-x-1/2",
+        "px-2 py-1 text-xs bg-primary text-primary-foreground rounded",
+        "whitespace-nowrap"
+    );
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_jsModule != null && _jsInitialized)
+        {
+            try
+            {
+                await _jsModule.InvokeVoidAsync("disposeRangeSlider", _sliderId);
+                await _jsModule.DisposeAsync();
+            }
+            catch { }
+        }
+        _dotNetRef?.Dispose();
+    }
+}

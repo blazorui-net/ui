@@ -1,0 +1,232 @@
+@namespace BlazorBlueprint.Components.ContextMenu
+@inject IJSRuntime JSRuntime
+@implements IAsyncDisposable
+
+@if (Context?.IsOpen == true)
+{
+    <div class="fixed inset-0 z-40"
+         @onclick="HandleOverlayClick"
+         @onclick:stopPropagation="true"
+         @oncontextmenu="HandleOverlayClose"
+         @oncontextmenu:preventDefault="true"></div>
+    <div @ref="_contentRef"
+         class="@CssClass"
+         style="position: fixed; left: @(Context.X)px; top: @(Context.Y)px; z-index: 50;"
+         @onclick:stopPropagation="true"
+         @onkeydown="HandleKeyDown"
+         @onkeydown:preventDefault="true"
+         @oncontextmenu:preventDefault="true"
+         tabindex="-1"
+         data-autofocus
+         role="menu">
+        <div class="p-1">
+            @ChildContent
+        </div>
+    </div>
+}
+
+@code {
+    [CascadingParameter]
+    public ContextMenu? Context { get; set; }
+
+    [Parameter]
+    public string? Class { get; set; }
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    [Parameter]
+    public bool Loop { get; set; } = true;
+
+    private ElementReference _contentRef;
+    private bool _wasClosed = true;
+    private IJSObjectReference? _portalModule;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (Context?.IsOpen == true && _wasClosed)
+        {
+            _wasClosed = false;
+            try
+            {
+                // Load portal module and trigger autofocus
+                _portalModule ??= await JSRuntime.InvokeAsync<IJSObjectReference>(
+                    "import", "./_content/BlazorBlueprint.Primitives/js/primitives/portal.js");
+                await _portalModule.InvokeVoidAsync("triggerAutofocus", _contentRef);
+            }
+            catch
+            {
+                // Ignore errors during prerendering
+            }
+        }
+        else if (Context?.IsOpen != true)
+        {
+            _wasClosed = true;
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_portalModule != null)
+        {
+            await _portalModule.DisposeAsync();
+        }
+    }
+
+    private async Task HandleOverlayClick()
+    {
+        if (Context != null)
+        {
+            await Context.Close();
+        }
+    }
+
+    private async Task HandleOverlayClose(MouseEventArgs e)
+    {
+        if (Context != null)
+        {
+            await Context.Close();
+        }
+    }
+
+    private async Task HandleKeyDown(KeyboardEventArgs e)
+    {
+        if (Context == null) return;
+
+        switch (e.Key)
+        {
+            case "Escape":
+                await Context.Close();
+                break;
+
+            case "ArrowDown":
+                await NavigateNext();
+                break;
+
+            case "ArrowUp":
+                await NavigatePrevious();
+                break;
+
+            case "Home":
+                await FocusFirst();
+                break;
+
+            case "End":
+                await FocusLast();
+                break;
+        }
+    }
+
+    private async Task NavigateNext()
+    {
+        if (Context == null) return;
+
+        var items = Context.GetMenuItems();
+        var enabledItems = items.Where(i => !i.IsDisabled).ToList();
+        if (enabledItems.Count == 0) return;
+
+        var currentIndex = Context.FocusedIndex;
+        int nextIndex;
+
+        if (currentIndex == -1)
+        {
+            nextIndex = 0;
+        }
+        else
+        {
+            var currentItem = currentIndex < items.Count ? items[currentIndex] : null;
+            var enabledIndex = currentItem != null ? enabledItems.IndexOf(currentItem) : -1;
+
+            if (enabledIndex == -1)
+            {
+                nextIndex = 0;
+            }
+            else if (enabledIndex == enabledItems.Count - 1)
+            {
+                nextIndex = Loop ? 0 : enabledIndex;
+            }
+            else
+            {
+                nextIndex = enabledIndex + 1;
+            }
+        }
+
+        await FocusEnabledItem(enabledItems, items, nextIndex);
+    }
+
+    private async Task NavigatePrevious()
+    {
+        if (Context == null) return;
+
+        var items = Context.GetMenuItems();
+        var enabledItems = items.Where(i => !i.IsDisabled).ToList();
+        if (enabledItems.Count == 0) return;
+
+        var currentIndex = Context.FocusedIndex;
+        int prevIndex;
+
+        if (currentIndex == -1)
+        {
+            prevIndex = enabledItems.Count - 1;
+        }
+        else
+        {
+            var currentItem = currentIndex < items.Count ? items[currentIndex] : null;
+            var enabledIndex = currentItem != null ? enabledItems.IndexOf(currentItem) : -1;
+
+            if (enabledIndex == -1)
+            {
+                prevIndex = enabledItems.Count - 1;
+            }
+            else if (enabledIndex == 0)
+            {
+                prevIndex = Loop ? enabledItems.Count - 1 : 0;
+            }
+            else
+            {
+                prevIndex = enabledIndex - 1;
+            }
+        }
+
+        await FocusEnabledItem(enabledItems, items, prevIndex);
+    }
+
+    private async Task FocusFirst()
+    {
+        if (Context == null) return;
+
+        var items = Context.GetMenuItems();
+        var enabledItems = items.Where(i => !i.IsDisabled).ToList();
+        if (enabledItems.Count == 0) return;
+
+        await FocusEnabledItem(enabledItems, items, 0);
+    }
+
+    private async Task FocusLast()
+    {
+        if (Context == null) return;
+
+        var items = Context.GetMenuItems();
+        var enabledItems = items.Where(i => !i.IsDisabled).ToList();
+        if (enabledItems.Count == 0) return;
+
+        await FocusEnabledItem(enabledItems, items, enabledItems.Count - 1);
+    }
+
+    private async Task FocusEnabledItem(List<ContextMenuItem> enabledItems, List<ContextMenuItem> allItems, int enabledIndex)
+    {
+        if (enabledIndex < 0 || enabledIndex >= enabledItems.Count) return;
+
+        var item = enabledItems[enabledIndex];
+        var absoluteIndex = allItems.IndexOf(item);
+
+        Context!.SetFocusedIndex(absoluteIndex);
+        await item.FocusAsync();
+    }
+
+    private string CssClass => BlazorBlueprint.Components.Utilities.ClassNames.cn(
+        "min-w-[8rem] overflow-hidden rounded-md border bg-popover text-popover-foreground shadow-md outline-none",
+        "animate-in fade-in-0 zoom-in-95",
+        Class
+    );
+}

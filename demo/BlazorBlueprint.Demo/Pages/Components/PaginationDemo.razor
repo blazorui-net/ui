@@ -1,0 +1,266 @@
+@page "/components/pagination"
+@using BlazorBlueprint.Components.Pagination
+@using BlazorBlueprint.Components.Separator
+@using BlazorBlueprint.Primitives.Table
+
+<PageTitle>Pagination Component - BlazorBlueprint</PageTitle>
+
+<div class="space-y-8 max-w-4xl">
+    <div>
+        <div class="space-y-3">
+            <h1 class="text-4xl font-bold tracking-tight">Pagination Component</h1>
+            <p class="text-xl text-muted-foreground">
+                Pagination with page navigation, previous and next controls, and optional state management.
+            </p>
+        </div>
+    </div>
+
+    <!-- Basic Example -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Basic Example</h2>
+            <p class="text-sm text-muted-foreground">
+                A simple pagination component with page numbers using manual state management.
+            </p>
+        </div>
+        <Pagination>
+            <PaginationContent>
+                <PaginationItem>
+                    <PaginationPrevious OnClick="@(() => GoToPage(_currentPage - 1))" Disabled="@(_currentPage <= 1)" />
+                </PaginationItem>
+                @for (int i = 1; i <= 5; i++)
+                {
+                    var page = i;
+                    <PaginationItem>
+                        <PaginationLink IsActive="@(_currentPage == page)" OnClick="@(() => GoToPage(page))">@(page)</PaginationLink>
+                    </PaginationItem>
+                }
+                <PaginationItem>
+                    <PaginationNext OnClick="@(() => GoToPage(_currentPage + 1))" Disabled="@(_currentPage >= 5)" />
+                </PaginationItem>
+            </PaginationContent>
+        </Pagination>
+        <p class="text-sm text-muted-foreground text-center">Current page: @_currentPage</p>
+    </div>
+
+    <!-- With Ellipsis -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">With Ellipsis</h2>
+            <p class="text-sm text-muted-foreground">
+                Show ellipsis for large page ranges.
+            </p>
+        </div>
+        <Pagination>
+            <PaginationContent>
+                <PaginationItem>
+                    <PaginationPrevious />
+                </PaginationItem>
+                <PaginationItem>
+                    <PaginationLink IsActive="true">1</PaginationLink>
+                </PaginationItem>
+                <PaginationItem>
+                    <PaginationLink>2</PaginationLink>
+                </PaginationItem>
+                <PaginationItem>
+                    <PaginationEllipsis />
+                </PaginationItem>
+                <PaginationItem>
+                    <PaginationLink>9</PaginationLink>
+                </PaginationItem>
+                <PaginationItem>
+                    <PaginationLink>10</PaginationLink>
+                </PaginationItem>
+                <PaginationItem>
+                    <PaginationNext />
+                </PaginationItem>
+            </PaginationContent>
+        </Pagination>
+    </div>
+
+    <!-- State-Managed Pagination -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">State-Managed Pagination</h2>
+            <p class="text-sm text-muted-foreground">
+                Use <code class="bg-muted px-1 py-0.5 rounded">PaginationState</code> for automatic state management.
+                Navigation buttons automatically enable/disable and update state.
+            </p>
+        </div>
+        <Pagination State="@_paginationState"
+                    OnPageChanged="HandlePageChanged"
+                    Class="flex items-center justify-between">
+            <PaginationInfo />
+            <PaginationContent>
+                <PaginationItem>
+                    <PaginationFirst />
+                </PaginationItem>
+                <PaginationItem>
+                    <PaginationPrevious ShowText="false" />
+                </PaginationItem>
+                <PaginationItem>
+                    <PaginationPageDisplay />
+                </PaginationItem>
+                <PaginationItem>
+                    <PaginationNext ShowText="false" />
+                </PaginationItem>
+                <PaginationItem>
+                    <PaginationLast />
+                </PaginationItem>
+            </PaginationContent>
+        </Pagination>
+    </div>
+
+    <!-- Full Table Pagination Style -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Table Pagination Style</h2>
+            <p class="text-sm text-muted-foreground">
+                Full-featured pagination with page size selector, ideal for data tables.
+            </p>
+        </div>
+        <Pagination State="@_tablePaginationState"
+                    PageSizes="@(new[] { 5, 10, 20, 50 })"
+                    OnPageChanged="HandleTablePageChanged"
+                    OnPageSizeChanged="HandleTablePageSizeChanged"
+                    Class="flex items-center justify-between px-2 py-4 border rounded-lg">
+            <PaginationInfo />
+            <PaginationContent Class="flex items-center gap-6 lg:gap-8">
+                <PaginationPageSizeSelector />
+                <div class="flex items-center gap-2">
+                    <PaginationPageDisplay />
+                    <div class="flex items-center gap-1">
+                        <PaginationItem><PaginationFirst /></PaginationItem>
+                        <PaginationItem><PaginationPrevious ShowText="false" /></PaginationItem>
+                        <PaginationItem><PaginationNext ShowText="false" /></PaginationItem>
+                        <PaginationItem><PaginationLast /></PaginationItem>
+                    </div>
+                </div>
+            </PaginationContent>
+        </Pagination>
+    </div>
+
+    <!-- Customized Labels -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Customized Labels</h2>
+            <p class="text-sm text-muted-foreground">
+                Customize labels and formats for internationalization or different use cases.
+            </p>
+        </div>
+        <Pagination State="@_customPaginationState"
+                    Class="flex items-center justify-between px-2 py-4 border rounded-lg">
+            <PaginationInfo Format="Items {0} to {1} (Total: {2})" EmptyText="No data available" />
+            <PaginationContent Class="flex items-center gap-4">
+                <PaginationPageSizeSelector Label="Items per page" ShowLabel="true" />
+                <PaginationPageDisplay Format="{0} / {1}" />
+                <div class="flex items-center gap-1">
+                    <PaginationItem><PaginationFirst /></PaginationItem>
+                    <PaginationItem><PaginationPrevious ShowText="false" /></PaginationItem>
+                    <PaginationItem><PaginationNext ShowText="false" /></PaginationItem>
+                    <PaginationItem><PaginationLast /></PaginationItem>
+                </div>
+            </PaginationContent>
+        </Pagination>
+    </div>
+
+    <!-- API Reference -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">API Reference</h2>
+        </div>
+        <div class="border rounded-lg p-6 space-y-4">
+            <div>
+                <h3 class="font-semibold mb-2">Core Components</h3>
+                <div class="space-y-2 text-sm">
+                    <p><code class="bg-muted px-1 py-0.5 rounded">Pagination</code> - Container with optional State for automatic management</p>
+                    <p><code class="bg-muted px-1 py-0.5 rounded">PaginationContent</code> - List container</p>
+                    <p><code class="bg-muted px-1 py-0.5 rounded">PaginationItem</code> - Individual item wrapper</p>
+                    <p><code class="bg-muted px-1 py-0.5 rounded">PaginationLink</code> - Page number link</p>
+                    <p><code class="bg-muted px-1 py-0.5 rounded">PaginationEllipsis</code> - Ellipsis indicator</p>
+                </div>
+            </div>
+            <Separator />
+            <div>
+                <h3 class="font-semibold mb-2">Navigation Components</h3>
+                <div class="space-y-2 text-sm">
+                    <p><code class="bg-muted px-1 py-0.5 rounded">PaginationFirst</code> - First page button (auto-disables at start)</p>
+                    <p><code class="bg-muted px-1 py-0.5 rounded">PaginationPrevious</code> - Previous page button (ShowText, Text parameters)</p>
+                    <p><code class="bg-muted px-1 py-0.5 rounded">PaginationNext</code> - Next page button (ShowText, Text parameters)</p>
+                    <p><code class="bg-muted px-1 py-0.5 rounded">PaginationLast</code> - Last page button (auto-disables at end)</p>
+                </div>
+            </div>
+            <Separator />
+            <div>
+                <h3 class="font-semibold mb-2">Info Components</h3>
+                <div class="space-y-2 text-sm">
+                    <p><code class="bg-muted px-1 py-0.5 rounded">PaginationInfo</code> - Shows "Showing X-Y of Z" (Format, EmptyText parameters)</p>
+                    <p><code class="bg-muted px-1 py-0.5 rounded">PaginationPageDisplay</code> - Shows "Page X of Y" (Format parameter)</p>
+                    <p><code class="bg-muted px-1 py-0.5 rounded">PaginationPageSizeSelector</code> - Page size dropdown (Label, ShowLabel, PageSizes parameters)</p>
+                </div>
+            </div>
+            <Separator />
+            <div>
+                <h3 class="font-semibold mb-2">Pagination Parameters</h3>
+                <div class="space-y-2 text-sm">
+                    <p><strong>State:</strong> <code class="bg-muted px-1 py-0.5 rounded">PaginationState?</code> - Optional state for automatic management</p>
+                    <p><strong>PageSizes:</strong> <code class="bg-muted px-1 py-0.5 rounded">int[]</code> - Available page size options (default: 10, 20, 50, 100)</p>
+                    <p><strong>OnPageChanged:</strong> <code class="bg-muted px-1 py-0.5 rounded">EventCallback&lt;int&gt;</code> - Callback when page changes</p>
+                    <p><strong>OnPageSizeChanged:</strong> <code class="bg-muted px-1 py-0.5 rounded">EventCallback&lt;int&gt;</code> - Callback when page size changes</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private int _currentPage = 1;
+
+    // State-managed pagination
+    private PaginationState _paginationState = new()
+    {
+        CurrentPage = 1,
+        PageSize = 10,
+        TotalItems = 100
+    };
+
+    // Table-style pagination
+    private PaginationState _tablePaginationState = new()
+    {
+        CurrentPage = 1,
+        PageSize = 10,
+        TotalItems = 253
+    };
+
+    // Custom labels pagination
+    private PaginationState _customPaginationState = new()
+    {
+        CurrentPage = 1,
+        PageSize = 20,
+        TotalItems = 500
+    };
+
+    private void GoToPage(int page)
+    {
+        if (page >= 1 && page <= 5)
+        {
+            _currentPage = page;
+        }
+    }
+
+    private void HandlePageChanged(int page)
+    {
+        // State is already updated automatically
+        StateHasChanged();
+    }
+
+    private void HandleTablePageChanged(int page)
+    {
+        StateHasChanged();
+    }
+
+    private void HandleTablePageSizeChanged(int pageSize)
+    {
+        StateHasChanged();
+    }
+}

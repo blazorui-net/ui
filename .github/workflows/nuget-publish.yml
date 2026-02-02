@@ -79,24 +79,24 @@ jobs:
           # Determine project path and display name
           case $PACKAGE in
             primitives)
-              echo "project_path=src/BlazorUI.Primitives/BlazorUI.Primitives.csproj" >> $GITHUB_OUTPUT
-              echo "display_name=BlazorUI.Primitives" >> $GITHUB_OUTPUT
+              echo "project_path=src/BlazorBlueprint.Primitives/BlazorBlueprint.Primitives.csproj" >> $GITHUB_OUTPUT
+              echo "display_name=BlazorBlueprint.Primitives" >> $GITHUB_OUTPUT
               ;;
             components)
-              echo "project_path=src/BlazorUI.Components/BlazorUI.Components.csproj" >> $GITHUB_OUTPUT
-              echo "display_name=BlazorUI.Components" >> $GITHUB_OUTPUT
+              echo "project_path=src/BlazorBlueprint.Components/BlazorBlueprint.Components.csproj" >> $GITHUB_OUTPUT
+              echo "display_name=BlazorBlueprint.Components" >> $GITHUB_OUTPUT
               ;;
             icons-lucide)
-              echo "project_path=src/BlazorUI.Icons.Lucide/BlazorUI.Icons.Lucide.csproj" >> $GITHUB_OUTPUT
-              echo "display_name=BlazorUI.Icons.Lucide" >> $GITHUB_OUTPUT
+              echo "project_path=src/BlazorBlueprint.Icons.Lucide/BlazorBlueprint.Icons.Lucide.csproj" >> $GITHUB_OUTPUT
+              echo "display_name=BlazorBlueprint.Icons.Lucide" >> $GITHUB_OUTPUT
               ;;
             icons-heroicons)
-              echo "project_path=src/BlazorUI.Icons.Heroicons/BlazorUI.Icons.Heroicons.csproj" >> $GITHUB_OUTPUT
-              echo "display_name=BlazorUI.Icons.Heroicons" >> $GITHUB_OUTPUT
+              echo "project_path=src/BlazorBlueprint.Icons.Heroicons/BlazorBlueprint.Icons.Heroicons.csproj" >> $GITHUB_OUTPUT
+              echo "display_name=BlazorBlueprint.Icons.Heroicons" >> $GITHUB_OUTPUT
               ;;
             icons-feather)
-              echo "project_path=src/BlazorUI.Icons.Feather/BlazorUI.Icons.Feather.csproj" >> $GITHUB_OUTPUT
-              echo "display_name=BlazorUI.Icons.Feather" >> $GITHUB_OUTPUT
+              echo "project_path=src/BlazorBlueprint.Icons.Feather/BlazorBlueprint.Icons.Feather.csproj" >> $GITHUB_OUTPUT
+              echo "display_name=BlazorBlueprint.Icons.Feather" >> $GITHUB_OUTPUT
               ;;
             *)
               echo "Unknown package: $PACKAGE"

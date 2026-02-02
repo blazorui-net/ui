@@ -1,13 +1,13 @@
 #!/bin/bash
 
-# Release script for BlazorUI.Primitives
+# Release script for BlazorBlueprint.Primitives
 # Usage: ./scripts/release-primitives.sh <version>
 # Example: ./scripts/release-primitives.sh 1.6.2
 
 set -e  # Exit on error
 
 PACKAGE_NAME="primitives"
-PROJECT_PATH="src/BlazorUI.Primitives"
+PROJECT_PATH="src/BlazorBlueprint.Primitives"
 COLOR_GREEN='\033[0;32m'
 COLOR_RED='\033[0;31m'
 COLOR_YELLOW='\033[1;33m'
@@ -68,7 +68,7 @@ fi
 echo -e "${COLOR_YELLOW}═══════════════════════════════════════════════════${COLOR_RESET}"
 echo -e "${COLOR_YELLOW}Release Summary${COLOR_RESET}"
 echo -e "${COLOR_YELLOW}═══════════════════════════════════════════════════${COLOR_RESET}"
-echo -e "Package:  ${COLOR_GREEN}BlazorUI.Primitives${COLOR_RESET}"
+echo -e "Package:  ${COLOR_GREEN}BlazorBlueprint.Primitives${COLOR_RESET}"
 echo -e "Version:  ${COLOR_GREEN}${VERSION}${COLOR_RESET}"
 echo -e "Branch:   ${COLOR_CYAN}${RELEASE_BRANCH}${COLOR_RESET}"
 echo -e "Tag:      ${COLOR_GREEN}${TAG_NAME}${COLOR_RESET}"
@@ -94,7 +94,7 @@ git checkout -b "$RELEASE_BRANCH"
 # Create and push tag
 echo ""
 echo -e "${COLOR_GREEN}Creating tag: $TAG_NAME${COLOR_RESET}"
-git tag -a "$TAG_NAME" -m "Release BlazorUI.Primitives v${VERSION}"
+git tag -a "$TAG_NAME" -m "Release BlazorBlueprint.Primitives v${VERSION}"
 
 echo -e "${COLOR_GREEN}Pushing release branch and tag to GitHub...${COLOR_RESET}"
 git push origin "$RELEASE_BRANCH"
@@ -111,7 +111,7 @@ if [ $COMMITS_MADE -gt 0 ]; then
         --body "$(cat <<EOF
 ## Release Changes
 
-This PR merges changes made during the release of **BlazorUI.Primitives v${VERSION}** back to main.
+This PR merges changes made during the release of **BlazorBlueprint.Primitives v${VERSION}** back to main.
 
 **Commits made during release:** $COMMITS_MADE
 
@@ -140,5 +140,5 @@ echo "  2. Pack the NuGet package"
 echo "  3. Publish to NuGet.org"
 echo ""
 echo "Monitor the workflow at:"
-echo "  https://github.com/blazorui-net/ui/actions"
+echo "  https://github.com/blazorblueprintui/ui/actions"
 echo ""

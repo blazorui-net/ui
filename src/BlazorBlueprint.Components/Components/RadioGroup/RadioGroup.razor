@@ -1,0 +1,13 @@
+@typeparam TValue
+@namespace BlazorBlueprint.Components.RadioGroup
+@using BlazorBlueprint.Primitives.RadioGroup
+
+<BlazorBlueprint.Primitives.RadioGroup.RadioGroup TValue="TValue"
+    Value="@Value"
+    ValueChanged="@HandleValueChanged"
+    Disabled="@Disabled"
+    AriaLabel="@AriaLabel"
+    class="@CssClass"
+    aria-invalid="@(IsInvalid ? "true" : null)">
+    @ChildContent
+</BlazorBlueprint.Primitives.RadioGroup.RadioGroup>

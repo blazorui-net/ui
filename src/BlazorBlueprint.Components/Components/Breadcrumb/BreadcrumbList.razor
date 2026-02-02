@@ -1,0 +1,11 @@
+@namespace BlazorBlueprint.Components.Breadcrumb
+
+@* BreadcrumbList is optional - items can be placed directly in Breadcrumb *@
+<CascadingValue Value="this" IsFixed="true">
+    @ChildContent
+</CascadingValue>
+
+@code {
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+}

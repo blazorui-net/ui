@@ -1,0 +1,185 @@
+@namespace BlazorBlueprint.Primitives.Table
+@typeparam TData where TData : class
+@inject IJSRuntime JSRuntime
+@implements IAsyncDisposable
+
+<tr @ref="_elementRef"
+    role="row"
+    aria-selected="@(IsSelected ? "true" : "false")"
+    tabindex="@(IsKeyboardNavigable ? 0 : -1)"
+    class="@ComputedClass"
+    @onclick="HandleClick"
+    @onkeydown="HandleKeyDown"
+    @attributes="AdditionalAttributes">
+    @ChildContent
+</tr>
+
+@code {
+    private ElementReference _elementRef;
+    private bool _spaceKeyHandlerAttached = false;
+    private IJSObjectReference? _tableRowNavModule;
+    private IJSObjectReference? _spaceKeyCleanup;
+
+    [CascadingParameter]
+    private TableContext<TData> Context { get; set; } = default!;
+
+    /// <summary>
+    /// The data item for this row.
+    /// </summary>
+    [Parameter]
+    public TData? Item { get; set; }
+
+    /// <summary>
+    /// Child content for the row (typically TableCell components).
+    /// </summary>
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>
+    /// Additional CSS classes to apply to the tr element.
+    /// </summary>
+    [Parameter]
+    public string? Class { get; set; }
+
+    /// <summary>
+    /// Additional attributes to apply to the tr element.
+    /// </summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private bool IsSelected => Item != null && Context != null && Context.IsSelected(Item);
+
+    private bool IsSelectable => Context != null && Context.SelectionMode != SelectionMode.None;
+
+    private bool IsKeyboardNavigable => IsSelectable && Context != null && Context.EnableKeyboardNavigation;
+
+    /// <summary>
+    /// Focus ring classes for keyboard navigation visibility.
+    /// Uses focus: instead of focus-visible: because programmatic focus via JS .focus()
+    /// doesn't always trigger focus-visible in browsers.
+    /// Includes relative positioning to ensure ring renders properly on tr elements.
+    /// </summary>
+    private const string FocusRingClasses = "relative focus:outline-none focus:ring-2 focus:ring-ring focus:ring-inset focus:z-10";
+
+    /// <summary>
+    /// Computed class that includes focus ring when row is keyboard navigable
+    /// </summary>
+    private string ComputedClass => IsKeyboardNavigable ? $"{FocusRingClasses} {Class}" : Class ?? "";
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && IsKeyboardNavigable && !_spaceKeyHandlerAttached)
+        {
+            try
+            {
+                // Lazy-load the table row navigation module
+                _tableRowNavModule ??= await JSRuntime.InvokeAsync<IJSObjectReference>(
+                    "import", "./_content/BlazorBlueprint.Primitives/js/primitives/table-row-nav.js");
+
+                // Attach event listener in capture phase to prevent Space from scrolling
+                // This runs before Blazor's event handler, allowing us to preventDefault
+                _spaceKeyCleanup = await _tableRowNavModule.InvokeAsync<IJSObjectReference>(
+                    "preventSpaceKeyScroll", _elementRef);
+                _spaceKeyHandlerAttached = true;
+            }
+            catch
+            {
+                // Silently fail during prerendering
+            }
+        }
+    }
+
+    private void HandleClick()
+    {
+        if (Item != null && IsSelectable)
+        {
+            Context.ToggleRowSelection(Item);
+        }
+    }
+
+    private async Task HandleKeyDown(KeyboardEventArgs e)
+    {
+        // Arrow key navigation only works when keyboard navigation is enabled
+        if (IsKeyboardNavigable)
+        {
+            switch (e.Key)
+            {
+                case "ArrowUp":
+                    await MoveFocusToPreviousRow();
+                    return;
+
+                case "ArrowDown":
+                    await MoveFocusToNextRow();
+                    return;
+            }
+        }
+
+        // Enter/Space selection works when row is selectable (even without keyboard nav)
+        if (IsSelectable && Item != null)
+        {
+            switch (e.Key)
+            {
+                case "Enter":
+                case " ":
+                    Context.ToggleRowSelection(Item);
+                    break;
+            }
+        }
+    }
+
+    private async Task MoveFocusToPreviousRow()
+    {
+        try
+        {
+            _tableRowNavModule ??= await JSRuntime.InvokeAsync<IJSObjectReference>(
+                "import", "./_content/BlazorBlueprint.Primitives/js/primitives/table-row-nav.js");
+            await _tableRowNavModule.InvokeVoidAsync("moveFocusToPreviousRow", _elementRef);
+        }
+        catch
+        {
+            // Ignore JS interop errors (e.g., during prerendering)
+        }
+    }
+
+    private async Task MoveFocusToNextRow()
+    {
+        try
+        {
+            _tableRowNavModule ??= await JSRuntime.InvokeAsync<IJSObjectReference>(
+                "import", "./_content/BlazorBlueprint.Primitives/js/primitives/table-row-nav.js");
+            await _tableRowNavModule.InvokeVoidAsync("moveFocusToNextRow", _elementRef);
+        }
+        catch
+        {
+            // Ignore JS interop errors (e.g., during prerendering)
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_spaceKeyCleanup != null)
+        {
+            try
+            {
+                await _spaceKeyCleanup.InvokeVoidAsync("dispose");
+                await _spaceKeyCleanup.DisposeAsync();
+            }
+            catch
+            {
+                // Ignore disposal errors
+            }
+        }
+
+        if (_tableRowNavModule != null)
+        {
+            try
+            {
+                await _tableRowNavModule.DisposeAsync();
+            }
+            catch
+            {
+                // Ignore disposal errors
+            }
+        }
+    }
+}

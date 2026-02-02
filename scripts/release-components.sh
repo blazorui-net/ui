@@ -1,37 +1,37 @@
 #!/bin/bash
 
-# Release script for BlazorUI.Components
+# Release script for BlazorBlueprint.Components
 # Usage: ./scripts/release-components.sh <version>
 # Example: ./scripts/release-components.sh 1.7.0
 
 set -e  # Exit on error
 
 PACKAGE_NAME="components"
-PROJECT_PATH="src/BlazorUI.Components"
+PROJECT_PATH="src/BlazorBlueprint.Components"
 COLOR_GREEN='\033[0;32m'
 COLOR_RED='\033[0;31m'
 COLOR_YELLOW='\033[1;33m'
 COLOR_CYAN='\033[0;36m'
 COLOR_RESET='\033[0m'
-CSPROJ="$PROJECT_PATH/BlazorUI.Components.csproj"
+CSPROJ="$PROJECT_PATH/BlazorBlueprint.Components.csproj"
 
 COMMITS_MADE=0
 
 # Get latest Primitives version from NuGet
 get_latest_primitives_version() {
-  local URL="https://api.nuget.org/v3-flatcontainer/blazorui.primitives/index.json"
+  local URL="https://api.nuget.org/v3-flatcontainer/BlazorBlueprint.Primitives/index.json"
   curl -s "$URL" | grep -o '"[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*"' | tail -1 | tr -d '"'
 }
 
 # Get current Primitives version from Components.csproj
 get_current_primitives_version() {
-  grep 'Include="BlazorUI.Primitives"' "$CSPROJ" | grep -o 'Version="[^"]*"' | cut -d'"' -f2
+  grep 'Include="BlazorBlueprint.Primitives"' "$CSPROJ" | grep -o 'Version="[^"]*"' | cut -d'"' -f2
 }
 
 # Update Primitives version in Components.csproj
 update_primitives_version() {
   local NEW_VERSION=$1
-  sed -i "s/Include=\"BlazorUI.Primitives\" Version=\"[^\"]*\"/Include=\"BlazorUI.Primitives\" Version=\"$NEW_VERSION\"/" "$CSPROJ"
+  sed -i "s/Include=\"BlazorBlueprint.Primitives\" Version=\"[^\"]*\"/Include=\"BlazorBlueprint.Primitives\" Version=\"$NEW_VERSION\"/" "$CSPROJ"
 }
 
 # Check if version argument is provided
@@ -60,22 +60,22 @@ if [ ! -d "$PROJECT_PATH" ]; then
     exit 1
 fi
 
-# Check for uncommitted changes (excluding blazorui.css which we handle automatically)
-CSS_FILE="$PROJECT_PATH/wwwroot/blazorui.css"
+# Check for uncommitted changes (excluding blazorblueprint.css which we handle automatically)
+CSS_FILE="$PROJECT_PATH/wwwroot/blazorblueprint.css"
 OTHER_CHANGES=$(git diff-index --name-only HEAD -- | grep -v "^$CSS_FILE$" || true)
 
 if [ -n "$OTHER_CHANGES" ]; then
     echo -e "${COLOR_RED}Error: You have uncommitted changes${COLOR_RESET}"
     echo "Please commit or stash your changes before creating a release"
     echo ""
-    echo "Uncommitted files (excluding blazorui.css which is handled automatically):"
+    echo "Uncommitted files (excluding blazorblueprint.css which is handled automatically):"
     echo "$OTHER_CHANGES" | sed 's/^/  /'
     exit 1
 fi
 
 # If CSS has uncommitted changes, note it (will be handled during release)
 if ! git diff --quiet -- "$CSS_FILE" 2>/dev/null; then
-    echo -e "${COLOR_YELLOW}Note: blazorui.css has uncommitted changes - will be rebuilt and committed during release${COLOR_RESET}"
+    echo -e "${COLOR_YELLOW}Note: blazorblueprint.css has uncommitted changes - will be rebuilt and committed during release${COLOR_RESET}"
 fi
 
 # Check if tag already exists
@@ -94,12 +94,12 @@ fi
 
 # Check Primitives version
 echo ""
-echo "Checking BlazorUI.Primitives version..."
+echo "Checking BlazorBlueprint.Primitives version..."
 LATEST_PRIMITIVES=$(get_latest_primitives_version)
 CURRENT_PRIMITIVES=$(get_current_primitives_version)
 
 echo ""
-echo -e "${COLOR_YELLOW}BlazorUI.Primitives Dependency${COLOR_RESET}"
+echo -e "${COLOR_YELLOW}BlazorBlueprint.Primitives Dependency${COLOR_RESET}"
 echo "   Current (in csproj): $CURRENT_PRIMITIVES"
 echo "   Latest (on NuGet):   $LATEST_PRIMITIVES"
 echo ""
@@ -118,7 +118,7 @@ echo ""
 echo -e "${COLOR_YELLOW}═══════════════════════════════════════════════════${COLOR_RESET}"
 echo -e "${COLOR_YELLOW}Release Summary${COLOR_RESET}"
 echo -e "${COLOR_YELLOW}═══════════════════════════════════════════════════${COLOR_RESET}"
-echo -e "Package:     ${COLOR_GREEN}BlazorUI.Components${COLOR_RESET}"
+echo -e "Package:     ${COLOR_GREEN}BlazorBlueprint.Components${COLOR_RESET}"
 echo -e "Version:     ${COLOR_GREEN}${VERSION}${COLOR_RESET}"
 echo -e "Branch:      ${COLOR_CYAN}${RELEASE_BRANCH}${COLOR_RESET}"
 echo -e "Tag:         ${COLOR_GREEN}${TAG_NAME}${COLOR_RESET}"
@@ -145,10 +145,10 @@ git checkout -b "$RELEASE_BRANCH"
 # Update Primitives version if requested
 if [ "$WILL_UPDATE_PRIMITIVES" = true ]; then
     echo ""
-    echo -e "${COLOR_CYAN}Updating BlazorUI.Primitives to $LATEST_PRIMITIVES...${COLOR_RESET}"
+    echo -e "${COLOR_CYAN}Updating BlazorBlueprint.Primitives to $LATEST_PRIMITIVES...${COLOR_RESET}"
     update_primitives_version "$LATEST_PRIMITIVES"
     git add "$CSPROJ"
-    git commit -m "chore: bump BlazorUI.Primitives to $LATEST_PRIMITIVES"
+    git commit -m "chore: bump BlazorBlueprint.Primitives to $LATEST_PRIMITIVES"
     COMMITS_MADE=$((COMMITS_MADE + 1))
     echo -e "${COLOR_GREEN}✓ Updated and committed Primitives version${COLOR_RESET}"
 fi
@@ -161,22 +161,22 @@ cd "$PROJECT_PATH"
 # Detect OS and use appropriate Tailwind CLI
 if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "win32" ]]; then
     # Windows (Git Bash/MSYS)
-    ../../tools/tailwindcss.exe -i wwwroot/css/blazorui-input.css -o wwwroot/blazorui.css --minify
+    ../../tools/tailwindcss.exe -i wwwroot/css/blazorblueprint-input.css -o wwwroot/blazorblueprint.css --minify
 else
     # Linux/macOS
-    npx --yes @tailwindcss/cli@4.1.16 -i wwwroot/css/blazorui-input.css -o wwwroot/blazorui.css --minify
+    npx --yes @tailwindcss/cli@4.1.16 -i wwwroot/css/blazorblueprint-input.css -o wwwroot/blazorblueprint.css --minify
 fi
 
 cd - > /dev/null
 
 # Check if CSS has any changes (content or line endings) and commit if needed
 # Use git status instead of git diff to catch line-ending changes
-CSS_STATUS=$(git status --porcelain -- "$PROJECT_PATH/wwwroot/blazorui.css")
+CSS_STATUS=$(git status --porcelain -- "$PROJECT_PATH/wwwroot/blazorblueprint.css")
 if [ -n "$CSS_STATUS" ]; then
     echo ""
     echo -e "${COLOR_YELLOW}CSS needs updating, committing...${COLOR_RESET}"
-    git add "$PROJECT_PATH/wwwroot/blazorui.css"
-    git commit -m "chore: rebuild blazorui.css for v${VERSION}"
+    git add "$PROJECT_PATH/wwwroot/blazorblueprint.css"
+    git commit -m "chore: rebuild blazorblueprint.css for v${VERSION}"
     COMMITS_MADE=$((COMMITS_MADE + 1))
     echo -e "${COLOR_GREEN}✓ CSS rebuilt and committed${COLOR_RESET}"
 else
@@ -186,7 +186,7 @@ fi
 # Create and push tag
 echo ""
 echo -e "${COLOR_GREEN}Creating tag: $TAG_NAME${COLOR_RESET}"
-git tag -a "$TAG_NAME" -m "Release BlazorUI.Components v${VERSION}"
+git tag -a "$TAG_NAME" -m "Release BlazorBlueprint.Components v${VERSION}"
 
 echo -e "${COLOR_GREEN}Pushing release branch and tag to GitHub...${COLOR_RESET}"
 git push origin "$RELEASE_BRANCH"
@@ -203,7 +203,7 @@ if [ $COMMITS_MADE -gt 0 ]; then
         --body "$(cat <<EOF
 ## Release Changes
 
-This PR merges changes made during the release of **BlazorUI.Components v${VERSION}** back to main.
+This PR merges changes made during the release of **BlazorBlueprint.Components v${VERSION}** back to main.
 
 **Commits made during release:** $COMMITS_MADE
 
@@ -235,7 +235,7 @@ echo "  2. Pack the NuGet package"
 echo "  3. Publish to NuGet.org"
 echo ""
 echo "Monitor the workflow at:"
-echo "  https://github.com/blazorui-net/ui/actions"
+echo "  https://github.com/blazorblueprintui/ui/actions"
 echo ""
 if [ $COMMITS_MADE -gt 0 ]; then
     echo -e "${COLOR_YELLOW}Remember to merge the PR to bring release changes back to main!${COLOR_RESET}"

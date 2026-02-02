@@ -1,0 +1,52 @@
+@namespace BlazorBlueprint.Components.Pagination
+
+<div class="@CssClass">
+    @if (Context?.State != null)
+    {
+        var state = Context.State;
+        @if (state.TotalItems > 0)
+        {
+            <span>@string.Format(Format, state.FirstItemIndex, state.LastItemIndex, state.TotalItems)</span>
+        }
+        else
+        {
+            <span>@EmptyText</span>
+        }
+    }
+    else
+    {
+        @ChildContent
+    }
+</div>
+
+@code {
+    [CascadingParameter]
+    private PaginationContext? Context { get; set; }
+
+    [Parameter]
+    public string? Class { get; set; }
+
+    /// <summary>
+    /// Format string for displaying item range. Use {0} for start, {1} for end, {2} for total.
+    /// Default: "Showing {0}-{1} of {2}"
+    /// </summary>
+    [Parameter]
+    public string Format { get; set; } = "Showing {0}-{1} of {2}";
+
+    /// <summary>
+    /// Text to display when there are no items. Default: "No items"
+    /// </summary>
+    [Parameter]
+    public string EmptyText { get; set; } = "No items";
+
+    /// <summary>
+    /// Custom content to display when not using pagination state.
+    /// </summary>
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    private string CssClass => BlazorBlueprint.Components.Utilities.ClassNames.cn(
+        "flex-1 text-sm text-muted-foreground",
+        Class
+    );
+}

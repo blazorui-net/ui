@@ -1,0 +1,12 @@
+@namespace BlazorBlueprint.Primitives.Collapsible
+
+@* CollapsibleContent primitive - collapsible content region *@
+@if (_shouldRender)
+{
+    <div role="region"
+         data-state="@(Context?.Open ?? false ? "open" : "closed")"
+         aria-hidden="@(!(Context?.Open ?? false))"
+         @attributes="AdditionalAttributes">
+        @ChildContent
+    </div>
+}

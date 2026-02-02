@@ -1,21 +1,21 @@
-# BlazorUI Theming Guide
+# BlazorBlueprint Theming Guide
 
-BlazorUI uses CSS custom properties (variables) for theming, following the [shadcn/ui](https://ui.shadcn.com) design system. This allows complete customization of colors, typography, and sizing without modifying component code.
+BlazorBlueprint uses CSS custom properties (variables) for theming, following the [shadcn/ui](https://ui.shadcn.com) design system. This allows complete customization of colors, typography, and sizing without modifying component code.
 
 ## Quick Start
 
 1. Create a theme CSS file (e.g., `wwwroot/styles/themes/my-theme.css`)
 2. Define CSS variables for `:root` (light mode) and `.dark` (dark mode)
-3. Load your theme **before** `blazorui.css`:
+3. Load your theme **before** `blazorblueprint.css`:
 
 ```html
 <link href="styles/themes/my-theme.css" rel="stylesheet" />
-<link href="_content/BlazorUI.Components/blazorui.css" rel="stylesheet" />
+<link href="_content/BlazorBlueprint.Components/blazorblueprint.css" rel="stylesheet" />
 ```
 
 ## Color Format
 
-BlazorUI uses the [OKLCH color space](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/oklch) for perceptually uniform colors:
+BlazorBlueprint uses the [OKLCH color space](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/oklch) for perceptually uniform colors:
 
 ```css
 --primary: oklch(0.205 0 0);
@@ -378,7 +378,7 @@ Here's a complete theme file with all variables:
 
 ## Dark Mode
 
-BlazorUI uses class-based dark mode. Add the `dark` class to the `<html>` element to enable dark mode:
+BlazorBlueprint uses class-based dark mode. Add the `dark` class to the `<html>` element to enable dark mode:
 
 ```html
 <html class="dark">

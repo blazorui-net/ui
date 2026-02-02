@@ -1,0 +1,87 @@
+@namespace BlazorBlueprint.Components.Menubar
+@implements IMenubarItem
+@implements IDisposable
+
+<div @ref="_itemRef"
+     role="menuitem"
+     class="@CssClass"
+     tabindex="-1"
+     @onclick="HandleClick"
+     @onkeydown="HandleKeyDown"
+     @onkeydown:preventDefault="true">
+    @ChildContent
+</div>
+
+@code {
+    [CascadingParameter]
+    public MenubarMenu? Menu { get; set; }
+
+    [Parameter]
+    public string? Class { get; set; }
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    [Parameter]
+    public bool Disabled { get; set; }
+
+    [Parameter]
+    public bool Inset { get; set; }
+
+    [Parameter]
+    public EventCallback OnClick { get; set; }
+
+    private ElementReference _itemRef;
+
+    public bool IsDisabled => Disabled;
+
+    protected override void OnInitialized()
+    {
+        Menu?.RegisterMenuItem(this);
+    }
+
+    public async Task FocusAsync()
+    {
+        try
+        {
+            await _itemRef.FocusAsync();
+        }
+        catch
+        {
+            // Ignore focus errors
+        }
+    }
+
+    private async Task HandleClick()
+    {
+        if (!Disabled)
+        {
+            await OnClick.InvokeAsync();
+            Menu?.Close();
+        }
+    }
+
+    private async Task HandleKeyDown(KeyboardEventArgs e)
+    {
+        if (Disabled) return;
+
+        if (e.Key == "Enter" || e.Key == " ")
+        {
+            await HandleClick();
+        }
+    }
+
+    public void Dispose()
+    {
+        Menu?.UnregisterMenuItem(this);
+    }
+
+    private string CssClass => BlazorBlueprint.Components.Utilities.ClassNames.cn(
+        "relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none",
+        "focus:bg-accent focus:text-accent-foreground",
+        "hover:bg-accent hover:text-accent-foreground",
+        Disabled ? "pointer-events-none opacity-50" : null,
+        Inset ? "pl-8" : null,
+        Class
+    );
+}

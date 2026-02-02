@@ -1,0 +1,81 @@
+@namespace BlazorBlueprint.Components.Pagination
+@using BlazorBlueprint.Icons.Lucide.Components
+
+<PaginationLink Href="@Href"
+                Size="@EffectiveSize"
+                Class="@CssClass"
+                Disabled="@IsDisabled"
+                OnClick="HandleClick">
+    @if (ShowText)
+    {
+        <span>@Text</span>
+    }
+    else
+    {
+        <span class="sr-only">@Text</span>
+    }
+    <LucideIcon Name="chevron-right" Class="h-4 w-4" />
+</PaginationLink>
+
+@code {
+    [CascadingParameter]
+    private PaginationContext? Context { get; set; }
+
+    [Parameter]
+    public string? Href { get; set; }
+
+    /// <summary>
+    /// Explicitly disable the button. When null, automatically determined from pagination state.
+    /// </summary>
+    [Parameter]
+    public bool? Disabled { get; set; }
+
+    [Parameter]
+    public string? Class { get; set; }
+
+    /// <summary>
+    /// Custom click handler. When using pagination state, navigation is automatic.
+    /// </summary>
+    [Parameter]
+    public EventCallback OnClick { get; set; }
+
+    /// <summary>
+    /// Whether to show the text label. Default: true
+    /// </summary>
+    [Parameter]
+    public bool ShowText { get; set; } = true;
+
+    /// <summary>
+    /// Custom text for the button. Default: "Next"
+    /// </summary>
+    [Parameter]
+    public string Text { get; set; } = "Next";
+
+    /// <summary>
+    /// Size of the pagination link. Default: PaginationLinkSize.Default
+    /// </summary>
+    [Parameter]
+    public PaginationLinkSize Size { get; set; } = PaginationLinkSize.Default;
+
+    private bool IsDisabled => Disabled ?? (Context?.State != null && !Context.State.CanGoNext);
+
+    private PaginationLinkSize EffectiveSize => ShowText ? Size : PaginationLinkSize.Icon;
+
+    private async Task HandleClick()
+    {
+        if (Context?.State != null)
+        {
+            Context.State.NextPage();
+            if (Context.OnPageChanged != null)
+                await Context.OnPageChanged(Context.State.CurrentPage);
+        }
+
+        if (OnClick.HasDelegate)
+            await OnClick.InvokeAsync();
+    }
+
+    private string CssClass => BlazorBlueprint.Components.Utilities.ClassNames.cn(
+        ShowText ? "gap-1 pr-2.5" : "h-8 w-8",
+        Class
+    );
+}

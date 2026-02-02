@@ -1,13 +1,13 @@
 #!/bin/bash
 
-# Release script for BlazorUI.Icons.Heroicons
+# Release script for BlazorBlueprint.Icons.Heroicons
 # Usage: ./scripts/release-icons-heroicons.sh <version>
 # Example: ./scripts/release-icons-heroicons.sh 1.0.0-beta.4
 
 set -e  # Exit on error
 
 PACKAGE_NAME="icons-heroicons"
-PROJECT_PATH="src/BlazorUI.Icons.Heroicons"
+PROJECT_PATH="src/BlazorBlueprint.Icons.Heroicons"
 COLOR_GREEN='\033[0;32m'
 COLOR_RED='\033[0;31m'
 COLOR_YELLOW='\033[1;33m'
@@ -57,7 +57,7 @@ fi
 echo -e "${COLOR_YELLOW}═══════════════════════════════════════════════════${COLOR_RESET}"
 echo -e "${COLOR_YELLOW}Release Summary${COLOR_RESET}"
 echo -e "${COLOR_YELLOW}═══════════════════════════════════════════════════${COLOR_RESET}"
-echo -e "Package:  ${COLOR_GREEN}BlazorUI.Icons.Heroicons${COLOR_RESET}"
+echo -e "Package:  ${COLOR_GREEN}BlazorBlueprint.Icons.Heroicons${COLOR_RESET}"
 echo -e "Version:  ${COLOR_GREEN}${VERSION}${COLOR_RESET}"
 echo -e "Tag:      ${COLOR_GREEN}${TAG_NAME}${COLOR_RESET}"
 echo -e "${COLOR_YELLOW}═══════════════════════════════════════════════════${COLOR_RESET}"
@@ -74,7 +74,7 @@ fi
 # Create and push tag
 echo ""
 echo -e "${COLOR_GREEN}Creating tag: $TAG_NAME${COLOR_RESET}"
-git tag -a "$TAG_NAME" -m "Release BlazorUI.Icons.Heroicons v${VERSION}"
+git tag -a "$TAG_NAME" -m "Release BlazorBlueprint.Icons.Heroicons v${VERSION}"
 
 echo -e "${COLOR_GREEN}Pushing tag to GitHub...${COLOR_RESET}"
 git push origin "$TAG_NAME"
@@ -90,5 +90,5 @@ echo "  2. Pack the NuGet package"
 echo "  3. Publish to NuGet.org"
 echo ""
 echo "Monitor the workflow at:"
-echo "  https://github.com/blazorui-net/ui/actions"
+echo "  https://github.com/blazorblueprintui/ui/actions"
 echo ""

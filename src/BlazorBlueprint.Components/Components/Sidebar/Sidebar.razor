@@ -1,0 +1,29 @@
+@namespace BlazorBlueprint.Components.Sidebar
+@using BlazorBlueprint.Components.Utilities
+@using BlazorBlueprint.Components.Sheet
+@using BlazorBlueprint.Primitives.Sheet
+
+@*
+    Main Sidebar component that renders as a Sheet on mobile and a sidebar on desktop.
+    Provides the container for all sidebar content.
+*@
+
+@if (Context != null)
+{
+    @if (Context.IsMobile)
+    {
+        @* Mobile: Render as Sheet *@
+        <BlazorBlueprint.Components.Sheet.Sheet Open="@MobileOpen" OpenChanged="@(value => MobileOpen = value)" Side="@GetSheetSide()">
+            <BlazorBlueprint.Components.Sheet.SheetContent Class="@GetMobileClasses()" ShowClose="false">
+                @ChildContent
+            </BlazorBlueprint.Components.Sheet.SheetContent>
+        </BlazorBlueprint.Components.Sheet.Sheet>
+    }
+    else
+    {
+        @* Desktop: Render as sidebar *@
+        <aside class="@GetDesktopClasses()" @attributes="AdditionalAttributes" data-state="@GetDataState()" data-collapsible="@(Collapsible ? (!Context.Open ? "icon" : "none") : "none")" data-variant="@Context.Variant.ToString().ToLowerInvariant()" data-side="@Context.Side.ToString().ToLowerInvariant()">
+            @ChildContent
+        </aside>
+    }
+}

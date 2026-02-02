@@ -1,0 +1,69 @@
+@namespace BlazorBlueprint.Components.ScrollArea
+
+<div class="@CssClass" style="@ContainerStyle">
+    <div class="@ComputedViewportClass">
+        @ChildContent
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public string? Class { get; set; }
+
+    [Parameter]
+    public string? ViewportClass { get; set; }
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    [Parameter]
+    public ScrollAreaType Type { get; set; } = ScrollAreaType.Hover;
+
+    [Parameter]
+    public ScrollAreaOrientation Orientation { get; set; } = ScrollAreaOrientation.Vertical;
+
+    [Parameter]
+    public string? Height { get; set; }
+
+    [Parameter]
+    public string? MaxHeight { get; set; }
+
+    private string ContainerStyle
+    {
+        get
+        {
+            var styles = new List<string>();
+            if (!string.IsNullOrEmpty(Height))
+                styles.Add($"height: {Height}");
+            if (!string.IsNullOrEmpty(MaxHeight))
+                styles.Add($"max-height: {MaxHeight}");
+            return string.Join("; ", styles);
+        }
+    }
+
+    private string CssClass => BlazorBlueprint.Components.Utilities.ClassNames.cn(
+        "relative",
+        Class
+    );
+
+    private string ScrollbarClass => Type switch
+    {
+        ScrollAreaType.Always => "[&::-webkit-scrollbar]:w-2.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-border",
+        ScrollAreaType.Hover => "[&::-webkit-scrollbar]:w-2.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:opacity-0 hover:[&::-webkit-scrollbar-thumb]:opacity-100",
+        ScrollAreaType.Hidden => "scrollbar-none [&::-webkit-scrollbar]:hidden",
+        _ => "[&::-webkit-scrollbar]:w-2.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-border"
+    };
+
+    private string ComputedViewportClass => BlazorBlueprint.Components.Utilities.ClassNames.cn(
+        "h-full w-full rounded-[inherit]",
+        Orientation switch
+        {
+            ScrollAreaOrientation.Vertical => "overflow-y-auto overflow-x-hidden",
+            ScrollAreaOrientation.Horizontal => "overflow-x-auto overflow-y-hidden",
+            ScrollAreaOrientation.Both => "overflow-auto",
+            _ => "overflow-y-auto overflow-x-hidden"
+        },
+        ScrollbarClass,
+        ViewportClass
+    );
+}

@@ -1,0 +1,14 @@
+@namespace BlazorBlueprint.Components.Switch
+@using BlazorBlueprint.Primitives.Switch
+
+<BlazorBlueprint.Primitives.Switch.Switch Checked="@Checked"
+                 CheckedChanged="@HandleCheckedChanged"
+                 Disabled="@Disabled"
+                 Id="@Id"
+                 aria-label="@AriaLabel"
+                 aria-required="@(CheckedExpression != null ? "true" : null)"
+                 aria-invalid="@(IsInvalid ? "true" : null)"
+                 class="@CssClass">
+    <span data-state="@(Checked ? "checked" : "unchecked")" class="@ThumbCssClass">
+    </span>
+</BlazorBlueprint.Primitives.Switch.Switch>

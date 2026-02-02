@@ -1,0 +1,26 @@
+@namespace BlazorBlueprint.Components.Breadcrumb
+@using BlazorBlueprint.Icons.Lucide.Components
+
+<li role="presentation" aria-hidden="true" class="@CssClass">
+    @if (ChildContent != null)
+    {
+        @ChildContent
+    }
+    else
+    {
+        <LucideIcon Name="chevron-right" Class="h-3.5 w-3.5" />
+    }
+</li>
+
+@code {
+    [Parameter]
+    public string? Class { get; set; }
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    private string CssClass => BlazorBlueprint.Components.Utilities.ClassNames.cn(
+        "[&>svg]:w-3.5 [&>svg]:h-3.5",
+        Class
+    );
+}

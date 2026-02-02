@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to BlazorUI are documented in this file.
+All notable changes to BlazorBlueprint are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
@@ -162,7 +162,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - DayClass and CellClass parameters for Calendar component - allows custom styling of day buttons and cells
 
 ### Changed
-- License changed from MIT to Apache 2.0 for BlazorUI.Components and BlazorUI.Primitives (icon libraries remain MIT)
+- License changed from MIT to Apache 2.0 for BlazorBlueprint.Components and BlazorBlueprint.Primitives (icon libraries remain MIT)
 - Added NOTICE file with attribution requirements for derivative works
 - Combobox and MultiSelect focus mechanism replaced with event-based approach using OnContentReady
 - MultiSelect search box styling now matches Combobox for visual consistency
@@ -190,8 +190,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 - RichTextEditor rewritten to use Quill.js v2 in headless mode with custom Blazor toolbar
-- RichTextEditor now uses BlazorUI components (NativeSelect, Dialog, Toggle, Button) instead of raw HTML elements
-- Link insertion uses BlazorUI Dialog instead of browser prompt for consistent UX
+- RichTextEditor now uses BlazorBlueprint components (NativeSelect, Dialog, Toggle, Button) instead of raw HTML elements
+- Link insertion uses BlazorBlueprint Dialog instead of browser prompt for consistent UX
 
 ### Fixed
 - RichTextEditor block format removal now preserves inline formatting (bold, italic, etc.)

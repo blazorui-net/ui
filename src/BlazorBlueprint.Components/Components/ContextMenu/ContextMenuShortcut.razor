@@ -1,0 +1,18 @@
+@namespace BlazorBlueprint.Components.ContextMenu
+
+<span class="@CssClass">
+    @ChildContent
+</span>
+
+@code {
+    [Parameter]
+    public string? Class { get; set; }
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    private string CssClass => BlazorBlueprint.Components.Utilities.ClassNames.cn(
+        "ml-auto text-xs tracking-widest opacity-60",
+        Class
+    );
+}

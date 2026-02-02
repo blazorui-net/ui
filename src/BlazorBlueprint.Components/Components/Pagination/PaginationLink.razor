@@ -1,0 +1,61 @@
+@namespace BlazorBlueprint.Components.Pagination
+
+@if (string.IsNullOrEmpty(Href))
+{
+    <button type="button"
+            aria-current="@(IsActive ? "page" : null)"
+            disabled="@Disabled"
+            class="@CssClass"
+            @onclick="HandleClick">
+        @ChildContent
+    </button>
+}
+else
+{
+    <a href="@Href"
+       aria-current="@(IsActive ? "page" : null)"
+       class="@CssClass">
+        @ChildContent
+    </a>
+}
+
+@code {
+    [Parameter]
+    public string? Href { get; set; }
+
+    [Parameter]
+    public bool IsActive { get; set; }
+
+    [Parameter]
+    public bool Disabled { get; set; }
+
+    [Parameter]
+    public PaginationLinkSize Size { get; set; } = PaginationLinkSize.Icon;
+
+    [Parameter]
+    public string? Class { get; set; }
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    [Parameter]
+    public EventCallback OnClick { get; set; }
+
+    private async Task HandleClick()
+    {
+        if (!Disabled)
+        {
+            await OnClick.InvokeAsync();
+        }
+    }
+
+    private string CssClass => BlazorBlueprint.Components.Utilities.ClassNames.cn(
+        "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+        IsActive
+            ? "border border-input bg-background hover:bg-accent hover:text-accent-foreground"
+            : "hover:bg-accent hover:text-accent-foreground",
+        Size == PaginationLinkSize.Default ? "h-10 px-4 py-2" : "h-10 w-10",
+        Disabled ? "pointer-events-none opacity-50" : null,
+        Class
+    );
+}

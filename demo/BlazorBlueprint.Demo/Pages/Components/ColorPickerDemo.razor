@@ -1,0 +1,177 @@
+@page "/components/color-picker"
+@using BlazorBlueprint.Components.ColorPicker
+
+<PageTitle>ColorPicker Component - BlazorBlueprint</PageTitle>
+
+<div class="space-y-8 max-w-4xl">
+    <div>
+        <div class="space-y-3">
+            <h1 class="text-4xl font-bold tracking-tight">ColorPicker Component</h1>
+            <p class="text-xl text-muted-foreground">
+                A visual color selection component with hex/RGB input, preset colors, and optional alpha channel.
+            </p>
+        </div>
+    </div>
+
+    <!-- Basic Example -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Basic Example</h2>
+            <p class="text-sm text-muted-foreground">
+                Select a color using the visual picker or enter a hex value.
+            </p>
+        </div>
+        <ColorPicker @bind-Value="_basicColor" />
+        <p class="text-sm text-muted-foreground">Selected: @_basicColor</p>
+        <div class="h-16 w-32 rounded-md border border-input"
+             style="background-color: @_basicColor;">
+        </div>
+    </div>
+
+    <!-- With Alpha Channel -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">With Alpha Channel</h2>
+            <p class="text-sm text-muted-foreground">
+                Enable transparency selection with the alpha slider.
+            </p>
+        </div>
+        <ColorPicker @bind-Value="_alphaColor" ShowAlpha="true" />
+        <p class="text-sm text-muted-foreground">Selected: @_alphaColor</p>
+        <div class="h-16 w-32 rounded-md border border-input"
+             style="background: @_alphaColor, url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2216%22 height=%2216%22 fill-opacity=%22.1%22><rect x=%220%22 y=%220%22 width=%228%22 height=%228%22 fill=%22%23000%22/><rect x=%228%22 y=%228%22 width=%228%22 height=%228%22 fill=%22%23000%22/></svg>');">
+        </div>
+    </div>
+
+    <!-- Without Presets -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Without Presets</h2>
+            <p class="text-sm text-muted-foreground">
+                Preset color swatches are hidden.
+            </p>
+        </div>
+        <ColorPicker @bind-Value="_noPresetsColor" ShowPresets="false" />
+        <p class="text-sm text-muted-foreground">Selected: @_noPresetsColor</p>
+    </div>
+
+    <!-- Custom Presets -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Custom Presets</h2>
+            <p class="text-sm text-muted-foreground">
+                Brand colors as presets.
+            </p>
+        </div>
+        <ColorPicker @bind-Value="_customPresetsColor"
+                     PresetColors="@_brandColors" />
+        <p class="text-sm text-muted-foreground">Selected: @_customPresetsColor</p>
+    </div>
+
+    <!-- Without Inputs -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Without Inputs</h2>
+            <p class="text-sm text-muted-foreground">
+                Visual picker only, no hex/RGB inputs.
+            </p>
+        </div>
+        <ColorPicker @bind-Value="_noInputsColor" ShowInputs="false" />
+        <p class="text-sm text-muted-foreground">Selected: @_noInputsColor</p>
+    </div>
+
+    <!-- Pre-selected Color -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Pre-selected Color</h2>
+            <p class="text-sm text-muted-foreground">
+                Initialized with a specific color.
+            </p>
+        </div>
+        <ColorPicker @bind-Value="_preselectedColor" />
+        <p class="text-sm text-muted-foreground">Selected: @_preselectedColor</p>
+    </div>
+
+    <!-- Multiple Pickers -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Foreground & Background</h2>
+            <p class="text-sm text-muted-foreground">
+                Common pattern for selecting text and background colors.
+            </p>
+        </div>
+        <div class="flex items-center gap-4">
+            <div>
+                <label class="text-sm font-medium mb-1 block">Foreground</label>
+                <ColorPicker @bind-Value="_fgColor" />
+            </div>
+            <div>
+                <label class="text-sm font-medium mb-1 block">Background</label>
+                <ColorPicker @bind-Value="_bgColor" />
+            </div>
+        </div>
+        <div class="p-4 rounded-md border border-input"
+             style="background-color: @_bgColor; color: @_fgColor;">
+            <p class="text-lg font-medium">Sample Text</p>
+            <p class="text-sm">This text uses the selected colors.</p>
+        </div>
+    </div>
+
+    <!-- Disabled -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Disabled</h2>
+        </div>
+        <ColorPicker Value="#3B82F6" Disabled="true" />
+    </div>
+
+    <!-- API Reference -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">API Reference</h2>
+        </div>
+        <div class="border rounded-lg p-6 space-y-4">
+            <div>
+                <h3 class="font-mono text-sm font-semibold mb-2">ColorPicker Parameters</h3>
+                <div class="space-y-2 text-sm">
+                    <p><strong>Value:</strong> <code class="bg-muted px-1 py-0.5 rounded">string</code> - Color value in hex format (#RRGGBB)</p>
+                    <p><strong>Format:</strong> <code class="bg-muted px-1 py-0.5 rounded">ColorFormat</code> - Output format (Hex, RGB, HSL). Default: Hex</p>
+                    <p><strong>ShowAlpha:</strong> <code class="bg-muted px-1 py-0.5 rounded">bool</code> - Show alpha slider. Default: false</p>
+                    <p><strong>ShowPresets:</strong> <code class="bg-muted px-1 py-0.5 rounded">bool</code> - Show preset colors. Default: true</p>
+                    <p><strong>PresetColors:</strong> <code class="bg-muted px-1 py-0.5 rounded">string[]?</code> - Custom preset colors</p>
+                    <p><strong>ShowInputs:</strong> <code class="bg-muted px-1 py-0.5 rounded">bool</code> - Show hex/RGB inputs. Default: true</p>
+                    <p><strong>Disabled:</strong> <code class="bg-muted px-1 py-0.5 rounded">bool</code> - Disables the picker</p>
+                </div>
+            </div>
+            <div>
+                <h3 class="font-mono text-sm font-semibold mb-2">ColorUtils Static Methods</h3>
+                <div class="space-y-2 text-sm">
+                    <p><strong>RgbToHsl(r, g, b):</strong> Convert RGB to HSL</p>
+                    <p><strong>HslToRgb(h, s, l):</strong> Convert HSL to RGB</p>
+                    <p><strong>RgbToHsv(r, g, b):</strong> Convert RGB to HSV</p>
+                    <p><strong>HsvToRgb(h, s, v):</strong> Convert HSV to RGB</p>
+                    <p><strong>ToHex(r, g, b, a?):</strong> Format as hex string</p>
+                    <p><strong>ParseHex(hex):</strong> Parse hex to RGBA values</p>
+                    <p><strong>IsValidHex(hex):</strong> Validate hex string</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private string _basicColor = "#3B82F6";
+    private string _alphaColor = "#3B82F680";
+    private string _noPresetsColor = "#10B981";
+    private string _customPresetsColor = "#6366F1";
+    private string _noInputsColor = "#F59E0B";
+    private string _preselectedColor = "#EC4899";
+    private string _fgColor = "#FFFFFF";
+    private string _bgColor = "#1E293B";
+
+    private string[] _brandColors = {
+        "#6366F1", "#8B5CF6", "#A855F7", "#D946EF",
+        "#EC4899", "#F43F5E", "#EF4444", "#F97316",
+        "#F59E0B", "#EAB308", "#84CC16", "#22C55E"
+    };
+}

@@ -1,0 +1,127 @@
+@page "/components/context-menu"
+@using BlazorBlueprint.Components.ContextMenu
+@using BlazorBlueprint.Components.Separator
+
+<PageTitle>Context Menu Component - BlazorBlueprint</PageTitle>
+
+<div class="space-y-8 max-w-4xl">
+    <div>
+        <div class="space-y-3">
+            <h1 class="text-4xl font-bold tracking-tight">Context Menu Component</h1>
+            <p class="text-xl text-muted-foreground">
+                Displays a menu triggered by right-click.
+            </p>
+        </div>
+    </div>
+
+    <!-- Basic Example -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Basic Example</h2>
+            <p class="text-sm text-muted-foreground">
+                Right-click the area below to open the context menu.
+            </p>
+        </div>
+        <ContextMenu>
+            <ContextMenuTrigger>
+                <div class="flex h-[150px] w-[300px] items-center justify-center rounded-md border border-dashed text-sm">
+                    Right click here
+                </div>
+            </ContextMenuTrigger>
+            <ContextMenuContent>
+                <ContextMenuItem OnClick="@(() => HandleAction("Back"))">
+                    Back
+                    <ContextMenuShortcut>Ctrl+[</ContextMenuShortcut>
+                </ContextMenuItem>
+                <ContextMenuItem OnClick="@(() => HandleAction("Forward"))" Disabled="true">
+                    Forward
+                    <ContextMenuShortcut>Ctrl+]</ContextMenuShortcut>
+                </ContextMenuItem>
+                <ContextMenuItem OnClick="@(() => HandleAction("Reload"))">
+                    Reload
+                    <ContextMenuShortcut>Ctrl+R</ContextMenuShortcut>
+                </ContextMenuItem>
+                <ContextMenuSeparator />
+                <ContextMenuItem OnClick="@(() => HandleAction("Save Page As..."))">
+                    Save Page As...
+                    <ContextMenuShortcut>Ctrl+S</ContextMenuShortcut>
+                </ContextMenuItem>
+                <ContextMenuItem OnClick="@(() => HandleAction("Print"))">
+                    Print...
+                    <ContextMenuShortcut>Ctrl+P</ContextMenuShortcut>
+                </ContextMenuItem>
+            </ContextMenuContent>
+        </ContextMenu>
+        @if (!string.IsNullOrEmpty(_lastAction))
+        {
+            <p class="text-sm text-muted-foreground">Last action: @_lastAction</p>
+        }
+    </div>
+
+    <!-- With Labels -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">With Labels and Groups</h2>
+            <p class="text-sm text-muted-foreground">
+                Context menu with labeled sections.
+            </p>
+        </div>
+        <ContextMenu>
+            <ContextMenuTrigger>
+                <div class="flex h-[150px] w-[300px] items-center justify-center rounded-md border border-dashed text-sm">
+                    Right click here
+                </div>
+            </ContextMenuTrigger>
+            <ContextMenuContent>
+                <ContextMenuLabel>Edit</ContextMenuLabel>
+                <ContextMenuItem>Cut</ContextMenuItem>
+                <ContextMenuItem>Copy</ContextMenuItem>
+                <ContextMenuItem>Paste</ContextMenuItem>
+                <ContextMenuSeparator />
+                <ContextMenuLabel>View</ContextMenuLabel>
+                <ContextMenuItem>Zoom In</ContextMenuItem>
+                <ContextMenuItem>Zoom Out</ContextMenuItem>
+                <ContextMenuItem>Reset Zoom</ContextMenuItem>
+            </ContextMenuContent>
+        </ContextMenu>
+    </div>
+
+    <!-- API Reference -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">API Reference</h2>
+        </div>
+        <div class="border rounded-lg p-6 space-y-4">
+            <div>
+                <h3 class="font-semibold mb-2">Components</h3>
+                <div class="space-y-2 text-sm">
+                    <p><code class="bg-muted px-1 py-0.5 rounded">ContextMenu</code> - Root component</p>
+                    <p><code class="bg-muted px-1 py-0.5 rounded">ContextMenuTrigger</code> - Right-click target area</p>
+                    <p><code class="bg-muted px-1 py-0.5 rounded">ContextMenuContent</code> - Menu container</p>
+                    <p><code class="bg-muted px-1 py-0.5 rounded">ContextMenuItem</code> - Menu item with click handler</p>
+                    <p><code class="bg-muted px-1 py-0.5 rounded">ContextMenuLabel</code> - Section label</p>
+                    <p><code class="bg-muted px-1 py-0.5 rounded">ContextMenuSeparator</code> - Visual divider</p>
+                    <p><code class="bg-muted px-1 py-0.5 rounded">ContextMenuShortcut</code> - Keyboard shortcut hint</p>
+                </div>
+            </div>
+            <Separator />
+            <div>
+                <h3 class="font-mono text-sm font-semibold mb-2">ContextMenuItem Parameters</h3>
+                <div class="space-y-2 text-sm">
+                    <p><strong>OnClick:</strong> <code class="bg-muted px-1 py-0.5 rounded">EventCallback</code> - Click handler</p>
+                    <p><strong>Disabled:</strong> <code class="bg-muted px-1 py-0.5 rounded">bool</code> - Disables the item</p>
+                    <p><strong>Inset:</strong> <code class="bg-muted px-1 py-0.5 rounded">bool</code> - Adds left padding</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private string? _lastAction;
+
+    private void HandleAction(string action)
+    {
+        _lastAction = action;
+    }
+}

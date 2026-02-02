@@ -1,0 +1,22 @@
+@namespace BlazorBlueprint.Primitives.Collapsible
+@using BlazorBlueprint.Primitives.Utilities
+
+@if (AsChild)
+{
+    @* When AsChild is true, pass trigger context to child for it to handle *@
+    <CascadingValue Value="TriggerContext" Name="TriggerContext">
+        @ChildContent
+    </CascadingValue>
+}
+else
+{
+    <button type="button"
+            data-state="@(Context?.Open ?? false ? "open" : "closed")"
+            aria-expanded="@(Context?.Open ?? false)"
+            disabled="@(Context?.Disabled ?? false)"
+            @onclick="HandleClick"
+            @onkeydown="HandleKeyDown"
+            @attributes="AdditionalAttributes">
+        @ChildContent
+    </button>
+}

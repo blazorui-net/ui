@@ -1,6 +1,6 @@
-# Contributing to BlazorUI
+# Contributing to BlazorBlueprint
 
-Thank you for your interest in contributing to BlazorUI! We welcome contributions from the community.
+Thank you for your interest in contributing to BlazorBlueprint! We welcome contributions from the community.
 
 ## How to Contribute
 
@@ -35,7 +35,7 @@ If you find a bug or have a feature request, please create an issue on GitHub:
 1. **Clone the repository:**
 
 ```bash
-git clone https://github.com/blazorui-net/ui.git
+git clone https://github.com/blazorblueprintui/ui.git
 cd ui
 ```
 
@@ -46,16 +46,16 @@ dotnet build
 ```
 
 This builds all five NuGet packages:
-- `BlazorUI.Components` - Styled components
-- `BlazorUI.Primitives` - Headless primitives
-- `BlazorUI.Icons.Lucide` - Lucide icon library
-- `BlazorUI.Icons.Heroicons` - Heroicons library
-- `BlazorUI.Icons.Feather` - Feather icon library
+- `BlazorBlueprint.Components` - Styled components
+- `BlazorBlueprint.Primitives` - Headless primitives
+- `BlazorBlueprint.Icons.Lucide` - Lucide icon library
+- `BlazorBlueprint.Icons.Heroicons` - Heroicons library
+- `BlazorBlueprint.Icons.Feather` - Feather icon library
 
 ### Run the Demo Application
 
 ```bash
-cd demo/BlazorUI.Demo
+cd demo/BlazorBlueprint.Demo
 dotnet watch run
 ```
 
@@ -68,17 +68,17 @@ The demo app will be available at `https://localhost:5001`
 This is a mono-repo containing:
 
 ```
-BlazorUI/
+BlazorBlueprint/
 ├── src/
-│   ├── BlazorUI.Components/      # Styled components (shadcn/ui design)
-│   ├── BlazorUI.Primitives/      # Headless UI primitives
-│   ├── BlazorUI.Icons.Lucide/    # Lucide icon integration
-│   ├── BlazorUI.Icons.Heroicons/ # Heroicons integration
-│   └── BlazorUI.Icons.Feather/   # Feather icon integration
+│   ├── BlazorBlueprint.Components/      # Styled components (shadcn/ui design)
+│   ├── BlazorBlueprint.Primitives/      # Headless UI primitives
+│   ├── BlazorBlueprint.Icons.Lucide/    # Lucide icon integration
+│   ├── BlazorBlueprint.Icons.Heroicons/ # Heroicons integration
+│   └── BlazorBlueprint.Icons.Feather/   # Feather icon integration
 ├── demo/
-│   └── BlazorUI.Demo/            # Demo Blazor Server app
+│   └── BlazorBlueprint.Demo/            # Demo Blazor Server app
 ├── website/
-│   └── BlazorUI.Website/         # Documentation website
+│   └── BlazorBlueprint.Website/         # Documentation website
 ├── .devflow/                     # DevFlow documentation and standards
 ├── scripts/                      # Release automation scripts
 └── .github/                      # CI/CD workflows
@@ -96,7 +96,7 @@ For detailed technical architecture, see [.devflow/architecture.md](../.devflow/
 
 ## Code Style Guidelines
 
-BlazorUI follows the coding standards documented in `.devflow/constitution.md`. Key guidelines:
+BlazorBlueprint follows the coding standards documented in `.devflow/constitution.md`. Key guidelines:
 
 ### Naming Conventions
 - **PascalCase** for public members, types, and namespaces
@@ -131,12 +131,12 @@ Before submitting a pull request, please:
 
 ## License
 
-By contributing to BlazorUI, you agree that your contributions will be licensed under the [Apache License 2.0](LICENSE).
+By contributing to BlazorBlueprint, you agree that your contributions will be licensed under the [Apache License 2.0](LICENSE).
 
 This means:
 - Your contributions will be freely available to everyone
 - You retain copyright to your contributions
-- You grant BlazorUI and its users the rights specified in the Apache License 2.0
+- You grant BlazorBlueprint and its users the rights specified in the Apache License 2.0
 
 ## Code of Conduct
 
@@ -163,4 +163,4 @@ If you have questions about contributing, feel free to:
 - Join the community discussions on GitHub
 - Reach out to the maintainers
 
-Thank you for contributing to BlazorUI!
+Thank you for contributing to BlazorBlueprint!

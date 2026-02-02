@@ -1,0 +1,35 @@
+@namespace BlazorBlueprint.Components.HoverCard
+@using BlazorBlueprint.Primitives.HoverCard
+
+@*
+    Styled HoverCardTrigger component.
+    Wraps the HoverCardTrigger primitive with shadcn/ui styling.
+*@
+
+<BlazorBlueprint.Primitives.HoverCard.HoverCardTrigger AsChild="@AsChild" class="@CssClass">
+    @ChildContent
+</BlazorBlueprint.Primitives.HoverCard.HoverCardTrigger>
+
+@code {
+    /// <summary>
+    /// The child content to render within the trigger.
+    /// </summary>
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>
+    /// When true, the trigger does not render its own div element.
+    /// Instead, it passes trigger behavior via TriggerContext to child components.
+    /// Use this when you want a custom component to act as the trigger.
+    /// </summary>
+    [Parameter]
+    public bool AsChild { get; set; } = false;
+
+    /// <summary>
+    /// Additional CSS classes to apply to the trigger.
+    /// </summary>
+    [Parameter]
+    public string? Class { get; set; }
+
+    private string CssClass => $"{Class}".Trim();
+}

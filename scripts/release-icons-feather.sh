@@ -1,13 +1,13 @@
 #!/bin/bash
 
-# Release script for BlazorUI.Icons.Feather
+# Release script for BlazorBlueprint.Icons.Feather
 # Usage: ./scripts/release-icons-feather.sh <version>
 # Example: ./scripts/release-icons-feather.sh 1.0.0-beta.4
 
 set -e  # Exit on error
 
 PACKAGE_NAME="icons-feather"
-PROJECT_PATH="src/BlazorUI.Icons.Feather"
+PROJECT_PATH="src/BlazorBlueprint.Icons.Feather"
 COLOR_GREEN='\033[0;32m'
 COLOR_RED='\033[0;31m'
 COLOR_YELLOW='\033[1;33m'
@@ -57,7 +57,7 @@ fi
 echo -e "${COLOR_YELLOW}═══════════════════════════════════════════════════${COLOR_RESET}"
 echo -e "${COLOR_YELLOW}Release Summary${COLOR_RESET}"
 echo -e "${COLOR_YELLOW}═══════════════════════════════════════════════════${COLOR_RESET}"
-echo -e "Package:  ${COLOR_GREEN}BlazorUI.Icons.Feather${COLOR_RESET}"
+echo -e "Package:  ${COLOR_GREEN}BlazorBlueprint.Icons.Feather${COLOR_RESET}"
 echo -e "Version:  ${COLOR_GREEN}${VERSION}${COLOR_RESET}"
 echo -e "Tag:      ${COLOR_GREEN}${TAG_NAME}${COLOR_RESET}"
 echo -e "${COLOR_YELLOW}═══════════════════════════════════════════════════${COLOR_RESET}"
@@ -74,7 +74,7 @@ fi
 # Create and push tag
 echo ""
 echo -e "${COLOR_GREEN}Creating tag: $TAG_NAME${COLOR_RESET}"
-git tag -a "$TAG_NAME" -m "Release BlazorUI.Icons.Feather v${VERSION}"
+git tag -a "$TAG_NAME" -m "Release BlazorBlueprint.Icons.Feather v${VERSION}"
 
 echo -e "${COLOR_GREEN}Pushing tag to GitHub...${COLOR_RESET}"
 git push origin "$TAG_NAME"
@@ -90,5 +90,5 @@ echo "  2. Pack the NuGet package"
 echo "  3. Publish to NuGet.org"
 echo ""
 echo "Monitor the workflow at:"
-echo "  https://github.com/blazorui-net/ui/actions"
+echo "  https://github.com/blazorblueprintui/ui/actions"
 echo ""

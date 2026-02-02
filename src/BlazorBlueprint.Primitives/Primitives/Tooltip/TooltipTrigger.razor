@@ -1,0 +1,155 @@
+@namespace BlazorBlueprint.Primitives.Tooltip
+@using BlazorBlueprint.Primitives.Utilities
+
+@* Tooltip trigger - shows tooltip on hover/focus *@
+@if (AsChild)
+{
+    @* When AsChild is true, pass trigger context to child for it to handle *@
+    <CascadingValue Value="TriggerContext" Name="TriggerContext">
+        @ChildContent
+    </CascadingValue>
+}
+else
+{
+    <span @ref="@_triggerRef"
+          id="@Context.TriggerId"
+          @onmouseenter="HandleMouseEnter"
+          @onmouseleave="HandleMouseLeave"
+          @onfocus="HandleFocus"
+          @onblur="HandleBlur"
+          @attributes="AdditionalAttributes"
+          tabindex="@(Focusable ? "0" : null)"
+          aria-describedby="@(Context.IsOpen ? Context.TooltipId : null)">
+        @ChildContent
+    </span>
+}
+
+@code {
+    [CascadingParameter]
+    private TooltipContext Context { get; set; } = null!;
+
+    private ElementReference _triggerRef;
+
+    /// <summary>
+    /// The content to display inside the trigger.
+    /// </summary>
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>
+    /// When true, the trigger does not render its own span element.
+    /// Instead, it passes trigger behavior via TriggerContext to child components.
+    /// The child component must consume TriggerContext and apply hover/focus behavior.
+    /// </summary>
+    [Parameter]
+    public bool AsChild { get; set; } = false;
+
+    /// <summary>
+    /// Additional attributes to apply to the trigger element.
+    /// </summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    /// <summary>
+    /// Whether the trigger should be keyboard focusable.
+    /// Default is true. Set to false if child content is already focusable.
+    /// </summary>
+    [Parameter]
+    public bool Focusable { get; set; } = true;
+
+    /// <summary>
+    /// Custom mouse enter handler. If provided, this is called in addition to the default show behavior.
+    /// </summary>
+    [Parameter]
+    public EventCallback<MouseEventArgs> OnMouseEnter { get; set; }
+
+    /// <summary>
+    /// Custom mouse leave handler. If provided, this is called in addition to the default hide behavior.
+    /// </summary>
+    [Parameter]
+    public EventCallback<MouseEventArgs> OnMouseLeave { get; set; }
+
+    /// <summary>
+    /// Stores the trigger element reference when using AsChild pattern.
+    /// </summary>
+    private ElementReference? _asChildTriggerRef;
+
+    /// <summary>
+    /// Context passed to child components when AsChild is true.
+    /// </summary>
+    private TriggerContext TriggerContext => new()
+    {
+        TriggerId = Context.TriggerId,
+        IsOpen = Context.IsOpen,
+        Open = () => Context.Open(_asChildTriggerRef),
+        Close = () => Context.Close(),
+        OnMouseEnter = () => Context.Open(_asChildTriggerRef),
+        OnMouseLeave = () => Context.Close(),
+        OnFocus = () => Context.Open(_asChildTriggerRef),
+        OnBlur = () => Context.Close(),
+        SetTriggerElement = (ElementReference el) => _asChildTriggerRef = el
+    };
+
+    private async Task HandleMouseEnter(MouseEventArgs args)
+    {
+        // Open tooltip and store trigger element for positioning
+        Context.Open(_triggerRef);
+
+        // Invoke custom handler if provided
+        if (OnMouseEnter.HasDelegate)
+        {
+            await OnMouseEnter.InvokeAsync(args);
+        }
+    }
+
+    private async Task HandleMouseLeave(MouseEventArgs args)
+    {
+        // Close tooltip
+        Context.Close();
+
+        // Invoke custom handler if provided
+        if (OnMouseLeave.HasDelegate)
+        {
+            await OnMouseLeave.InvokeAsync(args);
+        }
+    }
+
+    private void HandleFocus(FocusEventArgs args)
+    {
+        // Open tooltip on focus for keyboard users
+        Context.Open(_triggerRef);
+    }
+
+    private void HandleBlur(FocusEventArgs args)
+    {
+        // Close tooltip on blur
+        Context.Close();
+    }
+
+    protected override void OnInitialized()
+    {
+        if (Context == null)
+        {
+            throw new InvalidOperationException(
+                "TooltipTrigger must be used within a Tooltip component. " +
+                "Ensure TooltipTrigger is a child of a Tooltip component.");
+        }
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        // Proactively set the trigger element reference so it's available
+        // even when the tooltip is opened programmatically (via @bind-Open)
+        if (!AsChild)
+        {
+            Context.SetTriggerElement(_triggerRef);
+        }
+        else if (_asChildTriggerRef.HasValue)
+        {
+            // When using AsChild pattern, the child component (e.g., Button) sets
+            // _asChildTriggerRef via TriggerContext.SetTriggerElement. We need to
+            // propagate this to the context so Content can position relative to it.
+            Context.SetTriggerElement(_asChildTriggerRef.Value);
+        }
+    }
+}

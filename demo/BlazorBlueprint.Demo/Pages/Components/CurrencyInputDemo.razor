@@ -1,0 +1,247 @@
+@page "/components/currency-input"
+@using BlazorBlueprint.Components.CurrencyInput
+
+<PageTitle>CurrencyInput Component - BlazorBlueprint</PageTitle>
+
+<div class="space-y-8 max-w-4xl">
+    <div>
+        <div class="space-y-3">
+            <h1 class="text-4xl font-bold tracking-tight">CurrencyInput Component</h1>
+            <p class="text-xl text-muted-foreground">
+                A locale-aware currency input with support for 40+ currencies and automatic formatting.
+            </p>
+        </div>
+    </div>
+
+    <!-- US Dollar -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">US Dollar (USD)</h2>
+            <p class="text-sm text-muted-foreground">
+                Standard US Dollar input with 2 decimal places.
+            </p>
+        </div>
+        <div class="w-64">
+            <CurrencyInput @bind-Value="_usdValue" CurrencyCode="USD" Placeholder="0.00" />
+        </div>
+        <p class="text-sm text-muted-foreground">Value: $@_usdValue.ToString("F2")</p>
+    </div>
+
+    <!-- Euro -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Euro (EUR)</h2>
+            <p class="text-sm text-muted-foreground">
+                Euro with European formatting (comma as decimal separator).
+            </p>
+        </div>
+        <div class="w-64">
+            <CurrencyInput @bind-Value="_eurValue" CurrencyCode="EUR" Placeholder="0,00" />
+        </div>
+        <p class="text-sm text-muted-foreground">Value: @_eurValue.ToString("F2")</p>
+    </div>
+
+    <!-- British Pound -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">British Pound (GBP)</h2>
+        </div>
+        <div class="w-64">
+            <CurrencyInput @bind-Value="_gbpValue" CurrencyCode="GBP" />
+        </div>
+        <p class="text-sm text-muted-foreground">Value: @_gbpValue.ToString("F2")</p>
+    </div>
+
+    <!-- Japanese Yen (0 decimals) -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Japanese Yen (JPY)</h2>
+            <p class="text-sm text-muted-foreground">
+                No decimal places - Yen uses whole numbers only.
+            </p>
+        </div>
+        <div class="w-64">
+            <CurrencyInput @bind-Value="_jpyValue" CurrencyCode="JPY" />
+        </div>
+        <p class="text-sm text-muted-foreground">Value: @_jpyValue.ToString("F0")</p>
+    </div>
+
+    <!-- Kuwaiti Dinar (3 decimals) -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Kuwaiti Dinar (KWD)</h2>
+            <p class="text-sm text-muted-foreground">
+                3 decimal places - one of few currencies with 3 decimals.
+            </p>
+        </div>
+        <div class="w-64">
+            <CurrencyInput @bind-Value="_kwdValue" CurrencyCode="KWD" />
+        </div>
+        <p class="text-sm text-muted-foreground">Value: @_kwdValue.ToString("F3")</p>
+    </div>
+
+    <!-- Swiss Franc (symbol after) -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Swiss Franc (CHF)</h2>
+            <p class="text-sm text-muted-foreground">
+                Symbol appears after the amount.
+            </p>
+        </div>
+        <div class="w-64">
+            <CurrencyInput @bind-Value="_chfValue" CurrencyCode="CHF" />
+        </div>
+        <p class="text-sm text-muted-foreground">Value: @_chfValue.ToString("F2")</p>
+    </div>
+
+    <!-- Brazilian Real -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Brazilian Real (BRL)</h2>
+        </div>
+        <div class="w-64">
+            <CurrencyInput @bind-Value="_brlValue" CurrencyCode="BRL" />
+        </div>
+        <p class="text-sm text-muted-foreground">Value: @_brlValue.ToString("F2")</p>
+    </div>
+
+    <!-- Indian Rupee -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Indian Rupee (INR)</h2>
+        </div>
+        <div class="w-64">
+            <CurrencyInput @bind-Value="_inrValue" CurrencyCode="INR" />
+        </div>
+        <p class="text-sm text-muted-foreground">Value: @_inrValue.ToString("F2")</p>
+    </div>
+
+    <!-- Without Symbol -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Without Symbol</h2>
+            <p class="text-sm text-muted-foreground">
+                Currency input without the symbol prefix/suffix.
+            </p>
+        </div>
+        <div class="w-64">
+            <CurrencyInput @bind-Value="_noSymbolValue" CurrencyCode="USD" ShowSymbol="false" />
+        </div>
+        <p class="text-sm text-muted-foreground">Value: @_noSymbolValue.ToString("F2")</p>
+    </div>
+
+    <!-- With Min/Max -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">With Min/Max Constraints</h2>
+            <p class="text-sm text-muted-foreground">
+                Value is constrained between $0 and $1,000.
+            </p>
+        </div>
+        <div class="w-64">
+            <CurrencyInput @bind-Value="_constrainedValue" CurrencyCode="USD" Min="0" Max="1000" />
+        </div>
+        <p class="text-sm text-muted-foreground">Value: $@_constrainedValue.ToString("F2") (min: $0, max: $1,000)</p>
+    </div>
+
+    <!-- Positive Only -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Positive Only</h2>
+            <p class="text-sm text-muted-foreground">
+                Negative values are not allowed.
+            </p>
+        </div>
+        <div class="w-64">
+            <CurrencyInput @bind-Value="_positiveValue" CurrencyCode="USD" AllowNegative="false" />
+        </div>
+        <p class="text-sm text-muted-foreground">Value: $@_positiveValue.ToString("F2")</p>
+    </div>
+
+    <!-- Disabled -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Disabled</h2>
+        </div>
+        <div class="w-64">
+            <CurrencyInput Value="1234.56m" CurrencyCode="USD" Disabled="true" />
+        </div>
+    </div>
+
+    <!-- Currency Selector Example -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Dynamic Currency</h2>
+            <p class="text-sm text-muted-foreground">
+                Change the currency to see different formatting.
+            </p>
+        </div>
+        <div class="flex gap-4 items-end">
+            <div class="w-64">
+                <CurrencyInput @bind-Value="_dynamicValue" CurrencyCode="@_selectedCurrency" />
+            </div>
+            <select class="h-10 px-3 rounded-md border border-input bg-background text-sm"
+                    @onchange="HandleCurrencyChange">
+                <option value="USD">USD - US Dollar</option>
+                <option value="EUR">EUR - Euro</option>
+                <option value="GBP">GBP - British Pound</option>
+                <option value="JPY">JPY - Japanese Yen</option>
+                <option value="CNY">CNY - Chinese Yuan</option>
+                <option value="INR">INR - Indian Rupee</option>
+                <option value="BRL">BRL - Brazilian Real</option>
+                <option value="CHF">CHF - Swiss Franc</option>
+                <option value="KWD">KWD - Kuwaiti Dinar</option>
+            </select>
+        </div>
+        <p class="text-sm text-muted-foreground">Value: @_dynamicValue (@_selectedCurrency)</p>
+    </div>
+
+    <!-- API Reference -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">API Reference</h2>
+        </div>
+        <div class="border rounded-lg p-6 space-y-4">
+            <div>
+                <h3 class="font-mono text-sm font-semibold mb-2">CurrencyInput Parameters</h3>
+                <div class="space-y-2 text-sm">
+                    <p><strong>Value:</strong> <code class="bg-muted px-1 py-0.5 rounded">decimal</code> - Current value</p>
+                    <p><strong>CurrencyCode:</strong> <code class="bg-muted px-1 py-0.5 rounded">string</code> - ISO 4217 currency code. Default: "USD"</p>
+                    <p><strong>ShowSymbol:</strong> <code class="bg-muted px-1 py-0.5 rounded">bool</code> - Show currency symbol. Default: true</p>
+                    <p><strong>Min:</strong> <code class="bg-muted px-1 py-0.5 rounded">decimal?</code> - Minimum allowed value</p>
+                    <p><strong>Max:</strong> <code class="bg-muted px-1 py-0.5 rounded">decimal?</code> - Maximum allowed value</p>
+                    <p><strong>AllowNegative:</strong> <code class="bg-muted px-1 py-0.5 rounded">bool</code> - Allow negative values. Default: true</p>
+                    <p><strong>UseThousandSeparator:</strong> <code class="bg-muted px-1 py-0.5 rounded">bool</code> - Use thousand separators. Default: true</p>
+                    <p><strong>Disabled:</strong> <code class="bg-muted px-1 py-0.5 rounded">bool</code> - Disables the input</p>
+                </div>
+            </div>
+            <div>
+                <h3 class="font-mono text-sm font-semibold mb-2">Supported Currencies (40+)</h3>
+                <div class="text-sm text-muted-foreground">
+                    <p>USD, EUR, GBP, JPY, CNY, INR, CAD, AUD, CHF, HKD, SGD, SEK, NOK, DKK, NZD, MXN, BRL, KRW, TRY, RUB, ZAR, THB, MYR, IDR, PHP, VND, PLN, CZK, ILS, AED, SAR, KWD, BHD, OMR, NGN, EGP, ARS, CLP, COP, TWD</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private decimal _usdValue = 1234.56m;
+    private decimal _eurValue = 999.99m;
+    private decimal _gbpValue = 500.00m;
+    private decimal _jpyValue = 15000m;
+    private decimal _kwdValue = 100.500m;
+    private decimal _chfValue = 750.00m;
+    private decimal _brlValue = 1500.00m;
+    private decimal _inrValue = 10000.00m;
+    private decimal _noSymbolValue = 250.00m;
+    private decimal _constrainedValue = 500.00m;
+    private decimal _positiveValue = 100.00m;
+    private decimal _dynamicValue = 1000.00m;
+    private string _selectedCurrency = "USD";
+
+    private void HandleCurrencyChange(ChangeEventArgs e)
+    {
+        _selectedCurrency = e.Value?.ToString() ?? "USD";
+    }
+}

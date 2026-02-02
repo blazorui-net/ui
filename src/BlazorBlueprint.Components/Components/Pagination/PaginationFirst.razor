@@ -1,0 +1,50 @@
+@namespace BlazorBlueprint.Components.Pagination
+@using BlazorBlueprint.Icons.Lucide.Components
+
+<PaginationLink Size="PaginationLinkSize.Icon"
+                Class="@CssClass"
+                Disabled="@IsDisabled"
+                OnClick="HandleClick">
+    <LucideIcon Name="chevrons-left" Class="h-4 w-4" />
+    <span class="sr-only">Go to first page</span>
+</PaginationLink>
+
+@code {
+    [CascadingParameter]
+    private PaginationContext? Context { get; set; }
+
+    [Parameter]
+    public string? Class { get; set; }
+
+    /// <summary>
+    /// Explicitly disable the button. When null, automatically determined from pagination state.
+    /// </summary>
+    [Parameter]
+    public bool? Disabled { get; set; }
+
+    /// <summary>
+    /// Custom click handler. When using pagination state, navigation is automatic.
+    /// </summary>
+    [Parameter]
+    public EventCallback OnClick { get; set; }
+
+    private bool IsDisabled => Disabled ?? !(Context?.State?.CanGoPrevious ?? true);
+
+    private async Task HandleClick()
+    {
+        if (Context?.State != null)
+        {
+            Context.State.FirstPage();
+            if (Context.OnPageChanged != null)
+                await Context.OnPageChanged(Context.State.CurrentPage);
+        }
+
+        if (OnClick.HasDelegate)
+            await OnClick.InvokeAsync();
+    }
+
+    private string CssClass => BlazorBlueprint.Components.Utilities.ClassNames.cn(
+        "h-8 w-8",
+        Class
+    );
+}

@@ -1,0 +1,30 @@
+@namespace BlazorBlueprint.Components.Breadcrumb
+
+@if (string.IsNullOrEmpty(Href))
+{
+    <span class="@CssClass">
+        @ChildContent
+    </span>
+}
+else
+{
+    <a href="@Href" class="@CssClass">
+        @ChildContent
+    </a>
+}
+
+@code {
+    [Parameter]
+    public string? Href { get; set; }
+
+    [Parameter]
+    public string? Class { get; set; }
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    private string CssClass => BlazorBlueprint.Components.Utilities.ClassNames.cn(
+        "transition-colors hover:text-foreground",
+        Class
+    );
+}

@@ -1,0 +1,18 @@
+@namespace BlazorBlueprint.Components.Drawer
+
+<h2 class="@CssClass">
+    @ChildContent
+</h2>
+
+@code {
+    [Parameter]
+    public string? Class { get; set; }
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    private string CssClass => BlazorBlueprint.Components.Utilities.ClassNames.cn(
+        "text-lg font-semibold leading-none tracking-tight",
+        Class
+    );
+}

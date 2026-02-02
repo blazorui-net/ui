@@ -1,0 +1,78 @@
+@namespace BlazorBlueprint.Components.Menubar
+
+<div class="relative">
+    <CascadingValue Value="this" IsFixed="false">
+        @ChildContent
+    </CascadingValue>
+</div>
+
+@code {
+    [CascadingParameter]
+    public Menubar? Context { get; set; }
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    internal string MenuId { get; } = Guid.NewGuid().ToString();
+    internal bool IsOpen => Context?.ActiveMenu == MenuId;
+    internal int FocusedIndex { get; private set; } = -1;
+
+    private List<IMenubarItem> _menuItems = new();
+
+    protected override void OnInitialized()
+    {
+        Context?.RegisterMenu(this);
+    }
+
+    internal void RegisterMenuItem(IMenubarItem item)
+    {
+        if (!_menuItems.Contains(item))
+        {
+            _menuItems.Add(item);
+        }
+    }
+
+    internal void UnregisterMenuItem(IMenubarItem item)
+    {
+        _menuItems.Remove(item);
+    }
+
+    internal List<IMenubarItem> GetMenuItems() => _menuItems;
+
+    internal void SetFocusedIndex(int index)
+    {
+        FocusedIndex = index;
+    }
+
+    internal void Open()
+    {
+        FocusedIndex = -1;
+        Context?.SetActiveMenu(MenuId);
+    }
+
+    internal void Close()
+    {
+        if (IsOpen)
+        {
+            FocusedIndex = -1;
+            Context?.SetActiveMenu(null);
+        }
+    }
+
+    internal void Toggle()
+    {
+        if (IsOpen)
+        {
+            Close();
+        }
+        else
+        {
+            Open();
+        }
+    }
+
+    public void Dispose()
+    {
+        Context?.UnregisterMenu(this);
+    }
+}

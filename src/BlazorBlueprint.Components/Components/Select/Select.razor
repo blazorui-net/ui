@@ -1,0 +1,76 @@
+@typeparam TValue
+@namespace BlazorBlueprint.Components.Select
+@using BlazorBlueprint.Primitives.Select
+@attribute [CascadingTypeParameter(nameof(TValue))]
+
+@* Styled Select wrapper around Select *@
+<BlazorBlueprint.Primitives.Select.Select TValue="TValue"
+                 Value="@Value"
+                 ValueChanged="@ValueChanged"
+                 @bind-Open="IsOpen"
+                 Disabled="Disabled"
+                 DisplayTextSelector="@DisplayTextSelector"
+                 class="@CssClass">
+    @ChildContent
+</BlazorBlueprint.Primitives.Select.Select>
+
+@code {
+    /// <summary>
+    /// Gets or sets the currently selected value.
+    /// </summary>
+    [Parameter]
+    public TValue? Value { get; set; }
+
+    /// <summary>
+    /// Gets or sets the callback invoked when the selected value changes.
+    /// </summary>
+    [Parameter]
+    public EventCallback<TValue?> ValueChanged { get; set; }
+
+    /// <summary>
+    /// Gets or sets whether the select is disabled.
+    /// </summary>
+    [Parameter]
+    public bool Disabled { get; set; }
+
+    /// <summary>
+    /// Gets or sets whether the dropdown is open (controlled mode).
+    /// </summary>
+    [Parameter]
+    public bool? Open { get; set; }
+
+    /// <summary>
+    /// Gets or sets the callback invoked when the open state changes.
+    /// </summary>
+    [Parameter]
+    public EventCallback<bool> OpenChanged { get; set; }
+
+    /// <summary>
+    /// Gets or sets additional CSS classes to apply to the select container.
+    /// </summary>
+    [Parameter]
+    public string? Class { get; set; }
+
+    /// <summary>
+    /// Optional function to derive display text from the selected value.
+    /// Use this when you have a pre-selected value and want to show its display text
+    /// without waiting for the dropdown items to render and register.
+    /// This keeps display text in sync automatically when the value changes.
+    /// </summary>
+    [Parameter]
+    public Func<TValue, string>? DisplayTextSelector { get; set; }
+
+    /// <summary>
+    /// Gets or sets the content to be rendered inside the select component.
+    /// Should contain SelectTrigger and SelectContent components.
+    /// </summary>
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    private bool IsOpen { get; set; }
+
+    /// <summary>
+    /// Gets the computed CSS classes for the select container.
+    /// </summary>
+    private string CssClass => ClassNames.cn("relative", Class);
+}

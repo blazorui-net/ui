@@ -1,0 +1,111 @@
+@page "/components/slider"
+@using BlazorBlueprint.Components.Slider
+@using BlazorBlueprint.Components.Separator
+
+<PageTitle>Slider Component - BlazorBlueprint</PageTitle>
+
+<div class="space-y-8 max-w-4xl">
+    <div>
+        <div class="space-y-3">
+            <h1 class="text-4xl font-bold tracking-tight">Slider Component</h1>
+            <p class="text-xl text-muted-foreground">
+                An input where the user selects a value from within a given range.
+            </p>
+        </div>
+    </div>
+
+    <!-- Basic Example -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Basic Example</h2>
+            <p class="text-sm text-muted-foreground">
+                A simple slider with default settings.
+            </p>
+        </div>
+        <div class="w-[60%]">
+            <Slider @bind-Value="_basicValue" />
+        </div>
+        <p class="text-sm text-muted-foreground">Value: @_basicValue</p>
+    </div>
+
+    <!-- With Default Value -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">With Default Value</h2>
+            <p class="text-sm text-muted-foreground">
+                Slider with a preset default value.
+            </p>
+        </div>
+        <div class="w-[60%]">
+            <Slider @bind-Value="_presetValue" DefaultValue="50" />
+        </div>
+        <p class="text-sm text-muted-foreground">Value: @_presetValue</p>
+    </div>
+
+    <!-- Custom Range -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Custom Range</h2>
+            <p class="text-sm text-muted-foreground">
+                Slider with custom min and max values.
+            </p>
+        </div>
+        <div class="w-[60%]">
+            <Slider @bind-Value="_rangeValue" Min="0" Max="10" Step="1" />
+        </div>
+        <p class="text-sm text-muted-foreground">Value: @_rangeValue (0-10)</p>
+    </div>
+
+    <!-- Step Size -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Step Size</h2>
+            <p class="text-sm text-muted-foreground">
+                Slider with custom step increments.
+            </p>
+        </div>
+        <div class="w-[60%]">
+            <Slider @bind-Value="_stepValue" Step="10" />
+        </div>
+        <p class="text-sm text-muted-foreground">Value: @_stepValue (step: 10)</p>
+    </div>
+
+    <!-- Disabled -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Disabled</h2>
+            <p class="text-sm text-muted-foreground">
+                A disabled slider.
+            </p>
+        </div>
+        <div class="w-[60%]">
+            <Slider Value="50" Disabled="true" />
+        </div>
+    </div>
+
+    <!-- API Reference -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">API Reference</h2>
+        </div>
+        <div class="border rounded-lg p-6 space-y-4">
+            <div>
+                <h3 class="font-mono text-sm font-semibold mb-2">Slider Parameters</h3>
+                <div class="space-y-2 text-sm">
+                    <p><strong>Value:</strong> <code class="bg-muted px-1 py-0.5 rounded">double</code> - Current value</p>
+                    <p><strong>Min:</strong> <code class="bg-muted px-1 py-0.5 rounded">double</code> - Minimum value. Default: 0</p>
+                    <p><strong>Max:</strong> <code class="bg-muted px-1 py-0.5 rounded">double</code> - Maximum value. Default: 100</p>
+                    <p><strong>Step:</strong> <code class="bg-muted px-1 py-0.5 rounded">double</code> - Step increment. Default: 1</p>
+                    <p><strong>Disabled:</strong> <code class="bg-muted px-1 py-0.5 rounded">bool</code> - Disables the slider</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private double _basicValue = 0;
+    private double _presetValue = 50;
+    private double _rangeValue = 5;
+    private double _stepValue = 50;
+}

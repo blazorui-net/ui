@@ -1,0 +1,411 @@
+@page "/components/datatable"
+@using BlazorBlueprint.Components.DataTable
+@using BlazorBlueprint.Components.Badge
+@using BlazorBlueprint.Components.Button
+@using BlazorBlueprint.Demo.Services
+@inject MockDataService MockDataService
+
+<PageTitle>Data Table Component - BlazorBlueprint</PageTitle>
+
+<div class="space-y-8 max-w-7xl">
+    <div>
+        <div class="space-y-3">
+            <h1 class="text-4xl font-bold tracking-tight">Data Table Component</h1>
+            <p class="text-xl text-muted-foreground">
+                A powerful and flexible data table component with sorting, filtering, pagination, and row selection.
+            </p>
+        </div>
+    </div>
+
+    <!-- Basic Example -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Basic Table</h2>
+            <p class="text-sm text-muted-foreground">
+                A simple table with automatic sorting and pagination.
+            </p>
+        </div>
+        <DataTable TData="Person" Data="@people" InitialPageSize="5">
+            <Columns>
+                <DataTableColumn TData="Person" TValue="int" Property="@(p => p.Id)" Header="ID" Sortable />
+                <DataTableColumn TData="Person" TValue="string" Property="@(p => p.Name)" Header="Name" Sortable />
+                <DataTableColumn TData="Person" TValue="string" Property="@(p => p.Email)" Header="Email" Sortable />
+                <DataTableColumn TData="Person" TValue="int" Property="@(p => p.Age)" Header="Age" Sortable />
+            </Columns>
+        </DataTable>
+    </div>
+
+    <!-- With Row Selection -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Row Selection</h2>
+            <p class="text-sm text-muted-foreground">
+                Table with multiple row selection using checkboxes. Use arrow keys to navigate and Enter/Space to select.
+            </p>
+        </div>
+        <div class="flex items-center gap-2 mb-2">
+            <input type="checkbox"
+                   id="enableKeyboardNavDataTable"
+                   checked="@enableKeyboardNavigation"
+                   @onchange="@((e) => enableKeyboardNavigation = (bool)(e.Value ?? true))"
+                   class="h-4 w-4 rounded border-gray-300 text-primary focus:ring-2 focus:ring-primary" />
+            <label for="enableKeyboardNavDataTable" class="text-sm font-medium">Enable keyboard navigation</label>
+        </div>
+        <DataTable TData="Person"
+                   Data="@people"
+                   SelectionMode="DataTableSelectionMode.Multiple"
+                   EnableKeyboardNavigation="@enableKeyboardNavigation"
+                   @bind-SelectedItems="@selectedPeople"
+                   InitialPageSize="5">
+            <Columns>
+                <DataTableColumn TData="Person" TValue="string" Property="@(p => p.Name)" Header="Name" Sortable />
+                <DataTableColumn TData="Person" TValue="string" Property="@(p => p.Email)" Header="Email" />
+                <DataTableColumn TData="Person" TValue="string" Property="@(p => p.Role)" Header="Role" />
+            </Columns>
+        </DataTable>
+        @if (selectedPeople.Any())
+        {
+            <div class="p-4 bg-muted rounded-md">
+                <p class="text-sm font-medium">Selected: @selectedPeople.Count people</p>
+                <div class="flex flex-wrap gap-2 mt-2">
+                    @foreach (var person in selectedPeople)
+                    {
+                        <Badge>@person.Name</Badge>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+
+    <!-- Custom Cell Templates -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Custom Cell Templates</h2>
+            <p class="text-sm text-muted-foreground">
+                Use custom templates to render cells with badges, buttons, and other components.
+            </p>
+        </div>
+        <DataTable TData="Person" Data="@people" ShowPagination="false">
+            <Columns>
+                <DataTableColumn TData="Person" TValue="string" Property="@(p => p.Name)" Header="Name" Sortable />
+                <DataTableColumn TData="Person" TValue="string" Property="@(p => p.Status)" Header="Status" Sortable>
+                    <CellTemplate Context="person">
+                        <Badge Variant="@(person.Status == "Active" ? BadgeVariant.Default : BadgeVariant.Outline)">
+                            @person.Status
+                        </Badge>
+                    </CellTemplate>
+                </DataTableColumn>
+                <DataTableColumn TData="Person" TValue="string" Property="@(p => p.Role)" Header="Role">
+                    <CellTemplate Context="person">
+                        <Badge Variant="BadgeVariant.Secondary">@person.Role</Badge>
+                    </CellTemplate>
+                </DataTableColumn>
+                <DataTableColumn TData="Person" TValue="string" Property="@(p => p.Email)" Header="Actions">
+                    <CellTemplate Context="person">
+                        <div class="flex gap-2">
+                            <Button Variant="ButtonVariant.Outline" Size="ButtonSize.Small" OnClick="@(() => ShowDetails(person))">
+                                View
+                            </Button>
+                            <Button Variant="ButtonVariant.Ghost" Size="ButtonSize.Small" OnClick="@(() => EditPerson(person))">
+                                Edit
+                            </Button>
+                        </div>
+                    </CellTemplate>
+                </DataTableColumn>
+            </Columns>
+        </DataTable>
+    </div>
+
+    <!-- With Global Search -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Global Search & Column Visibility</h2>
+            <p class="text-sm text-muted-foreground">
+                Search across all columns and toggle column visibility.
+            </p>
+        </div>
+        <DataTable TData="Person" Data="@people" InitialPageSize="10">
+            <Columns>
+                <DataTableColumn TData="Person" TValue="int" Property="@(p => p.Id)" Header="ID" Sortable />
+                <DataTableColumn TData="Person" TValue="string" Property="@(p => p.Name)" Header="Name" Sortable />
+                <DataTableColumn TData="Person" TValue="string" Property="@(p => p.Email)" Header="Email" />
+                <DataTableColumn TData="Person" TValue="int" Property="@(p => p.Age)" Header="Age" Sortable />
+                <DataTableColumn TData="Person" TValue="string" Property="@(p => p.Role)" Header="Role" />
+                <DataTableColumn TData="Person" TValue="string" Property="@(p => p.Status)" Header="Status">
+                    <CellTemplate Context="person">
+                        <Badge Variant="@(person.Status == "Active" ? BadgeVariant.Default : BadgeVariant.Destructive)">
+                            @person.Status
+                        </Badge>
+                    </CellTemplate>
+                </DataTableColumn>
+            </Columns>
+        </DataTable>
+    </div>
+
+    <!-- Empty State -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Empty State</h2>
+            <p class="text-sm text-muted-foreground">
+                Displays a message when there's no data to show.
+            </p>
+        </div>
+        <DataTable TData="Person" Data="@emptyPeople" InitialPageSize="5">
+            <Columns>
+                <DataTableColumn TData="Person" TValue="string" Property="@(p => p.Name)" Header="Name" />
+                <DataTableColumn TData="Person" TValue="string" Property="@(p => p.Email)" Header="Email" />
+            </Columns>
+        </DataTable>
+    </div>
+
+    <!-- Loading State -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Loading State</h2>
+            <p class="text-sm text-muted-foreground">
+                Shows a loading indicator while data is being fetched.
+            </p>
+        </div>
+        <div class="flex gap-2 mb-4">
+            <Button OnClick="@(() => isLoading = !isLoading)">
+                Toggle Loading
+            </Button>
+        </div>
+        <DataTable TData="Person" Data="@people" IsLoading="@isLoading" InitialPageSize="5">
+            <Columns>
+                <DataTableColumn TData="Person" TValue="string" Property="@(p => p.Name)" Header="Name" Sortable />
+                <DataTableColumn TData="Person" TValue="string" Property="@(p => p.Email)" Header="Email" />
+                <DataTableColumn TData="Person" TValue="string" Property="@(p => p.Role)" Header="Role" />
+            </Columns>
+        </DataTable>
+    </div>
+
+    <!-- Without Toolbar -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Without Toolbar</h2>
+            <p class="text-sm text-muted-foreground">
+                A minimal table without the toolbar (no search or column visibility).
+            </p>
+        </div>
+        <DataTable TData="Person" Data="@people" ShowToolbar="false" InitialPageSize="5">
+            <Columns>
+                <DataTableColumn TData="Person" TValue="string" Property="@(p => p.Name)" Header="Name" Sortable />
+                <DataTableColumn TData="Person" TValue="string" Property="@(p => p.Email)" Header="Email" />
+                <DataTableColumn TData="Person" TValue="int" Property="@(p => p.Age)" Header="Age" Sortable />
+            </Columns>
+        </DataTable>
+    </div>
+
+    <!-- Custom Toolbar Actions -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Custom Toolbar Actions</h2>
+            <p class="text-sm text-muted-foreground">
+                Add custom action buttons to the toolbar.
+            </p>
+        </div>
+        <DataTable TData="Person" Data="@people" InitialPageSize="5">
+            <ToolbarActions>
+                <Button Variant="ButtonVariant.Default" Size="ButtonSize.Small" OnClick="@AddNewPerson">
+                    Add Person
+                </Button>
+                <Button Variant="ButtonVariant.Outline" Size="ButtonSize.Small" OnClick="@ExportData">
+                    Export
+                </Button>
+            </ToolbarActions>
+            <Columns>
+                <DataTableColumn TData="Person" TValue="string" Property="@(p => p.Name)" Header="Name" Sortable />
+                <DataTableColumn TData="Person" TValue="string" Property="@(p => p.Email)" Header="Email" />
+                <DataTableColumn TData="Person" TValue="string" Property="@(p => p.Role)" Header="Role" />
+            </Columns>
+        </DataTable>
+    </div>
+
+    <!-- Accessibility Features -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Accessibility Features</h2>
+            <p class="text-sm text-muted-foreground">Built-in accessibility features following WAI-ARIA design patterns.</p>
+        </div>
+
+        <div class="rounded-md border p-4 space-y-4">
+            <div>
+                <h3 class="font-semibold mb-2">ARIA Attributes</h3>
+                <ul class="text-sm space-y-1 text-muted-foreground">
+                    <li class="flex items-center gap-2"><span class="text-green-600">&#10003;</span> <code class="bg-muted px-1 rounded">role="grid"</code> for screen readers</li>
+                    <li class="flex items-center gap-2"><span class="text-green-600">&#10003;</span> <code class="bg-muted px-1 rounded">aria-sort</code> indicates column sort direction</li>
+                    <li class="flex items-center gap-2"><span class="text-green-600">&#10003;</span> <code class="bg-muted px-1 rounded">aria-selected</code> indicates row selection state</li>
+                    <li class="flex items-center gap-2"><span class="text-green-600">&#10003;</span> <code class="bg-muted px-1 rounded">aria-label</code> on checkboxes for selection</li>
+                    <li class="flex items-center gap-2"><span class="text-green-600">&#10003;</span> Focusable rows with visible focus indicator</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Keyboard Shortcuts -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Keyboard Shortcuts</h2>
+            <p class="text-sm text-muted-foreground">Navigate and interact with the table using keyboard.</p>
+        </div>
+
+        <div class="rounded-md border">
+            <div class="flex justify-between items-center p-4 border-b">
+                <span class="font-medium">Navigate to next row</span>
+                <kbd class="px-2 py-1 bg-muted rounded text-sm font-mono">ArrowDown</kbd>
+            </div>
+            <div class="flex justify-between items-center p-4 border-b">
+                <span class="font-medium">Navigate to previous row</span>
+                <kbd class="px-2 py-1 bg-muted rounded text-sm font-mono">ArrowUp</kbd>
+            </div>
+            <div class="flex justify-between items-center p-4 border-b">
+                <span class="font-medium">Toggle row selection</span>
+                <div class="flex gap-1">
+                    <kbd class="px-2 py-1 bg-muted rounded text-sm font-mono">Enter</kbd>
+                    <span class="text-muted-foreground">/</span>
+                    <kbd class="px-2 py-1 bg-muted rounded text-sm font-mono">Space</kbd>
+                </div>
+            </div>
+            <div class="flex justify-between items-center p-4">
+                <span class="font-medium">Sort column (click header)</span>
+                <kbd class="px-2 py-1 bg-muted rounded text-sm font-mono">Click</kbd>
+            </div>
+        </div>
+    </div>
+
+    <!-- API Reference -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">API Reference</h2>
+            <p class="text-sm text-muted-foreground">Component properties and parameters.</p>
+        </div>
+
+        <div class="rounded-md border p-4 space-y-6">
+            <div>
+                <h3 class="font-semibold mb-3">DataTable</h3>
+                <div class="space-y-4">
+                    <div>
+                        <code class="bg-muted px-1 rounded text-sm">Data</code>
+                        <p class="text-sm text-muted-foreground mt-1"><strong>Type:</strong> IEnumerable&lt;TData&gt;</p>
+                        <p class="text-sm text-muted-foreground">The data source for the table.</p>
+                    </div>
+                    <div>
+                        <code class="bg-muted px-1 rounded text-sm">SelectionMode</code>
+                        <p class="text-sm text-muted-foreground mt-1"><strong>Type:</strong> DataTableSelectionMode</p>
+                        <p class="text-sm text-muted-foreground"><strong>Default:</strong> None</p>
+                        <p class="text-sm text-muted-foreground">The selection mode: None, Single, or Multiple.</p>
+                    </div>
+                    <div>
+                        <code class="bg-muted px-1 rounded text-sm">SelectedItems</code>
+                        <p class="text-sm text-muted-foreground mt-1"><strong>Type:</strong> IReadOnlyCollection&lt;TData&gt;</p>
+                        <p class="text-sm text-muted-foreground">The currently selected items. Use with @@bind-SelectedItems for two-way binding.</p>
+                    </div>
+                    <div>
+                        <code class="bg-muted px-1 rounded text-sm">EnableKeyboardNavigation</code>
+                        <p class="text-sm text-muted-foreground mt-1"><strong>Type:</strong> bool</p>
+                        <p class="text-sm text-muted-foreground"><strong>Default:</strong> true</p>
+                        <p class="text-sm text-muted-foreground">When true, enables keyboard navigation for table rows (arrow keys to navigate, Enter/Space to select).</p>
+                    </div>
+                    <div>
+                        <code class="bg-muted px-1 rounded text-sm">ShowToolbar</code>
+                        <p class="text-sm text-muted-foreground mt-1"><strong>Type:</strong> bool</p>
+                        <p class="text-sm text-muted-foreground"><strong>Default:</strong> true</p>
+                        <p class="text-sm text-muted-foreground">Whether to show the toolbar with global search and column visibility.</p>
+                    </div>
+                    <div>
+                        <code class="bg-muted px-1 rounded text-sm">ShowPagination</code>
+                        <p class="text-sm text-muted-foreground mt-1"><strong>Type:</strong> bool</p>
+                        <p class="text-sm text-muted-foreground"><strong>Default:</strong> true</p>
+                        <p class="text-sm text-muted-foreground">Whether to show pagination controls.</p>
+                    </div>
+                    <div>
+                        <code class="bg-muted px-1 rounded text-sm">IsLoading</code>
+                        <p class="text-sm text-muted-foreground mt-1"><strong>Type:</strong> bool</p>
+                        <p class="text-sm text-muted-foreground"><strong>Default:</strong> false</p>
+                        <p class="text-sm text-muted-foreground">Whether the table is in a loading state.</p>
+                    </div>
+                    <div>
+                        <code class="bg-muted px-1 rounded text-sm">InitialPageSize</code>
+                        <p class="text-sm text-muted-foreground mt-1"><strong>Type:</strong> int</p>
+                        <p class="text-sm text-muted-foreground"><strong>Default:</strong> 5</p>
+                        <p class="text-sm text-muted-foreground">The initial page size.</p>
+                    </div>
+                    <div>
+                        <code class="bg-muted px-1 rounded text-sm">PageSizes</code>
+                        <p class="text-sm text-muted-foreground mt-1"><strong>Type:</strong> int[]</p>
+                        <p class="text-sm text-muted-foreground"><strong>Default:</strong> [5, 10, 20, 50, 100]</p>
+                        <p class="text-sm text-muted-foreground">The available page size options.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <h3 class="font-semibold mb-3">DataTableColumn</h3>
+                <div class="space-y-4">
+                    <div>
+                        <code class="bg-muted px-1 rounded text-sm">Property</code>
+                        <p class="text-sm text-muted-foreground mt-1"><strong>Type:</strong> Func&lt;TData, TValue&gt;</p>
+                        <p class="text-sm text-muted-foreground">Expression to get the column value from a data item.</p>
+                    </div>
+                    <div>
+                        <code class="bg-muted px-1 rounded text-sm">Header</code>
+                        <p class="text-sm text-muted-foreground mt-1"><strong>Type:</strong> string</p>
+                        <p class="text-sm text-muted-foreground">The column header text.</p>
+                    </div>
+                    <div>
+                        <code class="bg-muted px-1 rounded text-sm">Sortable</code>
+                        <p class="text-sm text-muted-foreground mt-1"><strong>Type:</strong> bool</p>
+                        <p class="text-sm text-muted-foreground"><strong>Default:</strong> false</p>
+                        <p class="text-sm text-muted-foreground">Whether the column is sortable.</p>
+                    </div>
+                    <div>
+                        <code class="bg-muted px-1 rounded text-sm">CellTemplate</code>
+                        <p class="text-sm text-muted-foreground mt-1"><strong>Type:</strong> RenderFragment&lt;TData&gt;?</p>
+                        <p class="text-sm text-muted-foreground">Custom template for rendering the cell content.</p>
+                    </div>
+                    <div>
+                        <code class="bg-muted px-1 rounded text-sm">Visible</code>
+                        <p class="text-sm text-muted-foreground mt-1"><strong>Type:</strong> bool</p>
+                        <p class="text-sm text-muted-foreground"><strong>Default:</strong> true</p>
+                        <p class="text-sm text-muted-foreground">Whether the column is visible.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private List<Person> people = new();
+    private List<Person> emptyPeople = new();
+    private IReadOnlyCollection<Person> selectedPeople = Array.Empty<Person>();
+    private bool isLoading = false;
+    private bool enableKeyboardNavigation = true;
+
+    protected override void OnInitialized()
+    {
+        // Generate 500 sample records using MockDataService
+        people = MockDataService.GeneratePersons(500);
+    }
+
+    private void ShowDetails(Person person)
+    {
+        // TODO: Implement show details dialog
+    }
+
+    private void EditPerson(Person person)
+    {
+        // TODO: Implement edit dialog
+    }
+
+    private void AddNewPerson()
+    {
+        // TODO: Implement add person dialog
+    }
+
+    private void ExportData()
+    {
+        // TODO: Implement export functionality
+    }
+}

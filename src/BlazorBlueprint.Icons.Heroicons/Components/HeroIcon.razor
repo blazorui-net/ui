@@ -1,0 +1,44 @@
+@namespace BlazorBlueprint.Icons.Heroicons.Components
+
+@if (!string.IsNullOrEmpty(SvgContent))
+{
+    @if (IsOutline)
+    {
+        @* Outline variant: stroke-based with stroke attributes *@
+        <svg
+            width="@ComputedSize"
+            height="@ComputedSize"
+            viewBox="@ViewBox"
+            fill="@Fill"
+            stroke="@Stroke"
+            stroke-width="@ComputedStrokeWidth"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="@CssClass"
+            role="img"
+            aria-label="@AriaLabel"
+            @attributes="AdditionalAttributes">
+            @((MarkupString)SvgContent)
+        </svg>
+    }
+    else
+    {
+        @* Solid/Mini/Micro variants: filled with no stroke *@
+        <svg
+            width="@ComputedSize"
+            height="@ComputedSize"
+            viewBox="@ViewBox"
+            fill="@Fill"
+            class="@CssClass"
+            role="img"
+            aria-label="@AriaLabel"
+            @attributes="AdditionalAttributes">
+            @((MarkupString)SvgContent)
+        </svg>
+    }
+}
+else
+{
+    @* Fallback for missing icons *@
+    <span class="text-destructive" role="alert" aria-label="Icon not found: @Name (@Variant)">⚠️</span>
+}

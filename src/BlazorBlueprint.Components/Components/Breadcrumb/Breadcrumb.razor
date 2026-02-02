@@ -1,0 +1,17 @@
+@namespace BlazorBlueprint.Components.Breadcrumb
+
+<nav aria-label="breadcrumb" class="@CssClass">
+    <ol class="flex flex-wrap items-center gap-1.5 break-words text-sm text-muted-foreground sm:gap-2.5">
+        @ChildContent
+    </ol>
+</nav>
+
+@code {
+    [Parameter]
+    public string? Class { get; set; }
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    private string CssClass => Class ?? string.Empty;
+}

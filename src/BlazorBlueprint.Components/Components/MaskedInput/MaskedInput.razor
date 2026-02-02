@@ -1,0 +1,21 @@
+@namespace BlazorBlueprint.Components.MaskedInput
+@using Microsoft.JSInterop
+@inject IJSRuntime JSRuntime
+@implements IAsyncDisposable
+
+<input
+    @ref="_inputRef"
+    id="@Id"
+    type="text"
+    inputmode="@InputMode"
+    class="@CssClass"
+    value="@_displayValue"
+    @oninput="HandleInput"
+    placeholder="@EffectivePlaceholder"
+    disabled="@Disabled"
+    required="@Required"
+    aria-label="@AriaLabel"
+    aria-describedby="@AriaDescribedBy"
+    aria-invalid="@(AriaInvalid?.ToString().ToLower())"
+    @onfocus="HandleFocus"
+    @onblur="HandleBlur" />

@@ -1,0 +1,16 @@
+/* Base styles for theme system */
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+  }
+
+  /* Portal wrapper - removed from layout flow so portal content doesn't cause layout shifts */
+  .blazorblueprint-portal {
+    display: contents;
+  }
+}

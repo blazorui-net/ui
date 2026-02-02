@@ -1,0 +1,149 @@
+@namespace BlazorBlueprint.Primitives.HoverCard
+@using System.Linq
+@using BlazorBlueprint.Primitives.Floating
+@using BlazorBlueprint.Primitives.Services
+@implements IAsyncDisposable
+
+@*
+    HoverCardContent is the content container for the hover card.
+    Uses FloatingPortal for portal/positioning infrastructure.
+    Maintains HoverCard-specific behavior: mouse hover persistence.
+*@
+
+@if (Context.IsOpen && Context.State.TriggerElement.HasValue)
+{
+    <FloatingPortal IsOpen="true"
+                    AnchorElement="@Context.State.TriggerElement"
+                    PortalId="@_portalId"
+                    Side="@Side"
+                    Align="@Align"
+                    Offset="@Offset"
+                    Strategy="absolute"
+                    ZIndex="50"
+                    OnReady="@HandleFloatingReady">
+        @RenderHoverCardContent()
+    </FloatingPortal>
+}
+
+@code {
+    [CascadingParameter]
+    private HoverCardContext Context { get; set; } = null!;
+
+    /// <summary>
+    /// The content to render inside the hover card.
+    /// </summary>
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>
+    /// Additional attributes to apply to the content container.
+    /// </summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    /// <summary>
+    /// Preferred side for positioning.
+    /// Default is Bottom.
+    /// </summary>
+    [Parameter]
+    public PopoverSide Side { get; set; } = PopoverSide.Bottom;
+
+    /// <summary>
+    /// Alignment relative to trigger.
+    /// Default is Center.
+    /// </summary>
+    [Parameter]
+    public PopoverAlign Align { get; set; } = PopoverAlign.Center;
+
+    /// <summary>
+    /// Offset distance from the trigger element in pixels.
+    /// Default is 4.
+    /// </summary>
+    [Parameter]
+    public int Offset { get; set; } = 4;
+
+    private System.Timers.Timer? _closeTimer;
+    private string _portalId = "";
+
+    protected override void OnInitialized()
+    {
+        if (Context == null)
+        {
+            throw new InvalidOperationException("HoverCardContent must be used within a HoverCard component.");
+        }
+
+        _portalId = $"hovercard-portal-{Context.ContentId}";
+    }
+
+    private RenderFragment RenderHoverCardContent() => __builder =>
+    {
+        // Mouse handlers must be on this inner div to maintain hover persistence
+        <div id="@Context.ContentId"
+             role="dialog"
+             aria-describedby="@Context.TriggerId"
+             tabindex="-1"
+             @onmouseenter="HandleMouseEnter"
+             @onmouseleave="HandleMouseLeave"
+             data-state="open"
+             data-side="@Side"
+             @attributes="GetNonStyleAttributes()">
+            @ChildContent
+        </div>
+    };
+
+    private Task HandleFloatingReady()
+    {
+        // HoverCard doesn't need any special setup after positioning
+        // Mouse handlers are already set up in the render fragment
+        return Task.CompletedTask;
+    }
+
+    private void HandleMouseEnter()
+    {
+        // Cancel any pending close timer when hovering over content
+        CancelCloseTimer();
+    }
+
+    private void HandleMouseLeave()
+    {
+        // Close with delay when leaving content
+        _closeTimer?.Dispose();
+        _closeTimer = new System.Timers.Timer(Context.CloseDelay);
+        _closeTimer.Elapsed += (sender, e) =>
+        {
+            InvokeAsync(() =>
+            {
+                Context.Close();
+                StateHasChanged();
+            });
+        };
+        _closeTimer.AutoReset = false;
+        _closeTimer.Start();
+    }
+
+    private void CancelCloseTimer()
+    {
+        if (_closeTimer != null)
+        {
+            _closeTimer.Stop();
+            _closeTimer.Dispose();
+            _closeTimer = null;
+        }
+    }
+
+    private Dictionary<string, object>? GetNonStyleAttributes()
+    {
+        if (AdditionalAttributes == null) return null;
+
+        // Return all attributes except 'style' since FloatingPortal handles positioning styles
+        return AdditionalAttributes
+            .Where(kvp => kvp.Key != "style")
+            .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+    }
+
+    public ValueTask DisposeAsync()
+    {
+        CancelCloseTimer();
+        return ValueTask.CompletedTask;
+    }
+}

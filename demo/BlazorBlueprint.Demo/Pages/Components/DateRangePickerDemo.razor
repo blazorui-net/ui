@@ -1,0 +1,214 @@
+@page "/components/date-range-picker"
+@using BlazorBlueprint.Components.DateRangePicker
+
+<PageTitle>DateRangePicker Component - BlazorBlueprint</PageTitle>
+
+<div class="space-y-8 max-w-4xl">
+    <div>
+        <div class="space-y-3">
+            <h1 class="text-4xl font-bold tracking-tight">DateRangePicker Component</h1>
+            <p class="text-xl text-muted-foreground">
+                A date range selection component with two-month view, presets, and range constraints.
+            </p>
+        </div>
+    </div>
+
+    <!-- Basic Example -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Basic Example</h2>
+            <p class="text-sm text-muted-foreground">
+                Two-month view with preset date ranges.
+            </p>
+        </div>
+        <DateRangePicker @bind-Value="_basicRange" />
+        <p class="text-sm text-muted-foreground">
+            @if (_basicRange != null)
+            {
+                @($"Selected: {_basicRange.Start:MMM d, yyyy} - {_basicRange.End:MMM d, yyyy} ({_basicRange.Days} days)")
+            }
+            else
+            {
+                @("No range selected")
+            }
+        </p>
+    </div>
+
+    <!-- Single Month View -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Single Month View</h2>
+            <p class="text-sm text-muted-foreground">
+                Compact single calendar view.
+            </p>
+        </div>
+        <DateRangePicker @bind-Value="_singleMonth" ShowTwoMonths="false" />
+        <p class="text-sm text-muted-foreground">
+            @if (_singleMonth != null)
+            {
+                @($"Selected: {_singleMonth.Days} days")
+            }
+        </p>
+    </div>
+
+    <!-- Without Presets -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Without Presets</h2>
+            <p class="text-sm text-muted-foreground">
+                Calendar only, no quick select presets.
+            </p>
+        </div>
+        <DateRangePicker @bind-Value="_noPresets" ShowPresets="false" />
+    </div>
+
+    <!-- With Date Constraints -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">With Date Constraints</h2>
+            <p class="text-sm text-muted-foreground">
+                Only dates within the last 30 days are selectable.
+            </p>
+        </div>
+        <DateRangePicker @bind-Value="_constrained"
+                         MinDate="@DateTime.Today.AddDays(-30)"
+                         MaxDate="@DateTime.Today" />
+    </div>
+
+    <!-- Min/Max Days -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Min/Max Days Constraint</h2>
+            <p class="text-sm text-muted-foreground">
+                Range must be between 3 and 14 days.
+            </p>
+        </div>
+        <DateRangePicker @bind-Value="_minMaxDays" MinDays="3" MaxDays="14" />
+        <p class="text-sm text-muted-foreground">
+            @if (_minMaxDays != null)
+            {
+                @($"Selected: {_minMaxDays.Days} days (min: 3, max: 14)")
+            }
+        </p>
+    </div>
+
+    <!-- With Disabled Dates -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Disabled Weekends</h2>
+            <p class="text-sm text-muted-foreground">
+                Saturdays and Sundays are disabled.
+            </p>
+        </div>
+        <DateRangePicker @bind-Value="_noWeekends"
+                         DisabledDates="@(date => date.DayOfWeek == DayOfWeek.Saturday || date.DayOfWeek == DayOfWeek.Sunday)" />
+    </div>
+
+    <!-- Pre-selected Value -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Pre-selected Value</h2>
+            <p class="text-sm text-muted-foreground">
+                Initialized with last 7 days.
+            </p>
+        </div>
+        <DateRangePicker @bind-Value="_preselected" />
+        <p class="text-sm text-muted-foreground">
+            @if (_preselected != null)
+            {
+                @($"Selected: {_preselected.Start:MMM d} - {_preselected.End:MMM d}")
+            }
+        </p>
+    </div>
+
+    <!-- Custom Date Format -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Custom Date Format</h2>
+            <p class="text-sm text-muted-foreground">
+                Using ISO date format.
+            </p>
+        </div>
+        <DateRangePicker @bind-Value="_customFormat" DateFormat="yyyy-MM-dd" />
+    </div>
+
+    <!-- Custom Placeholder -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Custom Placeholder</h2>
+        </div>
+        <DateRangePicker @bind-Value="_placeholder" Placeholder="Choose booking dates" />
+    </div>
+
+    <!-- Monday First -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Monday First</h2>
+            <p class="text-sm text-muted-foreground">
+                Week starts on Monday.
+            </p>
+        </div>
+        <DateRangePicker @bind-Value="_mondayFirst" FirstDayOfWeek="DayOfWeek.Monday" />
+    </div>
+
+    <!-- Disabled -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Disabled</h2>
+        </div>
+        <DateRangePicker Value="@(new DateRange(DateTime.Today.AddDays(-7), DateTime.Today))" Disabled="true" />
+    </div>
+
+    <!-- API Reference -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">API Reference</h2>
+        </div>
+        <div class="border rounded-lg p-6 space-y-4">
+            <div>
+                <h3 class="font-mono text-sm font-semibold mb-2">DateRangePicker Parameters</h3>
+                <div class="space-y-2 text-sm">
+                    <p><strong>Value:</strong> <code class="bg-muted px-1 py-0.5 rounded">DateRange?</code> - Selected date range (Start, End)</p>
+                    <p><strong>MinDate:</strong> <code class="bg-muted px-1 py-0.5 rounded">DateTime?</code> - Minimum selectable date</p>
+                    <p><strong>MaxDate:</strong> <code class="bg-muted px-1 py-0.5 rounded">DateTime?</code> - Maximum selectable date</p>
+                    <p><strong>MinDays:</strong> <code class="bg-muted px-1 py-0.5 rounded">int?</code> - Minimum range span in days</p>
+                    <p><strong>MaxDays:</strong> <code class="bg-muted px-1 py-0.5 rounded">int?</code> - Maximum range span in days</p>
+                    <p><strong>DisabledDates:</strong> <code class="bg-muted px-1 py-0.5 rounded">Func&lt;DateTime, bool&gt;?</code> - Function to disable specific dates</p>
+                    <p><strong>ShowTwoMonths:</strong> <code class="bg-muted px-1 py-0.5 rounded">bool</code> - Show two calendars side by side. Default: true</p>
+                    <p><strong>ShowPresets:</strong> <code class="bg-muted px-1 py-0.5 rounded">bool</code> - Show quick select presets. Default: true</p>
+                    <p><strong>FirstDayOfWeek:</strong> <code class="bg-muted px-1 py-0.5 rounded">DayOfWeek</code> - First day of week. Default: Sunday</p>
+                    <p><strong>DateFormat:</strong> <code class="bg-muted px-1 py-0.5 rounded">string</code> - Display format. Default: "MMM d, yyyy"</p>
+                    <p><strong>Disabled:</strong> <code class="bg-muted px-1 py-0.5 rounded">bool</code> - Disables the picker</p>
+                </div>
+            </div>
+            <div>
+                <h3 class="font-mono text-sm font-semibold mb-2">DateRange Properties</h3>
+                <div class="space-y-2 text-sm">
+                    <p><strong>Start:</strong> <code class="bg-muted px-1 py-0.5 rounded">DateTime</code> - Start date of range</p>
+                    <p><strong>End:</strong> <code class="bg-muted px-1 py-0.5 rounded">DateTime</code> - End date of range</p>
+                    <p><strong>Days:</strong> <code class="bg-muted px-1 py-0.5 rounded">int</code> - Number of days (inclusive)</p>
+                    <p><strong>Contains(date):</strong> <code class="bg-muted px-1 py-0.5 rounded">bool</code> - Check if date is within range</p>
+                </div>
+            </div>
+            <div>
+                <h3 class="font-mono text-sm font-semibold mb-2">Preset Ranges</h3>
+                <div class="space-y-2 text-sm">
+                    <p>Today, Yesterday, Last 7 days, Last 30 days, This month, Last month</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private DateRange? _basicRange;
+    private DateRange? _singleMonth;
+    private DateRange? _noPresets;
+    private DateRange? _constrained;
+    private DateRange? _minMaxDays;
+    private DateRange? _noWeekends;
+    private DateRange? _preselected = new DateRange(DateTime.Today.AddDays(-6), DateTime.Today);
+    private DateRange? _customFormat;
+    private DateRange? _placeholder;
+    private DateRange? _mondayFirst;
+}

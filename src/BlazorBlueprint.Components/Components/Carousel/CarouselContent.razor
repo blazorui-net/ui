@@ -1,0 +1,42 @@
+@namespace BlazorBlueprint.Components.Carousel
+
+<div class="overflow-hidden">
+    <div class="@CssClass" style="@TransformStyle">
+        @ChildContent
+    </div>
+</div>
+
+@code {
+    [CascadingParameter]
+    public Carousel? Context { get; set; }
+
+    [Parameter]
+    public string? Class { get; set; }
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    private string TransformStyle
+    {
+        get
+        {
+            var index = Context?.CurrentIndex ?? 0;
+            var isHorizontal = Context?.Orientation == CarouselOrientation.Horizontal;
+
+            if (isHorizontal)
+            {
+                return $"transform: translateX(-{index * 100}%); transition: transform 300ms ease-in-out;";
+            }
+            else
+            {
+                return $"transform: translateY(-{index * 100}%); transition: transform 300ms ease-in-out;";
+            }
+        }
+    }
+
+    private string CssClass => BlazorBlueprint.Components.Utilities.ClassNames.cn(
+        "flex",
+        Context?.Orientation == CarouselOrientation.Vertical ? "flex-col" : "-ml-4",
+        Class
+    );
+}

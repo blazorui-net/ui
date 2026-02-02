@@ -1,0 +1,13 @@
+@typeparam TValue
+@namespace BlazorBlueprint.Components.RadioGroup
+@using BlazorBlueprint.Primitives.RadioGroup
+
+<BlazorBlueprint.Primitives.RadioGroup.RadioGroupItem TValue="TValue"
+    @ref="primitiveRef"
+    Value="@Value"
+    Disabled="@Disabled"
+    Id="@Id"
+    AriaLabel="@AriaLabel"
+    class="@CssClass">
+    <span class="@CircleIndicatorClass"></span>
+</BlazorBlueprint.Primitives.RadioGroup.RadioGroupItem>

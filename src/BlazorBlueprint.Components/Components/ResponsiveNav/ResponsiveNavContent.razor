@@ -1,0 +1,112 @@
+@namespace BlazorBlueprint.Components.ResponsiveNav
+@using BlazorBlueprint.Primitives.Sheet
+@using Microsoft.AspNetCore.Components.Routing
+@inject NavigationManager NavigationManager
+@implements IDisposable
+
+@*
+    ResponsiveNavContent component for mobile navigation.
+    Renders content inside a Sheet that slides in from the left.
+    Auto-closes when navigation occurs.
+*@
+
+@if (Context != null)
+{
+    <BlazorBlueprint.Components.Sheet.Sheet Open="@Context.OpenMobile" OpenChanged="@(EventCallback.Factory.Create<bool>(this, OnOpenChanged))" Side="@Side">
+        <BlazorBlueprint.Components.Sheet.SheetContent Class="@ContentClass" ShowClose="@ShowClose">
+            @if (Header != null)
+            {
+                <div class="border-b pb-4 mb-4">
+                    @Header
+                </div>
+            }
+            @ChildContent
+            @if (Footer != null)
+            {
+                <div class="mt-auto pt-4 border-t">
+                    @Footer
+                </div>
+            }
+        </BlazorBlueprint.Components.Sheet.SheetContent>
+    </BlazorBlueprint.Components.Sheet.Sheet>
+}
+
+@code {
+    [CascadingParameter]
+    private ResponsiveNavContext? Context { get; set; }
+
+    /// <summary>
+    /// The navigation content to render inside the mobile sheet.
+    /// </summary>
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>
+    /// Optional header content for the mobile menu.
+    /// </summary>
+    [Parameter]
+    public RenderFragment? Header { get; set; }
+
+    /// <summary>
+    /// Optional footer content for the mobile menu.
+    /// </summary>
+    [Parameter]
+    public RenderFragment? Footer { get; set; }
+
+    /// <summary>
+    /// The side from which the sheet slides in.
+    /// Default is Left.
+    /// </summary>
+    [Parameter]
+    public SheetSide Side { get; set; } = SheetSide.Left;
+
+    /// <summary>
+    /// Whether to show the close button.
+    /// Default is true.
+    /// </summary>
+    [Parameter]
+    public bool ShowClose { get; set; } = true;
+
+    /// <summary>
+    /// Additional CSS classes for the sheet content.
+    /// </summary>
+    [Parameter]
+    public string? ContentClass { get; set; }
+
+    /// <summary>
+    /// Whether to close the menu when navigation occurs.
+    /// Default is true.
+    /// </summary>
+    [Parameter]
+    public bool CloseOnNavigate { get; set; } = true;
+
+    protected override void OnInitialized()
+    {
+        if (CloseOnNavigate)
+        {
+            NavigationManager.LocationChanged += OnLocationChanged;
+        }
+    }
+
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        // Close mobile menu when navigation occurs
+        if (Context?.OpenMobile == true)
+        {
+            Context.SetOpenMobile(false);
+        }
+    }
+
+    private void OnOpenChanged(bool open)
+    {
+        Context?.SetOpenMobile(open);
+    }
+
+    public void Dispose()
+    {
+        if (CloseOnNavigate)
+        {
+            NavigationManager.LocationChanged -= OnLocationChanged;
+        }
+    }
+}

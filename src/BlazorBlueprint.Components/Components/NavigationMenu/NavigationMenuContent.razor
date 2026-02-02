@@ -1,0 +1,216 @@
+@namespace BlazorBlueprint.Components.NavigationMenu
+@using BlazorBlueprint.Components.Utilities
+@inject IJSRuntime JSRuntime
+@implements IAsyncDisposable
+
+@*
+    Navigation Menu Content - the dropdown content panel.
+*@
+
+@if (MenuItem?.IsOpen == true)
+{
+    <div @ref="_contentRef"
+         class="@CssClass"
+         role="menu"
+         tabindex="@(IsKeyboardNavigationEnabled ? -1 : null)"
+         data-state="@(MenuItem?.IsOpen == true ? "open" : "closed")"
+         @onmouseenter="HandleMouseEnter"
+         @onmouseleave="HandleMouseLeave"
+         @onclick="HandleClick">
+        @ChildContent
+    </div>
+}
+
+@code {
+    private ElementReference _contentRef;
+    private IJSObjectReference? _navModule;
+    private IJSObjectReference? _keyboardCleanup;
+    private DotNetObjectReference<NavigationMenuContent>? _dotNetRef;
+    private bool _moduleLoaded = false;
+    private bool _wasOpen = false;
+
+    /// <summary>
+    /// Reference to the parent menu item.
+    /// </summary>
+    [CascadingParameter]
+    public NavigationMenuItem? MenuItem { get; set; }
+
+    /// <summary>
+    /// The content to render in the dropdown.
+    /// </summary>
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>
+    /// Additional CSS classes to apply to the content.
+    /// </summary>
+    [Parameter]
+    public string? Class { get; set; }
+
+    protected override void OnInitialized()
+    {
+        MenuItem?.RegisterContent(this);
+    }
+
+    /// <summary>
+    /// Gets whether keyboard navigation is enabled on the parent menu.
+    /// </summary>
+    private bool IsKeyboardNavigationEnabled => MenuItem?.Menu?.EnableKeyboardNavigation == true;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        var isOpen = MenuItem?.IsOpen == true;
+
+        // Only set up keyboard navigation if enabled
+        if (IsKeyboardNavigationEnabled)
+        {
+            // Load module if not loaded
+            if (isOpen && !_moduleLoaded)
+            {
+                try
+                {
+                    _navModule = await JSRuntime.InvokeAsync<IJSObjectReference>(
+                        "import", "./_content/BlazorBlueprint.Components/js/navigation-menu.js");
+                    _moduleLoaded = true;
+                }
+                catch
+                {
+                    // Module loading failed
+                }
+            }
+
+            // Set up keyboard navigation when menu opens
+            if (isOpen && !_wasOpen && _navModule != null)
+            {
+                try
+                {
+                    _dotNetRef = DotNetObjectReference.Create(this);
+                    _keyboardCleanup = await _navModule.InvokeAsync<IJSObjectReference>(
+                        "setupKeyboardNavigation", _contentRef, _dotNetRef);
+
+                    // Focus the first item in the content
+                    await _navModule.InvokeVoidAsync("navigateFirst", _contentRef);
+                }
+                catch
+                {
+                    // Keyboard navigation setup failed
+                }
+            }
+
+            // Clean up keyboard navigation when menu closes
+            if (!isOpen && _wasOpen && _keyboardCleanup != null)
+            {
+                try
+                {
+                    await _keyboardCleanup.InvokeVoidAsync("dispose");
+                    await _keyboardCleanup.DisposeAsync();
+                    _keyboardCleanup = null;
+                    _dotNetRef?.Dispose();
+                    _dotNetRef = null;
+                }
+                catch
+                {
+                    // Cleanup failed
+                }
+            }
+        }
+
+        _wasOpen = isOpen;
+    }
+
+    /// <summary>
+    /// Focuses the first focusable item in the content.
+    /// </summary>
+    internal async Task FocusFirstItemAsync()
+    {
+        // Ensure module is loaded
+        if (!_moduleLoaded)
+        {
+            try
+            {
+                _navModule = await JSRuntime.InvokeAsync<IJSObjectReference>(
+                    "import", "./_content/BlazorBlueprint.Components/js/navigation-menu.js");
+                _moduleLoaded = true;
+            }
+            catch
+            {
+                return;
+            }
+        }
+
+        if (_navModule != null)
+        {
+            await _navModule.InvokeVoidAsync("navigateFirst", _contentRef);
+        }
+    }
+
+    /// <summary>
+    /// Called from JavaScript when Escape key is pressed.
+    /// </summary>
+    [JSInvokable]
+    public async Task HandleEscapeKey()
+    {
+        if (MenuItem != null)
+        {
+            MenuItem.IsOpen = false;
+            await MenuItem.FocusTriggerAsync();
+        }
+    }
+
+    private void HandleMouseEnter()
+    {
+        if (MenuItem != null)
+        {
+            MenuItem.CancelCloseTimer();
+            MenuItem.IsOpen = true;
+        }
+    }
+
+    private void HandleMouseLeave()
+    {
+        MenuItem?.StartCloseTimer();
+    }
+
+    private void HandleClick()
+    {
+        // Close the menu immediately when any content is clicked
+        // This provides faster feedback than waiting for LocationChanged
+        if (MenuItem != null)
+        {
+            MenuItem.IsOpen = false;
+        }
+    }
+
+    /// <summary>
+    /// Gets the computed CSS classes for the content panel.
+    /// </summary>
+    private string CssClass => ClassNames.cn(
+        "absolute left-0 top-full mt-1.5 w-max z-50",
+        "rounded-md border bg-popover text-popover-foreground shadow-lg",
+        "outline-none ring-0 focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 focus-within:bg-popover",
+        "data-[state=open]:animate-in data-[state=closed]:animate-out",
+        "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
+        "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
+        Class
+    );
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_keyboardCleanup != null)
+        {
+            try
+            {
+                await _keyboardCleanup.InvokeVoidAsync("dispose");
+                await _keyboardCleanup.DisposeAsync();
+            }
+            catch { }
+        }
+
+        _dotNetRef?.Dispose();
+
+        if (_navModule != null)
+        {
+            await _navModule.DisposeAsync();
+        }
+    }
+}

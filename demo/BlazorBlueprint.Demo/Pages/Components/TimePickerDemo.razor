@@ -1,0 +1,236 @@
+@page "/components/time-picker"
+@using BlazorBlueprint.Components.TimePicker
+
+<PageTitle>TimePicker Component - BlazorBlueprint</PageTitle>
+
+<div class="space-y-8 max-w-4xl">
+    <div>
+        <div class="space-y-3">
+            <h1 class="text-4xl font-bold tracking-tight">TimePicker Component</h1>
+            <p class="text-xl text-muted-foreground">
+                A time selection component with 12/24-hour format support, minute stepping, and time constraints.
+            </p>
+        </div>
+    </div>
+
+    <!-- Basic 12-Hour -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">12-Hour Format (Default)</h2>
+            <p class="text-sm text-muted-foreground">
+                Standard 12-hour format with AM/PM toggle.
+            </p>
+        </div>
+        <TimePicker @bind-Value="_time12" />
+        <p class="text-sm text-muted-foreground">
+            Selected: @(_time12.HasValue ? FormatTime12(_time12.Value) : "None")
+        </p>
+    </div>
+
+    <!-- 24-Hour Format -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">24-Hour Format</h2>
+            <p class="text-sm text-muted-foreground">
+                Military/international time format.
+            </p>
+        </div>
+        <TimePicker @bind-Value="_time24" Format="TimeFormat.Hour24" />
+        <p class="text-sm text-muted-foreground">
+            Selected: @(_time24.HasValue ? _time24.Value.ToString(@"hh\:mm") : "None")
+        </p>
+    </div>
+
+    <!-- With Seconds -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">With Seconds</h2>
+            <p class="text-sm text-muted-foreground">
+                Shows seconds selector for precise time selection.
+            </p>
+        </div>
+        <TimePicker @bind-Value="_timeSeconds" ShowSeconds="true" />
+        <p class="text-sm text-muted-foreground">
+            Selected: @(_timeSeconds.HasValue ? FormatTime12WithSeconds(_timeSeconds.Value) : "None")
+        </p>
+    </div>
+
+    <!-- 24-Hour with Seconds -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">24-Hour with Seconds</h2>
+        </div>
+        <TimePicker @bind-Value="_time24Seconds" Format="TimeFormat.Hour24" ShowSeconds="true" />
+        <p class="text-sm text-muted-foreground">
+            Selected: @(_time24Seconds.HasValue ? _time24Seconds.Value.ToString(@"hh\:mm\:ss") : "None")
+        </p>
+    </div>
+
+    <!-- Minute Step -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">15-Minute Intervals</h2>
+            <p class="text-sm text-muted-foreground">
+                Minutes increment by 15 (0, 15, 30, 45).
+            </p>
+        </div>
+        <TimePicker @bind-Value="_timeStep15" MinuteStep="15" />
+        <p class="text-sm text-muted-foreground">
+            Selected: @(_timeStep15.HasValue ? FormatTime12(_timeStep15.Value) : "None")
+        </p>
+    </div>
+
+    <!-- 5-Minute Step -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">5-Minute Intervals</h2>
+        </div>
+        <TimePicker @bind-Value="_timeStep5" MinuteStep="5" />
+        <p class="text-sm text-muted-foreground">
+            Selected: @(_timeStep5.HasValue ? FormatTime12(_timeStep5.Value) : "None")
+        </p>
+    </div>
+
+    <!-- With Time Constraints -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Business Hours (9 AM - 5 PM)</h2>
+            <p class="text-sm text-muted-foreground">
+                Time is constrained to business hours.
+            </p>
+        </div>
+        <TimePicker @bind-Value="_timeConstrained"
+                    MinTime="@(new TimeSpan(9, 0, 0))"
+                    MaxTime="@(new TimeSpan(17, 0, 0))" />
+        <p class="text-sm text-muted-foreground">
+            Selected: @(_timeConstrained.HasValue ? FormatTime12(_timeConstrained.Value) : "None") (9:00 AM - 5:00 PM)
+        </p>
+    </div>
+
+    <!-- Pre-selected Value -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Pre-selected Value</h2>
+            <p class="text-sm text-muted-foreground">
+                Initialized with 2:30 PM.
+            </p>
+        </div>
+        <TimePicker @bind-Value="_timePreset" />
+        <p class="text-sm text-muted-foreground">
+            Selected: @(_timePreset.HasValue ? FormatTime12(_timePreset.Value) : "None")
+        </p>
+    </div>
+
+    <!-- Custom Placeholder -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Custom Placeholder</h2>
+        </div>
+        <TimePicker @bind-Value="_timePlaceholder" Placeholder="Choose meeting time" />
+        <p class="text-sm text-muted-foreground">
+            Selected: @(_timePlaceholder.HasValue ? FormatTime12(_timePlaceholder.Value) : "None")
+        </p>
+    </div>
+
+    <!-- Disabled -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Disabled</h2>
+        </div>
+        <TimePicker Value="@(new TimeSpan(10, 30, 0))" Disabled="true" />
+    </div>
+
+    <!-- Multiple Pickers -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Start and End Time</h2>
+            <p class="text-sm text-muted-foreground">
+                Common pattern for scheduling.
+            </p>
+        </div>
+        <div class="flex items-center gap-4">
+            <div>
+                <label class="text-sm font-medium mb-1 block">Start</label>
+                <TimePicker @bind-Value="_startTime" />
+            </div>
+            <span class="mt-6">to</span>
+            <div>
+                <label class="text-sm font-medium mb-1 block">End</label>
+                <TimePicker @bind-Value="_endTime" />
+            </div>
+        </div>
+        <p class="text-sm text-muted-foreground">
+            @if (_startTime.HasValue && _endTime.HasValue)
+            {
+                var duration = _endTime.Value - _startTime.Value;
+                if (duration < TimeSpan.Zero) duration += TimeSpan.FromHours(24);
+                @($"Duration: {duration.Hours}h {duration.Minutes}m")
+            }
+            else
+            {
+                @("Select both times to see duration")
+            }
+        </p>
+    </div>
+
+    <!-- API Reference -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">API Reference</h2>
+        </div>
+        <div class="border rounded-lg p-6 space-y-4">
+            <div>
+                <h3 class="font-mono text-sm font-semibold mb-2">TimePicker Parameters</h3>
+                <div class="space-y-2 text-sm">
+                    <p><strong>Value:</strong> <code class="bg-muted px-1 py-0.5 rounded">TimeSpan?</code> - Selected time</p>
+                    <p><strong>Format:</strong> <code class="bg-muted px-1 py-0.5 rounded">TimeFormat</code> - Hour12 or Hour24. Default: Hour12</p>
+                    <p><strong>ShowSeconds:</strong> <code class="bg-muted px-1 py-0.5 rounded">bool</code> - Show seconds selector. Default: false</p>
+                    <p><strong>MinuteStep:</strong> <code class="bg-muted px-1 py-0.5 rounded">int</code> - Minute increment (1, 5, 10, 15, 30). Default: 1</p>
+                    <p><strong>MinTime:</strong> <code class="bg-muted px-1 py-0.5 rounded">TimeSpan?</code> - Minimum allowed time</p>
+                    <p><strong>MaxTime:</strong> <code class="bg-muted px-1 py-0.5 rounded">TimeSpan?</code> - Maximum allowed time</p>
+                    <p><strong>Placeholder:</strong> <code class="bg-muted px-1 py-0.5 rounded">string</code> - Placeholder text. Default: "Select time"</p>
+                    <p><strong>Disabled:</strong> <code class="bg-muted px-1 py-0.5 rounded">bool</code> - Disables the picker</p>
+                </div>
+            </div>
+            <div>
+                <h3 class="font-mono text-sm font-semibold mb-2">Features</h3>
+                <div class="space-y-2 text-sm">
+                    <p><strong>Now button:</strong> Sets current time</p>
+                    <p><strong>Clear button:</strong> Clears selection</p>
+                    <p><strong>AM/PM toggle:</strong> Available in 12-hour format</p>
+                    <p><strong>Arrow buttons:</strong> Increment/decrement values</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private TimeSpan? _time12;
+    private TimeSpan? _time24;
+    private TimeSpan? _timeSeconds;
+    private TimeSpan? _time24Seconds;
+    private TimeSpan? _timeStep15;
+    private TimeSpan? _timeStep5;
+    private TimeSpan? _timeConstrained;
+    private TimeSpan? _timePreset = new TimeSpan(14, 30, 0);
+    private TimeSpan? _timePlaceholder;
+    private TimeSpan? _startTime = new TimeSpan(9, 0, 0);
+    private TimeSpan? _endTime = new TimeSpan(17, 0, 0);
+
+    private string FormatTime12(TimeSpan time)
+    {
+        var hour = time.Hours % 12;
+        if (hour == 0) hour = 12;
+        var amPm = time.Hours < 12 ? "AM" : "PM";
+        return $"{hour:D2}:{time.Minutes:D2} {amPm}";
+    }
+
+    private string FormatTime12WithSeconds(TimeSpan time)
+    {
+        var hour = time.Hours % 12;
+        if (hour == 0) hour = 12;
+        var amPm = time.Hours < 12 ? "AM" : "PM";
+        return $"{hour:D2}:{time.Minutes:D2}:{time.Seconds:D2} {amPm}";
+    }
+}

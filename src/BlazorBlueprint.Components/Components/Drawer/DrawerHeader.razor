@@ -1,0 +1,18 @@
+@namespace BlazorBlueprint.Components.Drawer
+
+<div class="@CssClass">
+    @ChildContent
+</div>
+
+@code {
+    [Parameter]
+    public string? Class { get; set; }
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    private string CssClass => BlazorBlueprint.Components.Utilities.ClassNames.cn(
+        "grid gap-1.5 p-4 text-center sm:text-left",
+        Class
+    );
+}

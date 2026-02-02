@@ -1,14 +1,14 @@
 <Project>
   <PropertyGroup>
-    <!-- Package Metadata - Common to all BlazorUI packages -->
-    <Authors>BlazorUI Contributors</Authors>
-    <Company>BlazorUI</Company>
-    <Copyright>Copyright (c) 2025 BlazorUI Contributors</Copyright>
+    <!-- Package Metadata - Common to all BlazorBlueprint packages -->
+    <Authors>BlazorBlueprint Contributors</Authors>
+    <Company>BlazorBlueprint</Company>
+    <Copyright>Copyright (c) 2025 BlazorBlueprint Contributors</Copyright>
 
     <!-- License and Repository -->
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
-    <PackageProjectUrl>https://github.com/blazorui-net/ui</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/blazorui-net/ui</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/blazorblueprintui/ui</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/blazorblueprintui/ui</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
 
     <!-- Build Configuration -->

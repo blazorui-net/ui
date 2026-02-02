@@ -1,0 +1,295 @@
+@namespace BlazorBlueprint.Primitives.Popover
+@using BlazorBlueprint.Primitives.Floating
+@using BlazorBlueprint.Primitives.Services
+@inject IJSRuntime JSRuntime
+@implements IAsyncDisposable
+
+@*
+    PopoverContent is the main content container for the popover.
+    Uses FloatingPortal for portal/positioning infrastructure.
+    Maintains Popover-specific behavior: click-outside, escape key, ARIA attributes.
+*@
+
+@if (Context.IsOpen && Context.State.TriggerElement.HasValue)
+{
+    <FloatingPortal IsOpen="true"
+                    AnchorElement="@Context.State.TriggerElement"
+                    PortalId="@_portalId"
+                    Side="@Side"
+                    Align="@Align"
+                    Offset="@Offset"
+                    MatchAnchorWidth="@MatchTriggerWidth"
+                    Strategy="@Strategy"
+                    ZIndex="@ZIndex"
+                    OnReady="@HandleFloatingReady">
+        @RenderPopoverContent()
+    </FloatingPortal>
+}
+
+@code {
+    [CascadingParameter]
+    private PopoverContext Context { get; set; } = null!;
+
+    /// <summary>
+    /// The content to render inside the popover.
+    /// </summary>
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>
+    /// Additional attributes to apply to the content container.
+    /// </summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    /// <summary>
+    /// Whether pressing Escape should close the popover.
+    /// Default is true.
+    /// </summary>
+    [Parameter]
+    public bool CloseOnEscape { get; set; } = true;
+
+    /// <summary>
+    /// Whether clicking outside should close the popover.
+    /// Default is true.
+    /// </summary>
+    [Parameter]
+    public bool CloseOnClickOutside { get; set; } = true;
+
+    /// <summary>
+    /// Preferred side for positioning.
+    /// Default is Bottom.
+    /// </summary>
+    [Parameter]
+    public PopoverSide Side { get; set; } = PopoverSide.Bottom;
+
+    /// <summary>
+    /// Alignment relative to trigger.
+    /// Default is Center.
+    /// </summary>
+    [Parameter]
+    public PopoverAlign Align { get; set; } = PopoverAlign.Center;
+
+    /// <summary>
+    /// Offset distance from the trigger element in pixels.
+    /// Default is 4.
+    /// </summary>
+    [Parameter]
+    public int Offset { get; set; } = 4;
+
+    /// <summary>
+    /// Whether to match the popover width to the trigger element width.
+    /// Default is false.
+    /// </summary>
+    [Parameter]
+    public bool MatchTriggerWidth { get; set; } = false;
+
+    /// <summary>
+    /// CSS positioning strategy: "absolute" or "fixed".
+    /// Use "fixed" for dropdowns that need to escape stacking contexts.
+    /// Default is "absolute".
+    /// </summary>
+    [Parameter]
+    public string Strategy { get; set; } = "absolute";
+
+    /// <summary>
+    /// CSS z-index value for the popover content.
+    /// Default is 50.
+    /// </summary>
+    [Parameter]
+    public int ZIndex { get; set; } = 50;
+
+    /// <summary>
+    /// Event callback invoked when Escape key is pressed.
+    /// </summary>
+    [Parameter]
+    public EventCallback<KeyboardEventArgs> OnEscapeKeyDown { get; set; }
+
+    /// <summary>
+    /// Event callback invoked when clicking outside the popover.
+    /// </summary>
+    [Parameter]
+    public EventCallback OnClickOutside { get; set; }
+
+    /// <summary>
+    /// Event callback invoked when the popover content is fully ready (positioned and visible).
+    /// Useful for focus management.
+    /// </summary>
+    [Parameter]
+    public EventCallback OnContentReady { get; set; }
+
+    private IJSObjectReference? _clickOutsideModule;
+    private IJSObjectReference? _clickOutsideCleanup;
+    private DotNetObjectReference<PopoverContent>? _dotNetRef;
+    private bool _disposed = false;
+    private string _portalId = "";
+
+    protected override void OnInitialized()
+    {
+        if (Context == null)
+        {
+            throw new InvalidOperationException(
+                "PopoverContent must be used within a Popover component. " +
+                "Ensure PopoverContent is a child of a Popover component.");
+        }
+
+        _portalId = $"popover-portal-{Context.ContentId}";
+
+        // Subscribe to context changes
+        Context.OnStateChanged += HandleContextStateChanged;
+    }
+
+    private RenderFragment RenderPopoverContent() => __builder =>
+    {
+        <div id="@Context.ContentId"
+             role="group"
+             tabindex="-1"
+             @onkeydown="HandleKeyDown"
+             @attributes="AdditionalAttributes"
+             data-state="open">
+            @ChildContent
+        </div>
+    };
+
+    private async Task HandleFloatingReady()
+    {
+        // Set up click-outside detection
+        if (CloseOnClickOutside)
+        {
+            await SetupClickOutsideAsync();
+        }
+
+        // Notify subscribers that content is ready (for focus management, etc.)
+        Context.NotifyContentReady();
+
+        // Also invoke the parameter callback if provided
+        if (OnContentReady.HasDelegate)
+        {
+            await OnContentReady.InvokeAsync();
+        }
+    }
+
+    private async Task SetupClickOutsideAsync()
+    {
+        try
+        {
+            _clickOutsideModule = await JSRuntime.InvokeAsync<IJSObjectReference>(
+                "import", "./_content/BlazorBlueprint.Primitives/js/primitives/click-outside.js");
+
+            _dotNetRef = DotNetObjectReference.Create(this);
+
+            // Use ID-based lookup instead of ElementReference
+            // This ensures we always reference the current DOM element, not a stale one
+            // that may have been replaced during Blazor re-renders
+            _clickOutsideCleanup = await _clickOutsideModule.InvokeAsync<IJSObjectReference>(
+                "onClickOutsideByIds",
+                Context.ContentId,      // Element ID (not ElementReference)
+                _dotNetRef,
+                "HandleClickOutside",
+                Context.TriggerId);     // Trigger ID (not ElementReference)
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Failed to set up click-outside: {ex.Message}");
+        }
+    }
+
+    [JSInvokable]
+    public async Task HandleClickOutside()
+    {
+        // Guard against callbacks after disposal
+        if (_disposed || !Context.IsOpen) return;
+
+        // Invoke custom handler if provided
+        if (OnClickOutside.HasDelegate)
+        {
+            await OnClickOutside.InvokeAsync();
+        }
+
+        // Close popover if configured
+        if (CloseOnClickOutside)
+        {
+            Context.Close();
+        }
+    }
+
+    private async void HandleContextStateChanged()
+    {
+        if (!Context.IsOpen)
+        {
+            // Popover closed, clean up
+            await InvokeAsync(async () =>
+            {
+                await CleanupAsync();
+                StateHasChanged();
+            });
+        }
+        else
+        {
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private async Task HandleKeyDown(KeyboardEventArgs args)
+    {
+        if (args.Key == "Escape")
+        {
+            // Invoke custom handler if provided
+            if (OnEscapeKeyDown.HasDelegate)
+            {
+                await OnEscapeKeyDown.InvokeAsync(args);
+            }
+
+            // Close popover if configured
+            if (CloseOnEscape)
+            {
+                Context.Close();
+            }
+        }
+    }
+
+    private async Task CleanupAsync()
+    {
+        // Remove click-outside listener by invoking dispose method
+        if (_clickOutsideCleanup != null)
+        {
+            try
+            {
+                await _clickOutsideCleanup.InvokeVoidAsync("dispose");
+                await _clickOutsideCleanup.DisposeAsync();
+            }
+            catch
+            {
+                // Cleanup may already be disposed
+            }
+            _clickOutsideCleanup = null;
+        }
+
+        // Dispose DotNetObjectReference to prevent stale callbacks
+        if (_dotNetRef != null)
+        {
+            _dotNetRef.Dispose();
+            _dotNetRef = null;
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        // Set disposed flag first to prevent JSInvokable callbacks during cleanup
+        _disposed = true;
+
+        await CleanupAsync();
+
+        if (_clickOutsideModule != null)
+        {
+            await _clickOutsideModule.DisposeAsync();
+        }
+
+        _dotNetRef?.Dispose();
+
+        if (Context != null)
+        {
+            Context.OnStateChanged -= HandleContextStateChanged;
+        }
+    }
+}

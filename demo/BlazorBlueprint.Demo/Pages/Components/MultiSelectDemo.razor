@@ -1,0 +1,375 @@
+@page "/components/multiselect"
+@using BlazorBlueprint.Components.MultiSelect
+
+<PageTitle>Multi Select Component - BlazorBlueprint</PageTitle>
+
+<div class="space-y-8 max-w-4xl">
+    <div>
+        <div class="space-y-3">
+            <h1 class="text-4xl font-bold tracking-tight">Multi Select Component</h1>
+            <p class="text-xl text-muted-foreground">
+                A searchable multi-select component that allows selecting multiple options with checkbox indicators and tag display.
+            </p>
+        </div>
+    </div>
+
+    <!-- Basic MultiSelect -->
+    <section class="space-y-4">
+        <h2 class="text-2xl font-semibold">Basic Multi Select</h2>
+        <p class="text-sm text-muted-foreground">
+            Select multiple programming languages. Selected items appear as tags.
+        </p>
+
+        <div class="flex flex-col gap-2">
+            <MultiSelect TItem="Language"
+                        Items="languages"
+                        @bind-Values="selectedLanguages"
+                        ValueSelector="@(l => l.Value)"
+                        DisplaySelector="@(l => l.Label)"
+                        Placeholder="Select languages..."
+                        SearchPlaceholder="Search languages..."
+                        EmptyMessage="No language found."
+                        PopoverWidth="w-[300px]" />
+            @if (selectedLanguages?.Any() == true)
+            {
+                <p class="text-sm">Selected (display): <strong>@string.Join(", ", selectedLanguages.Select(GetLanguageLabel))</strong></p>
+                <p class="text-sm">Selected (values): <strong>[@string.Join(", ", selectedLanguages)]</strong></p>
+            }
+        </div>
+    </section>
+
+    <!-- Tech Stack Example -->
+    <section class="space-y-4">
+        <h2 class="text-2xl font-semibold">Tech Stack Selector</h2>
+        <p class="text-sm text-muted-foreground">
+            Select your tech stack. Uses "Select All" functionality.
+        </p>
+
+        <div class="flex flex-col gap-2">
+            <MultiSelect TItem="Technology"
+                        Items="technologies"
+                        @bind-Values="selectedTechnologies"
+                        ValueSelector="@(t => t.Value)"
+                        DisplaySelector="@(t => t.Label)"
+                        Placeholder="Select technologies..."
+                        SearchPlaceholder="Search..."
+                        ShowSelectAll="true"
+                        SelectAllLabel="Select All"
+                        MaxDisplayTags="3"
+                        PopoverWidth="w-[320px]" />
+            @if (selectedTechnologies?.Any() == true)
+            {
+                <p class="text-sm">
+                    Selected (@selectedTechnologies.Count()):
+                    <strong>@string.Join(", ", selectedTechnologies.Select(GetTechnologyLabel))</strong>
+                </p>
+            }
+        </div>
+    </section>
+
+    <!-- Country Selector -->
+    <section class="space-y-4">
+        <h2 class="text-2xl font-semibold">Country Selector</h2>
+        <p class="text-sm text-muted-foreground">
+            Select countries with overflow indicator (+N more).
+        </p>
+
+        <div class="flex flex-col gap-2">
+            <MultiSelect TItem="Country"
+                        Items="countries"
+                        @bind-Values="selectedCountries"
+                        ValueSelector="@(c => c.Code)"
+                        DisplaySelector="@(c => c.Name)"
+                        Placeholder="Select countries..."
+                        SearchPlaceholder="Search country..."
+                        MaxDisplayTags="2"
+                        ShowSelectAll="true"
+                        PopoverWidth="w-[280px]" />
+            @if (selectedCountries?.Any() == true)
+            {
+                <p class="text-sm">
+                    Selected (@selectedCountries.Count()):
+                    <strong>@string.Join(", ", selectedCountries.Select(GetCountryName))</strong>
+                </p>
+            }
+        </div>
+    </section>
+
+    <!-- Without Select All -->
+    <section class="space-y-4">
+        <h2 class="text-2xl font-semibold">Without Select All</h2>
+        <p class="text-sm text-muted-foreground">
+            Multi Select without the "Select All" option.
+        </p>
+
+        <div class="flex flex-col gap-2">
+            <MultiSelect TItem="Framework"
+                        Items="frameworks"
+                        @bind-Values="selectedFrameworks"
+                        ValueSelector="@(f => f.Value)"
+                        DisplaySelector="@(f => f.Label)"
+                        Placeholder="Select frameworks..."
+                        SearchPlaceholder="Search..."
+                        ShowSelectAll="false"
+                        PopoverWidth="w-[250px]" />
+            @if (selectedFrameworks?.Any() == true)
+            {
+                <p class="text-sm">Selected (display): <strong>@string.Join(", ", selectedFrameworks.Select(GetFrameworkLabel))</strong></p>
+                <p class="text-sm">Selected (values): <strong>[@string.Join(", ", selectedFrameworks)]</strong></p>
+            }
+        </div>
+    </section>
+
+    <!-- Prevent Auto Close -->
+    <section class="space-y-4">
+        <h2 class="text-2xl font-semibold">Prevent Auto Close</h2>
+        <p class="text-sm text-muted-foreground">
+            With <code class="bg-muted px-1 py-0.5 rounded text-sm">AutoClose="false"</code>, the dropdown stays open when you click outside.
+            Use the Close button or press Escape to close it.
+        </p>
+
+        <div class="flex flex-col gap-2">
+            <MultiSelect TItem="Framework"
+                        Items="frameworks"
+                        @bind-Values="autoCloseFrameworks"
+                        ValueSelector="@(f => f.Value)"
+                        DisplaySelector="@(f => f.Label)"
+                        Placeholder="Select frameworks..."
+                        SearchPlaceholder="Search..."
+                        AutoClose="false"
+                        PopoverWidth="w-[280px]" />
+            @if (autoCloseFrameworks?.Any() == true)
+            {
+                <p class="text-sm">Selected: <strong>@string.Join(", ", autoCloseFrameworks.Select(GetFrameworkLabel))</strong></p>
+            }
+        </div>
+    </section>
+
+    <!-- Match Trigger Width -->
+    <section class="space-y-4">
+        <h2 class="text-2xl font-semibold">Match Trigger Width</h2>
+        <p class="text-sm text-muted-foreground">
+            With <code class="bg-muted px-1 py-0.5 rounded text-sm">MatchTriggerWidth="true"</code>,
+            the dropdown automatically matches the width of the trigger element.
+        </p>
+
+        <div class="flex flex-col gap-4">
+            <div class="w-72">
+                <label class="text-sm font-medium mb-2 block">Fixed width container (w-72)</label>
+                <MultiSelect TItem="Language"
+                            Items="languages"
+                            @bind-Values="matchWidthLanguages"
+                            ValueSelector="@(l => l.Value)"
+                            DisplaySelector="@(l => l.Label)"
+                            Placeholder="Select languages..."
+                            SearchPlaceholder="Search..."
+                            MatchTriggerWidth="true"
+                            Class="w-full" />
+            </div>
+
+            <div class="w-[500px]">
+                <label class="text-sm font-medium mb-2 block">Wider container (500px)</label>
+                <MultiSelect TItem="Technology"
+                            Items="technologies"
+                            @bind-Values="matchWidthTechnologies"
+                            ValueSelector="@(t => t.Value)"
+                            DisplaySelector="@(t => t.Label)"
+                            Placeholder="Select technologies..."
+                            SearchPlaceholder="Search..."
+                            ShowSelectAll="true"
+                            MatchTriggerWidth="true"
+                            Class="w-full" />
+            </div>
+        </div>
+    </section>
+
+    <!-- Disabled State -->
+    <section class="space-y-4">
+        <h2 class="text-2xl font-semibold">Disabled State</h2>
+        <p class="text-sm text-muted-foreground">
+            Multi Select in disabled state with pre-selected values.
+        </p>
+
+        <MultiSelect TItem="Language"
+                    Items="languages"
+                    Values="@disabledValues"
+                    ValueSelector="@(l => l.Value)"
+                    DisplaySelector="@(l => l.Label)"
+                    Placeholder="Disabled multiselect"
+                    Disabled="true"
+                    PopoverWidth="w-[300px]" />
+    </section>
+
+    <!-- Form Example -->
+    <section class="space-y-4">
+        <h2 class="text-2xl font-semibold">Form Integration</h2>
+        <p class="text-sm text-muted-foreground">
+            Example of Multi Select in a form layout.
+        </p>
+
+        <div class="space-y-4 max-w-md border rounded-lg p-6">
+            <div class="space-y-2">
+                <label class="text-sm font-medium">Skills</label>
+                <MultiSelect TItem="Language"
+                            Items="languages"
+                            @bind-Values="formSkills"
+                            ValueSelector="@(l => l.Value)"
+                            DisplaySelector="@(l => l.Label)"
+                            Placeholder="Select your skills..."
+                            SearchPlaceholder="Search skills..."
+                            ShowSelectAll="true"
+                            MatchTriggerWidth="true" />
+                <p class="text-xs text-muted-foreground">Select all programming languages you know.</p>
+            </div>
+
+            <div class="space-y-2">
+                <label class="text-sm font-medium">Preferred Frameworks</label>
+                <MultiSelect TItem="Framework"
+                            Items="frameworks"
+                            @bind-Values="formFrameworks"
+                            ValueSelector="@(f => f.Value)"
+                            DisplaySelector="@(f => f.Label)"
+                            Placeholder="Select frameworks..."
+                            SearchPlaceholder="Search frameworks..."
+                            MaxDisplayTags="2"
+                            MatchTriggerWidth="true" />
+                <p class="text-xs text-muted-foreground">Choose your preferred frameworks.</p>
+            </div>
+
+            <div class="pt-4 border-t">
+                <Button Variant="ButtonVariant.Default" OnClick="HandleFormSubmit">
+                    Submit
+                </Button>
+                @if (formSubmitted)
+                {
+                    <div class="text-sm text-green-600 mt-2 space-y-1">
+                        <p>Form submitted!</p>
+                        <p>Skills: <strong>@(formSkills?.Any() == true ? string.Join(", ", formSkills.Select(GetLanguageLabel)) : "None")</strong></p>
+                        <p>Frameworks: <strong>@(formFrameworks?.Any() == true ? string.Join(", ", formFrameworks.Select(GetFrameworkLabel)) : "None")</strong></p>
+                    </div>
+                }
+            </div>
+        </div>
+    </section>
+</div>
+
+@code {
+    // Basic example
+    private IEnumerable<string>? selectedLanguages;
+
+    // Tech stack example
+    private IEnumerable<string>? selectedTechnologies;
+
+    // Country example
+    private IEnumerable<string>? selectedCountries;
+
+    // Framework example
+    private IEnumerable<string>? selectedFrameworks;
+
+    // Auto close example
+    private IEnumerable<string>? autoCloseFrameworks;
+
+    // Disabled example
+    private IEnumerable<string> disabledValues = new[] { "csharp", "typescript" };
+
+    // Match trigger width examples
+    private IEnumerable<string>? matchWidthLanguages;
+    private IEnumerable<string>? matchWidthTechnologies;
+
+    // Form example
+    private IEnumerable<string>? formSkills;
+    private IEnumerable<string>? formFrameworks;
+    private bool formSubmitted;
+
+    private readonly List<Language> languages = new()
+    {
+        new Language { Value = "csharp", Label = "C#" },
+        new Language { Value = "typescript", Label = "TypeScript" },
+        new Language { Value = "javascript", Label = "JavaScript" },
+        new Language { Value = "python", Label = "Python" },
+        new Language { Value = "java", Label = "Java" },
+        new Language { Value = "go", Label = "Go" },
+        new Language { Value = "rust", Label = "Rust" },
+        new Language { Value = "php", Label = "PHP" }
+    };
+
+    private readonly List<Technology> technologies = new()
+    {
+        new Technology { Value = "react", Label = "React" },
+        new Technology { Value = "vue", Label = "Vue.js" },
+        new Technology { Value = "angular", Label = "Angular" },
+        new Technology { Value = "blazor", Label = "Blazor" },
+        new Technology { Value = "nextjs", Label = "Next.js" },
+        new Technology { Value = "nodejs", Label = "Node.js" },
+        new Technology { Value = "dotnet", Label = ".NET" },
+        new Technology { Value = "docker", Label = "Docker" },
+        new Technology { Value = "kubernetes", Label = "Kubernetes" },
+        new Technology { Value = "aws", Label = "AWS" }
+    };
+
+    private readonly List<Framework> frameworks = new()
+    {
+        new Framework { Value = "nextjs", Label = "Next.js" },
+        new Framework { Value = "sveltekit", Label = "SvelteKit" },
+        new Framework { Value = "nuxtjs", Label = "Nuxt.js" },
+        new Framework { Value = "remix", Label = "Remix" },
+        new Framework { Value = "astro", Label = "Astro" },
+        new Framework { Value = "blazor", Label = "Blazor" }
+    };
+
+    private readonly List<Country> countries = new()
+    {
+        new Country { Code = "US", Name = "United States" },
+        new Country { Code = "GB", Name = "United Kingdom" },
+        new Country { Code = "CA", Name = "Canada" },
+        new Country { Code = "AU", Name = "Australia" },
+        new Country { Code = "DE", Name = "Germany" },
+        new Country { Code = "FR", Name = "France" },
+        new Country { Code = "JP", Name = "Japan" },
+        new Country { Code = "BR", Name = "Brazil" },
+        new Country { Code = "MX", Name = "Mexico" },
+        new Country { Code = "NL", Name = "Netherlands" }
+    };
+
+    private string GetLanguageLabel(string value) =>
+        languages.FirstOrDefault(l => l.Value == value)?.Label ?? value;
+
+    private string GetTechnologyLabel(string value) =>
+        technologies.FirstOrDefault(t => t.Value == value)?.Label ?? value;
+
+    private string GetFrameworkLabel(string value) =>
+        frameworks.FirstOrDefault(f => f.Value == value)?.Label ?? value;
+
+    private string GetCountryName(string code) =>
+        countries.FirstOrDefault(c => c.Code == code)?.Name ?? code;
+
+    private void HandleFormSubmit()
+    {
+        formSubmitted = true;
+        StateHasChanged();
+    }
+
+    public class Language
+    {
+        public required string Value { get; set; }
+        public required string Label { get; set; }
+    }
+
+    public class Technology
+    {
+        public required string Value { get; set; }
+        public required string Label { get; set; }
+    }
+
+    public class Framework
+    {
+        public required string Value { get; set; }
+        public required string Label { get; set; }
+    }
+
+    public class Country
+    {
+        public required string Code { get; set; }
+        public required string Name { get; set; }
+    }
+}

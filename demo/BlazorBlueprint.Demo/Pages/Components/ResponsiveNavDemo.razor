@@ -1,0 +1,251 @@
+@page "/components/responsive-nav"
+@using BlazorBlueprint.Components.NavigationMenu
+@using BlazorBlueprint.Components.ResponsiveNav
+@using BlazorBlueprint.Components.Separator
+@using BlazorBlueprint.Icons.Lucide.Components
+
+<PageTitle>Responsive Navigation - BlazorBlueprint</PageTitle>
+
+<div class="space-y-8 max-w-4xl">
+    <div>
+        <div class="space-y-3">
+            <h1 class="text-4xl font-bold tracking-tight">Responsive Navigation</h1>
+            <p class="text-xl text-muted-foreground">
+                A responsive navigation wrapper that shows a hamburger menu on mobile and full navigation on desktop.
+            </p>
+        </div>
+    </div>
+
+    <!-- Basic Example -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Basic Example</h2>
+            <p class="text-sm text-muted-foreground">
+                Resize the browser window to see the navigation switch between desktop and mobile modes.
+                On mobile (below 768px), a hamburger icon appears and the navigation moves to a slide-out sheet.
+            </p>
+        </div>
+        <div class="border rounded-lg overflow-hidden">
+            <ResponsiveNavProvider>
+                <header class="flex items-center justify-between p-4 border-b bg-background">
+                    <div class="flex items-center gap-4">
+                        <a href="/" class="font-bold text-lg">BlazorBlueprint</a>
+
+                        <!-- Mobile trigger - hidden on desktop -->
+                        <ResponsiveNavTrigger />
+                    </div>
+
+                    <!-- Desktop navigation - hidden on mobile -->
+                    <NavigationMenu Class="hidden md:flex">
+                        <NavigationMenuList>
+                            <NavigationMenuItem>
+                                <NavigationMenuLink Href="/docs">Documentation</NavigationMenuLink>
+                            </NavigationMenuItem>
+                            <NavigationMenuItem Value="components">
+                                <NavigationMenuTrigger>Components</NavigationMenuTrigger>
+                                <NavigationMenuContent>
+                                    <div class="grid gap-3 p-4 w-[400px]">
+                                        <div class="p-3 rounded-lg hover:bg-accent">
+                                            <a href="/components/button" class="block font-medium mb-1">Button</a>
+                                            <p class="text-sm text-muted-foreground">Interactive buttons with variants.</p>
+                                        </div>
+                                        <div class="p-3 rounded-lg hover:bg-accent">
+                                            <a href="/components/dialog" class="block font-medium mb-1">Dialog</a>
+                                            <p class="text-sm text-muted-foreground">Modal dialogs for interactions.</p>
+                                        </div>
+                                    </div>
+                                </NavigationMenuContent>
+                            </NavigationMenuItem>
+                            <NavigationMenuItem>
+                                <NavigationMenuLink Href="/primitives">Primitives</NavigationMenuLink>
+                            </NavigationMenuItem>
+                        </NavigationMenuList>
+                    </NavigationMenu>
+
+                    <div class="hidden md:block">
+                        <a href="/login" class="text-sm text-muted-foreground hover:text-foreground">Sign In</a>
+                    </div>
+                </header>
+
+                <!-- Mobile navigation in Sheet -->
+                <ResponsiveNavContent>
+                    <nav class="flex flex-col space-y-4">
+                        <a href="/docs" class="text-lg font-medium hover:text-primary">Documentation</a>
+                        <div class="space-y-2">
+                            <span class="text-sm font-medium text-muted-foreground">Components</span>
+                            <div class="pl-4 space-y-2 border-l">
+                                <a href="/components/button" class="block text-sm hover:text-primary">Button</a>
+                                <a href="/components/dialog" class="block text-sm hover:text-primary">Dialog</a>
+                            </div>
+                        </div>
+                        <a href="/primitives" class="text-lg font-medium hover:text-primary">Primitives</a>
+                        <Separator />
+                        <a href="/login" class="text-sm text-muted-foreground hover:text-primary">Sign In</a>
+                    </nav>
+                </ResponsiveNavContent>
+            </ResponsiveNavProvider>
+        </div>
+    </div>
+
+    <!-- With Header and Footer -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">With Header and Footer</h2>
+            <p class="text-sm text-muted-foreground">
+                The mobile sheet can include optional header and footer sections.
+            </p>
+        </div>
+        <div class="border rounded-lg overflow-hidden">
+            <ResponsiveNavProvider>
+                <header class="flex items-center justify-between p-4 border-b bg-background">
+                    <div class="flex items-center gap-4">
+                        <LucideIcon Name="rocket" Size="24" Class="text-primary" />
+                        <span class="font-bold">Acme Inc</span>
+                        <ResponsiveNavTrigger />
+                    </div>
+
+                    <NavigationMenu Class="hidden md:flex">
+                        <NavigationMenuList>
+                            <NavigationMenuItem>
+                                <NavigationMenuLink Href="#">Products</NavigationMenuLink>
+                            </NavigationMenuItem>
+                            <NavigationMenuItem>
+                                <NavigationMenuLink Href="#">Solutions</NavigationMenuLink>
+                            </NavigationMenuItem>
+                            <NavigationMenuItem>
+                                <NavigationMenuLink Href="#">Pricing</NavigationMenuLink>
+                            </NavigationMenuItem>
+                            <NavigationMenuItem>
+                                <NavigationMenuLink Href="#">About</NavigationMenuLink>
+                            </NavigationMenuItem>
+                        </NavigationMenuList>
+                    </NavigationMenu>
+                </header>
+
+                <ResponsiveNavContent>
+                    <Header>
+                        <div class="flex items-center gap-3">
+                            <LucideIcon Name="rocket" Size="24" Class="text-primary" />
+                            <span class="font-bold text-lg">Acme Inc</span>
+                        </div>
+                    </Header>
+                    <ChildContent>
+                        <nav class="flex flex-col space-y-4">
+                            <a href="#" class="text-lg font-medium hover:text-primary">Products</a>
+                            <a href="#" class="text-lg font-medium hover:text-primary">Solutions</a>
+                            <a href="#" class="text-lg font-medium hover:text-primary">Pricing</a>
+                            <a href="#" class="text-lg font-medium hover:text-primary">About</a>
+                        </nav>
+                    </ChildContent>
+                    <Footer>
+                        <div class="flex flex-col gap-2">
+                            <a href="#" class="text-sm text-muted-foreground hover:text-primary">Contact Us</a>
+                            <a href="#" class="text-sm text-muted-foreground hover:text-primary">Support</a>
+                        </div>
+                    </Footer>
+                </ResponsiveNavContent>
+            </ResponsiveNavProvider>
+        </div>
+    </div>
+
+    <!-- Usage Notes -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Usage Notes</h2>
+        </div>
+        <div class="border rounded-lg p-6 space-y-3 bg-muted/50">
+            <p class="text-sm">
+                <strong>Structure:</strong> ResponsiveNavProvider wraps your header and provides context for responsive behavior.
+            </p>
+            <p class="text-sm">
+                <strong>Desktop navigation:</strong> Use the standard NavigationMenu with <code class="text-xs bg-muted px-1 py-0.5 rounded">Class="hidden md:flex"</code> to hide on mobile.
+            </p>
+            <p class="text-sm">
+                <strong>Mobile trigger:</strong> ResponsiveNavTrigger automatically shows only on mobile (below 768px).
+            </p>
+            <p class="text-sm">
+                <strong>Mobile content:</strong> ResponsiveNavContent renders a Sheet with your mobile navigation. Define your own layout inside.
+            </p>
+            <p class="text-sm">
+                <strong>Auto-close:</strong> The mobile sheet automatically closes when navigation occurs.
+            </p>
+        </div>
+    </div>
+
+    <!-- API Reference -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">API Reference</h2>
+        </div>
+        <div class="border rounded-lg p-6 space-y-4">
+            <div>
+                <h3 class="font-semibold mb-2">Components</h3>
+                <div class="space-y-2 text-sm">
+                    <p><code class="bg-muted px-1 py-0.5 rounded">ResponsiveNavProvider</code> - Root context provider (manages mobile state)</p>
+                    <p><code class="bg-muted px-1 py-0.5 rounded">ResponsiveNavTrigger</code> - Hamburger menu button (visible only on mobile)</p>
+                    <p><code class="bg-muted px-1 py-0.5 rounded">ResponsiveNavContent</code> - Mobile sheet content wrapper</p>
+                </div>
+            </div>
+            <Separator />
+            <div>
+                <h3 class="font-mono text-sm font-semibold mb-2">ResponsiveNavTrigger.Class</h3>
+                <p class="text-sm text-muted-foreground mb-2">
+                    Type: <code class="text-xs bg-muted px-1 py-0.5 rounded">string?</code>
+                </p>
+                <p class="text-sm text-muted-foreground">
+                    Additional CSS classes for the trigger button.
+                </p>
+            </div>
+            <Separator />
+            <div>
+                <h3 class="font-mono text-sm font-semibold mb-2">ResponsiveNavContent.Side</h3>
+                <p class="text-sm text-muted-foreground mb-2">
+                    Type: <code class="text-xs bg-muted px-1 py-0.5 rounded">SheetSide</code> — Default: <code class="text-xs bg-muted px-1 py-0.5 rounded">Left</code>
+                </p>
+                <p class="text-sm text-muted-foreground">
+                    The side from which the mobile sheet slides in.
+                </p>
+            </div>
+            <Separator />
+            <div>
+                <h3 class="font-mono text-sm font-semibold mb-2">ResponsiveNavContent.ShowClose</h3>
+                <p class="text-sm text-muted-foreground mb-2">
+                    Type: <code class="text-xs bg-muted px-1 py-0.5 rounded">bool</code> — Default: <code class="text-xs bg-muted px-1 py-0.5 rounded">true</code>
+                </p>
+                <p class="text-sm text-muted-foreground">
+                    Whether to show the close button in the sheet.
+                </p>
+            </div>
+            <Separator />
+            <div>
+                <h3 class="font-mono text-sm font-semibold mb-2">ResponsiveNavContent.CloseOnNavigate</h3>
+                <p class="text-sm text-muted-foreground mb-2">
+                    Type: <code class="text-xs bg-muted px-1 py-0.5 rounded">bool</code> — Default: <code class="text-xs bg-muted px-1 py-0.5 rounded">true</code>
+                </p>
+                <p class="text-sm text-muted-foreground">
+                    Whether to close the mobile menu when navigation occurs.
+                </p>
+            </div>
+            <Separator />
+            <div>
+                <h3 class="font-mono text-sm font-semibold mb-2">ResponsiveNavContent.Header</h3>
+                <p class="text-sm text-muted-foreground mb-2">
+                    Type: <code class="text-xs bg-muted px-1 py-0.5 rounded">RenderFragment?</code>
+                </p>
+                <p class="text-sm text-muted-foreground">
+                    Optional header content for the mobile menu.
+                </p>
+            </div>
+            <Separator />
+            <div>
+                <h3 class="font-mono text-sm font-semibold mb-2">ResponsiveNavContent.Footer</h3>
+                <p class="text-sm text-muted-foreground mb-2">
+                    Type: <code class="text-xs bg-muted px-1 py-0.5 rounded">RenderFragment?</code>
+                </p>
+                <p class="text-sm text-muted-foreground">
+                    Optional footer content for the mobile menu.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>

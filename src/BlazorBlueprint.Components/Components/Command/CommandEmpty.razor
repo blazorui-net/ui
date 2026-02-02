@@ -1,0 +1,68 @@
+@namespace BlazorBlueprint.Components.Command
+@implements IDisposable
+
+@if (!_hasVisibleItems)
+{
+    <div class="@CssClass">
+        @ChildContent
+    </div>
+}
+
+@code {
+    [CascadingParameter]
+    public CommandContext? Context { get; set; }
+
+    /// <summary>
+    /// Gets or sets additional CSS classes to apply to the empty state container.
+    /// </summary>
+    [Parameter]
+    public string? Class { get; set; }
+
+    /// <summary>
+    /// Gets or sets the content to be rendered when there are no results.
+    /// </summary>
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    private bool _hasVisibleItems = true;
+
+    /// <summary>
+    /// Gets the computed CSS classes for the empty state container.
+    /// </summary>
+    private string CssClass
+    {
+        get
+        {
+            var baseClasses = "py-6 text-center text-sm text-muted-foreground";
+            return string.IsNullOrWhiteSpace(Class) ? baseClasses : $"{baseClasses} {Class}";
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        if (Context != null)
+        {
+            Context.OnStateChanged += HandleContextStateChanged;
+            UpdateVisibility();
+        }
+    }
+
+    private void HandleContextStateChanged()
+    {
+        UpdateVisibility();
+        StateHasChanged();
+    }
+
+    private void UpdateVisibility()
+    {
+        _hasVisibleItems = Context?.HasVisibleItems() ?? true;
+    }
+
+    public void Dispose()
+    {
+        if (Context != null)
+        {
+            Context.OnStateChanged -= HandleContextStateChanged;
+        }
+    }
+}

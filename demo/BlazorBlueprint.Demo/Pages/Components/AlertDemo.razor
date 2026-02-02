@@ -1,0 +1,213 @@
+@page "/components/alert"
+@using BlazorBlueprint.Components.Alert
+@using BlazorBlueprint.Components.Separator
+@using BlazorBlueprint.Icons.Lucide.Components
+
+<PageTitle>Alert Component - BlazorBlueprint</PageTitle>
+
+<div class="space-y-8 max-w-4xl">
+    <div>
+        <div class="space-y-3">
+            <h1 class="text-4xl font-bold tracking-tight">Alert Component</h1>
+            <p class="text-xl text-muted-foreground">
+                Displays a callout for important messages that attract user attention.
+            </p>
+        </div>
+    </div>
+
+    <!-- All Variants -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Variants</h2>
+            <p class="text-sm text-muted-foreground">
+                Five semantic variants for different message types.
+            </p>
+        </div>
+        <div class="space-y-4">
+            <!-- Default -->
+            <Alert>
+                <Icon>
+                    <LucideIcon Name="terminal" Class="h-4 w-4" />
+                </Icon>
+                <ChildContent>
+                    <AlertTitle>Default</AlertTitle>
+                    <AlertDescription>
+                        A neutral alert for general informational messages.
+                    </AlertDescription>
+                </ChildContent>
+            </Alert>
+
+            <!-- Success -->
+            <Alert Variant="AlertVariant.Success">
+                <Icon>
+                    <LucideIcon Name="circle-check" Class="h-4 w-4" />
+                </Icon>
+                <ChildContent>
+                    <AlertTitle>Success</AlertTitle>
+                    <AlertDescription>
+                        Your changes have been saved successfully.
+                    </AlertDescription>
+                </ChildContent>
+            </Alert>
+
+            <!-- Info -->
+            <Alert Variant="AlertVariant.Info">
+                <Icon>
+                    <LucideIcon Name="info" Class="h-4 w-4" />
+                </Icon>
+                <ChildContent>
+                    <AlertTitle>Information</AlertTitle>
+                    <AlertDescription>
+                        This feature is currently in beta. Some functionality may change.
+                    </AlertDescription>
+                </ChildContent>
+            </Alert>
+
+            <!-- Warning -->
+            <Alert Variant="AlertVariant.Warning">
+                <Icon>
+                    <LucideIcon Name="triangle-alert" Class="h-4 w-4" />
+                </Icon>
+                <ChildContent>
+                    <AlertTitle>Warning</AlertTitle>
+                    <AlertDescription>
+                        Your account is approaching its storage limit.
+                    </AlertDescription>
+                </ChildContent>
+            </Alert>
+
+            <!-- Danger -->
+            <Alert Variant="AlertVariant.Danger">
+                <Icon>
+                    <LucideIcon Name="circle-alert" Class="h-4 w-4" />
+                </Icon>
+                <ChildContent>
+                    <AlertTitle>Danger</AlertTitle>
+                    <AlertDescription>
+                        Your session has expired. Please log in again.
+                    </AlertDescription>
+                </ChildContent>
+            </Alert>
+        </div>
+    </div>
+
+    <!-- With Accent Border -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">With Accent Border</h2>
+            <p class="text-sm text-muted-foreground">
+                Use <code class="text-xs bg-muted px-1 py-0.5 rounded">AccentBorder="true"</code> to display a thick left border with a subtle tinted background.
+            </p>
+        </div>
+        <div class="space-y-4">
+            <Alert Variant="AlertVariant.Warning" AccentBorder="true">
+                <Icon>
+                    <LucideIcon Name="triangle-alert" Class="h-4 w-4" />
+                </Icon>
+                <ChildContent>
+                    <AlertTitle>Note</AlertTitle>
+                    <AlertDescription>
+                        Each component has its own namespace (e.g., <code class="text-xs bg-muted px-1 py-0.5 rounded">BlazorBlueprint.Components.Button</code>, <code class="text-xs bg-muted px-1 py-0.5 rounded">BlazorBlueprint.Components.Dialog</code>). Import only the components you use to keep your imports clean.
+                    </AlertDescription>
+                </ChildContent>
+            </Alert>
+
+            <Alert Variant="AlertVariant.Info" AccentBorder="true">
+                <Icon>
+                    <LucideIcon Name="info" Class="h-4 w-4" />
+                </Icon>
+                <ChildContent>
+                    <AlertTitle>Tip</AlertTitle>
+                    <AlertDescription>
+                        You can customize the theme colors by modifying the CSS variables in your theme file.
+                    </AlertDescription>
+                </ChildContent>
+            </Alert>
+
+            <Alert Variant="AlertVariant.Danger" AccentBorder="true">
+                <Icon>
+                    <LucideIcon Name="circle-alert" Class="h-4 w-4" />
+                </Icon>
+                <ChildContent>
+                    <AlertTitle>Breaking Change</AlertTitle>
+                    <AlertDescription>
+                        The <code class="text-xs bg-muted px-1 py-0.5 rounded">Destructive</code> variant has been replaced with <code class="text-xs bg-muted px-1 py-0.5 rounded">Danger</code>.
+                    </AlertDescription>
+                </ChildContent>
+            </Alert>
+        </div>
+    </div>
+
+    <!-- Without Icons -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Without Icons</h2>
+            <p class="text-sm text-muted-foreground">
+                Alerts can be used without icons for simpler messages.
+            </p>
+        </div>
+        <div class="space-y-4">
+            <Alert>
+                <AlertTitle>Heads up!</AlertTitle>
+                <AlertDescription>
+                    You can add components to your app using the CLI.
+                </AlertDescription>
+            </Alert>
+
+            <Alert Variant="AlertVariant.Warning" AccentBorder="true">
+                <AlertTitle>Note</AlertTitle>
+                <AlertDescription>
+                    Remember to save your work before leaving the page.
+                </AlertDescription>
+            </Alert>
+        </div>
+    </div>
+
+    <!-- API Reference -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">API Reference</h2>
+        </div>
+        <div class="border rounded-lg p-6 space-y-4">
+            <div>
+                <h3 class="font-mono text-sm font-semibold mb-2">Variant</h3>
+                <p class="text-sm text-muted-foreground mb-2">
+                    Type: <code class="text-xs bg-muted px-1 py-0.5 rounded">AlertVariant</code> — Default: <code class="text-xs bg-muted px-1 py-0.5 rounded">Default</code>
+                </p>
+                <p class="text-sm text-muted-foreground">
+                    The visual style variant. Options: Default, Success, Info, Warning, Danger.
+                </p>
+            </div>
+            <Separator />
+            <div>
+                <h3 class="font-mono text-sm font-semibold mb-2">AccentBorder</h3>
+                <p class="text-sm text-muted-foreground mb-2">
+                    Type: <code class="text-xs bg-muted px-1 py-0.5 rounded">bool</code> — Default: <code class="text-xs bg-muted px-1 py-0.5 rounded">false</code>
+                </p>
+                <p class="text-sm text-muted-foreground">
+                    When true, displays a thick left border in the variant's accent color with a subtle tinted background.
+                </p>
+            </div>
+            <Separator />
+            <div>
+                <h3 class="font-mono text-sm font-semibold mb-2">Icon</h3>
+                <p class="text-sm text-muted-foreground mb-2">
+                    Type: <code class="text-xs bg-muted px-1 py-0.5 rounded">RenderFragment?</code>
+                </p>
+                <p class="text-sm text-muted-foreground">
+                    Optional icon to display in the alert.
+                </p>
+            </div>
+            <Separator />
+            <div>
+                <h3 class="font-mono text-sm font-semibold mb-2">Class</h3>
+                <p class="text-sm text-muted-foreground mb-2">
+                    Type: <code class="text-xs bg-muted px-1 py-0.5 rounded">string?</code>
+                </p>
+                <p class="text-sm text-muted-foreground">
+                    Additional CSS classes to apply to the alert.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>

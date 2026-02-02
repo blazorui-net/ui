@@ -1,0 +1,336 @@
+@page "/icons/heroicons"
+@using BlazorBlueprint.Icons.Heroicons.Components
+@using BlazorBlueprint.Icons.Heroicons.Data
+
+<PageTitle>Heroicons - BlazorBlueprint</PageTitle>
+
+<div class="space-y-8 max-w-4xl">
+    <div>
+        <div class="space-y-3">
+            <div class="flex items-center gap-3">
+                <a href="/icons" class="text-muted-foreground hover:text-foreground transition-colors">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="15 18 9 12 15 6"/>
+                    </svg>
+                </a>
+                <h1 class="text-4xl font-bold tracking-tight">Heroicons</h1>
+            </div>
+            <p class="text-xl text-muted-foreground">
+                Browse and search through @TotalIconCount icons from Heroicons by Tailwind Labs, available in 4 variants.
+            </p>
+        </div>
+    </div>
+
+    <!-- Variant Selector Tabs -->
+    <div class="flex gap-2 border-b border-border">
+        <button
+            class="px-4 py-2 font-medium transition-colors @(selectedVariant == HeroIconVariant.Outline ? "border-b-2 border-primary text-primary" : "text-muted-foreground hover:text-foreground")"
+            @onclick="() => SelectVariant(HeroIconVariant.Outline)">
+            Outline (@HeroIconData.OutlineIconCount)
+        </button>
+        <button
+            class="px-4 py-2 font-medium transition-colors @(selectedVariant == HeroIconVariant.Solid ? "border-b-2 border-primary text-primary" : "text-muted-foreground hover:text-foreground")"
+            @onclick="() => SelectVariant(HeroIconVariant.Solid)">
+            Solid (@HeroIconData.SolidIconCount)
+        </button>
+        <button
+            class="px-4 py-2 font-medium transition-colors @(selectedVariant == HeroIconVariant.Mini ? "border-b-2 border-primary text-primary" : "text-muted-foreground hover:text-foreground")"
+            @onclick="() => SelectVariant(HeroIconVariant.Mini)">
+            Mini (@HeroIconData.MiniIconCount)
+        </button>
+        <button
+            class="px-4 py-2 font-medium transition-colors @(selectedVariant == HeroIconVariant.Micro ? "border-b-2 border-primary text-primary" : "text-muted-foreground hover:text-foreground")"
+            @onclick="() => SelectVariant(HeroIconVariant.Micro)">
+            Micro (@HeroIconData.MicroIconCount)
+        </button>
+    </div>
+
+    <!-- Variant Description -->
+    <div class="p-4 bg-muted rounded-lg">
+        <div class="flex items-start gap-3">
+            <div class="flex-shrink-0 mt-1">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="12" y1="16" x2="12" y2="12"/>
+                    <line x1="12" y1="8" x2="12.01" y2="8"/>
+                </svg>
+            </div>
+            <div>
+                @switch (selectedVariant)
+                {
+                    case HeroIconVariant.Outline:
+                        <p class="text-sm">
+                            <strong>Outline (24x24):</strong> Stroke-based icons with 1.5px strokes. Perfect for general UI, navigation, and buttons.
+                        </p>
+                        break;
+                    case HeroIconVariant.Solid:
+                        <p class="text-sm">
+                            <strong>Solid (24x24):</strong> Filled icons perfect for active states, emphasis, and decorative elements.
+                        </p>
+                        break;
+                    case HeroIconVariant.Mini:
+                        <p class="text-sm">
+                            <strong>Mini (20x20):</strong> Compact filled icons ideal for inline with text, badges, and dense layouts.
+                        </p>
+                        break;
+                    case HeroIconVariant.Micro:
+                        <p class="text-sm">
+                            <strong>Micro (16x16):</strong> Smallest variant with simplified details, perfect for very small UI elements.
+                        </p>
+                        break;
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Search and Stats -->
+    <div class="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
+        <div class="w-full md:w-96">
+            <div class="relative">
+                <HeroIcon Name="magnifying-glass" Variant="@selectedVariant" Size="20" Class="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
+                <input
+                    type="text"
+                    placeholder="Search icons..."
+                    class="w-full pl-10 pr-4 py-2 border border-input bg-background rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
+                    @bind="searchQuery"
+                    @bind:event="oninput" />
+            </div>
+        </div>
+
+        <div class="text-sm text-muted-foreground">
+            Showing <span class="font-semibold text-foreground">@FilteredIcons.Count()</span> of @CurrentVariantCount icons
+        </div>
+    </div>
+
+    <!-- Icon Grid -->
+    @if (FilteredIcons.Any())
+    {
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4">
+            @foreach (var iconName in FilteredIcons)
+            {
+                <div class="flex flex-col items-center justify-center p-4 border border-border rounded-lg hover:bg-accent hover:border-accent-foreground/20 transition-colors cursor-pointer group"
+                     title="@iconName">
+                    <div class="mb-2 text-foreground group-hover:scale-110 transition-transform">
+                        <HeroIcon Name="@iconName" Variant="@selectedVariant" Size="32" />
+                    </div>
+                    <span class="text-xs text-center text-muted-foreground group-hover:text-foreground font-mono break-all">
+                        @iconName
+                    </span>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="flex flex-col items-center justify-center py-16 text-center">
+            <HeroIcon Name="magnifying-glass-minus" Variant="@selectedVariant" Size="48" Class="text-muted-foreground mb-4" />
+            <h3 class="text-lg font-semibold mb-2">No icons found</h3>
+            <p class="text-muted-foreground">
+                Try adjusting your search query
+            </p>
+        </div>
+    }
+
+    <!-- Usage Examples -->
+    <div class="mt-12 space-y-6">
+        <h2 class="text-2xl font-bold">Usage Examples</h2>
+
+        <!-- Basic Usage with Variants -->
+        <div class="space-y-4">
+            <h3 class="text-xl font-semibold">Basic Usage - All Variants</h3>
+            <div class="p-6 border border-border rounded-lg bg-card space-y-4">
+                <div class="space-y-4">
+                    <div class="flex items-center gap-4">
+                        <span class="text-sm text-muted-foreground w-24">Outline:</span>
+                        <HeroIcon Name="home" Variant="HeroIconVariant.Outline" />
+                        <HeroIcon Name="heart" Variant="HeroIconVariant.Outline" />
+                        <HeroIcon Name="star" Variant="HeroIconVariant.Outline" />
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <span class="text-sm text-muted-foreground w-24">Solid:</span>
+                        <HeroIcon Name="home" Variant="HeroIconVariant.Solid" />
+                        <HeroIcon Name="heart" Variant="HeroIconVariant.Solid" />
+                        <HeroIcon Name="star" Variant="HeroIconVariant.Solid" />
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <span class="text-sm text-muted-foreground w-24">Mini:</span>
+                        <HeroIcon Name="home" Variant="HeroIconVariant.Mini" />
+                        <HeroIcon Name="heart" Variant="HeroIconVariant.Mini" />
+                        <HeroIcon Name="star" Variant="HeroIconVariant.Mini" />
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <span class="text-sm text-muted-foreground w-24">Micro:</span>
+                        <HeroIcon Name="home" Variant="HeroIconVariant.Micro" />
+                        <HeroIcon Name="heart" Variant="HeroIconVariant.Micro" />
+                        <HeroIcon Name="star" Variant="HeroIconVariant.Micro" />
+                    </div>
+                </div>
+                <pre class="bg-muted p-4 rounded text-sm overflow-x-auto"><code>@@using BlazorBlueprint.Icons.Heroicons.Components
+
+&lt;HeroIcon Name="home" Variant="HeroIconVariant.Outline" /&gt;
+&lt;HeroIcon Name="heart" Variant="HeroIconVariant.Solid" /&gt;
+&lt;HeroIcon Name="star" Variant="HeroIconVariant.Mini" /&gt;</code></pre>
+            </div>
+        </div>
+
+        <!-- Different Sizes -->
+        <div class="space-y-4">
+            <h3 class="text-xl font-semibold">Custom Sizes</h3>
+            <div class="p-6 border border-border rounded-lg bg-card space-y-4">
+                <div class="flex items-center gap-6">
+                    <HeroIcon Name="camera" Variant="@selectedVariant" Size="16" />
+                    <HeroIcon Name="camera" Variant="@selectedVariant" Size="24" />
+                    <HeroIcon Name="camera" Variant="@selectedVariant" Size="32" />
+                    <HeroIcon Name="camera" Variant="@selectedVariant" Size="48" />
+                    <HeroIcon Name="camera" Variant="@selectedVariant" Size="64" />
+                </div>
+                <pre class="bg-muted p-4 rounded text-sm overflow-x-auto"><code>&lt;HeroIcon Name="camera" Variant="HeroIconVariant.Outline" Size="16" /&gt;
+&lt;HeroIcon Name="camera" Variant="HeroIconVariant.Solid" Size="24" /&gt;
+&lt;HeroIcon Name="camera" Variant="HeroIconVariant.Mini" Size="32" /&gt;</code></pre>
+            </div>
+        </div>
+
+        <!-- Custom Colors -->
+        <div class="space-y-4">
+            <h3 class="text-xl font-semibold">Custom Colors</h3>
+            <div class="p-6 border border-border rounded-lg bg-card space-y-4">
+                <div class="flex items-center gap-6">
+                    <HeroIcon Name="heart" Variant="HeroIconVariant.Solid" Size="32" Color="red" />
+                    <HeroIcon Name="star" Variant="HeroIconVariant.Solid" Size="32" Color="gold" />
+                    <HeroIcon Name="check-circle" Variant="HeroIconVariant.Solid" Size="32" Color="green" />
+                    <HeroIcon Name="exclamation-circle" Variant="HeroIconVariant.Solid" Size="32" Color="orange" />
+                    <HeroIcon Name="x-circle" Variant="HeroIconVariant.Solid" Size="32" Color="#ef4444" />
+                </div>
+                <pre class="bg-muted p-4 rounded text-sm overflow-x-auto"><code>&lt;HeroIcon Name="heart" Variant="HeroIconVariant.Solid" Size="32" Color="red" /&gt;
+&lt;HeroIcon Name="star" Variant="HeroIconVariant.Solid" Size="32" Color="gold" /&gt;</code></pre>
+            </div>
+        </div>
+
+        <!-- With Buttons -->
+        <div class="space-y-4">
+            <h3 class="text-xl font-semibold">Integration with Button Component</h3>
+            <div class="p-6 border border-border rounded-lg bg-card space-y-4">
+                <div class="flex flex-wrap items-center gap-3">
+                    <Button>
+                        <Icon>
+                            <HeroIcon Name="arrow-down-tray" Variant="HeroIconVariant.Outline" Size="20" />
+                        </Icon>
+                        <ChildContent>Download</ChildContent>
+                    </Button>
+
+                    <Button Variant="ButtonVariant.Outline">
+                        <Icon>
+                            <HeroIcon Name="trash" Variant="HeroIconVariant.Outline" Size="20" />
+                        </Icon>
+                        <ChildContent>Delete</ChildContent>
+                    </Button>
+
+                    <Button Variant="ButtonVariant.Secondary">
+                        <Icon>
+                            <HeroIcon Name="cog-6-tooth" Variant="HeroIconVariant.Solid" Size="20" />
+                        </Icon>
+                        <ChildContent>Settings</ChildContent>
+                    </Button>
+
+                    <Button Variant="ButtonVariant.Destructive">
+                        <Icon>
+                            <HeroIcon Name="exclamation-triangle" Variant="HeroIconVariant.Solid" Size="20" />
+                        </Icon>
+                        <ChildContent>Warning</ChildContent>
+                    </Button>
+                </div>
+                <pre class="bg-muted p-4 rounded text-sm overflow-x-auto"><code>&lt;Button&gt;
+    &lt;Icon&gt;
+        &lt;HeroIcon Name="arrow-down-tray" Variant="HeroIconVariant.Outline" Size="20" /&gt;
+    &lt;/Icon&gt;
+    Download
+&lt;/Button&gt;</code></pre>
+            </div>
+        </div>
+
+        <!-- Variant Use Cases -->
+        <div class="space-y-4">
+            <h3 class="text-xl font-semibold">When to Use Each Variant</h3>
+            <div class="p-6 border border-border rounded-lg bg-card space-y-4">
+                <div class="grid gap-4">
+                    <div class="flex items-start gap-3">
+                        <HeroIcon Name="squares-2x2" Variant="HeroIconVariant.Outline" Size="24" Class="flex-shrink-0" />
+                        <div>
+                            <p class="font-medium">Outline (24x24)</p>
+                            <p class="text-sm text-muted-foreground">General UI, navigation, buttons</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-3">
+                        <HeroIcon Name="squares-2x2" Variant="HeroIconVariant.Solid" Size="24" Class="flex-shrink-0" />
+                        <div>
+                            <p class="font-medium">Solid (24x24)</p>
+                            <p class="text-sm text-muted-foreground">Active states, emphasis, decorative elements</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-3">
+                        <HeroIcon Name="squares-2x2" Variant="HeroIconVariant.Mini" Size="20" Class="flex-shrink-0" />
+                        <div>
+                            <p class="font-medium">Mini (20x20)</p>
+                            <p class="text-sm text-muted-foreground">Inline with text, badges, compact UI</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-3">
+                        <HeroIcon Name="squares-2x2" Variant="HeroIconVariant.Micro" Size="16" Class="flex-shrink-0" />
+                        <div>
+                            <p class="font-medium">Micro (16x16)</p>
+                            <p class="text-sm text-muted-foreground">Very small UI elements, dense layouts, timestamps</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private string searchQuery = string.Empty;
+    private HeroIconVariant selectedVariant = HeroIconVariant.Outline;
+    private IEnumerable<string> allIcons = Enumerable.Empty<string>();
+
+    private int TotalIconCount => HeroIconData.TotalIconCount;
+
+    private int CurrentVariantCount => selectedVariant switch
+    {
+        HeroIconVariant.Outline => HeroIconData.OutlineIconCount,
+        HeroIconVariant.Solid => HeroIconData.SolidIconCount,
+        HeroIconVariant.Mini => HeroIconData.MiniIconCount,
+        HeroIconVariant.Micro => HeroIconData.MicroIconCount,
+        _ => 0
+    };
+
+    private IEnumerable<string> FilteredIcons
+    {
+        get
+        {
+            if (string.IsNullOrWhiteSpace(searchQuery))
+            {
+                return allIcons;
+            }
+
+            return allIcons.Where(icon =>
+                icon.Contains(searchQuery, StringComparison.OrdinalIgnoreCase));
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        LoadIconsForVariant();
+    }
+
+    private void SelectVariant(HeroIconVariant variant)
+    {
+        selectedVariant = variant;
+        searchQuery = string.Empty; // Reset search when switching variants
+        LoadIconsForVariant();
+    }
+
+    private void LoadIconsForVariant()
+    {
+        allIcons = HeroIconData.GetAvailableIcons(selectedVariant).OrderBy(x => x).ToList();
+    }
+}

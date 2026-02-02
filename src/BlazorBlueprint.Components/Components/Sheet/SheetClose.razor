@@ -1,0 +1,51 @@
+@namespace BlazorBlueprint.Components.Sheet
+@using BlazorBlueprint.Primitives.Sheet
+
+@*
+    Styled SheetClose component wrapper.
+    Renders a button to close the sheet.
+*@
+
+<BlazorBlueprint.Primitives.Sheet.SheetClose
+    AsChild="@AsChild"
+    OnClick="@OnClick"
+    PreventClose="@PreventClose"
+    @attributes="AdditionalAttributes">
+    @ChildContent
+</BlazorBlueprint.Primitives.Sheet.SheetClose>
+
+@code {
+    /// <summary>
+    /// The content to display inside the close button.
+    /// </summary>
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>
+    /// When true, the close does not render its own button element.
+    /// Instead, it passes trigger behavior via TriggerContext to child components.
+    /// Use this when you want a custom component (like Button) to act as the close button.
+    /// </summary>
+    [Parameter]
+    public bool AsChild { get; set; } = false;
+
+    /// <summary>
+    /// Custom click handler. Called after the sheet is closed.
+    /// </summary>
+    [Parameter]
+    public EventCallback<MouseEventArgs> OnClick { get; set; }
+
+    /// <summary>
+    /// Whether to prevent the default close behavior.
+    /// When true, only the OnClick handler is invoked.
+    /// Default is false (sheet closes on click).
+    /// </summary>
+    [Parameter]
+    public bool PreventClose { get; set; } = false;
+
+    /// <summary>
+    /// Additional attributes to apply to the close button.
+    /// </summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
+}

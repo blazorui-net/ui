@@ -1,0 +1,22 @@
+@namespace BlazorBlueprint.Components.ContextMenu
+
+<div class="@CssClass">
+    @ChildContent
+</div>
+
+@code {
+    [Parameter]
+    public string? Class { get; set; }
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    [Parameter]
+    public bool Inset { get; set; }
+
+    private string CssClass => BlazorBlueprint.Components.Utilities.ClassNames.cn(
+        "px-2 py-1.5 text-sm font-semibold",
+        Inset ? "pl-8" : null,
+        Class
+    );
+}
