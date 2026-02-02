@@ -112,6 +112,15 @@
   .blazorui-chart-tooltip .apexcharts-tooltip-marker {
     margin-right: 0.5rem !important;
   }
+
+  /* Chart legend styles - theme-aware ApexCharts legend */
+  .apexcharts-legend-text {
+    color: var(--foreground) !important;
+  }
+
+  .apexcharts-legend-series {
+    color: var(--foreground) !important;
+  }
 }
 
 /* Rich Text Editor - Headless Quill.js styles */
