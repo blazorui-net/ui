@@ -299,13 +299,13 @@ BlazorBlueprint.Primitives follows the "headless component" pattern popularized 
 ## Documentation
 
 For full documentation, examples, and API reference, visit:
-- [Documentation Site](https://github.com/blazorblueprint/blazorblueprint)
-- [GitHub Repository](https://github.com/blazorblueprint/blazorblueprint)
+- [Documentation Site](https://github.com/blazorblueprintui/ui)
+- [GitHub Repository](https://github.com/blazorblueprintui/ui)
 
 ## License
 
-Apache License 2.0 - see [LICENSE](https://github.com/blazorblueprint/blazorblueprint/blob/main/LICENSE) for details.
+Apache License 2.0 - see [LICENSE](https://github.com/blazorblueprintui/ui/blob/main/LICENSE) for details.
 
 ## Contributing
 
-Contributions are welcome! Please see our [Contributing Guide](https://github.com/blazorblueprint/blazorblueprint/blob/main/CONTRIBUTING.md).
+Contributions are welcome! Please see our [Contributing Guide](https://github.com/blazorblueprintui/ui/blob/main/CONTRIBUTING.md).

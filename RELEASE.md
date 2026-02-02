@@ -151,7 +151,7 @@ Before releasing a package:
 
 ### GitHub Actions Dashboard
 
-Monitor releases at: https://github.com/blazorblueprint/blazorblueprint/actions
+Monitor releases at: https://github.com/blazorblueprintui/ui/actions
 
 Each release creates a workflow run showing:
 - Build logs

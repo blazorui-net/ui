@@ -276,8 +276,8 @@ Heroicons are MIT licensed by [Tailwind Labs](https://github.com/tailwindlabs/he
 ## Links
 
 - **Heroicons**: [heroicons.com](https://heroicons.com/)
-- **BlazorBlueprint**: [GitHub Repository](https://github.com/blazorblueprint/blazorblueprint)
-- **Issues**: [Report a Bug](https://github.com/blazorblueprint/blazorblueprint/issues)
+- **BlazorBlueprint**: [GitHub Repository](https://github.com/blazorblueprintui/ui)
+- **Issues**: [Report a Bug](https://github.com/blazorblueprintui/ui/issues)
 
 ## Contributing
 

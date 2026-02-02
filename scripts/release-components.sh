@@ -235,7 +235,7 @@ echo "  2. Pack the NuGet package"
 echo "  3. Publish to NuGet.org"
 echo ""
 echo "Monitor the workflow at:"
-echo "  https://github.com/blazorblueprint/blazorblueprint/actions"
+echo "  https://github.com/blazorblueprintui/ui/actions"
 echo ""
 if [ $COMMITS_MADE -gt 0 ]; then
     echo -e "${COLOR_YELLOW}Remember to merge the PR to bring release changes back to main!${COLOR_RESET}"

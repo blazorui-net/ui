@@ -227,8 +227,8 @@ Feather icons are MIT licensed by [Cole Bemis](https://github.com/feathericons/f
 ## Links
 
 - **Feather Icons**: [feathericons.com](https://feathericons.com/)
-- **BlazorBlueprint**: [GitHub Repository](https://github.com/blazorblueprint/blazorblueprint)
-- **Issues**: [Report a Bug](https://github.com/blazorblueprint/blazorblueprint/issues)
+- **BlazorBlueprint**: [GitHub Repository](https://github.com/blazorblueprintui/ui)
+- **Issues**: [Report a Bug](https://github.com/blazorblueprintui/ui/issues)
 
 ## Contributing
 

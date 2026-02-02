@@ -7,8 +7,8 @@
 
     <!-- License and Repository -->
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
-    <PackageProjectUrl>https://github.com/blazorblueprint/blazorblueprint</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/blazorblueprint/blazorblueprint</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/blazorblueprintui/ui</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/blazorblueprintui/ui</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
 
     <!-- Build Configuration -->

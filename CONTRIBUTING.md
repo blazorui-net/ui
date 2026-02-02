@@ -35,7 +35,7 @@ If you find a bug or have a feature request, please create an issue on GitHub:
 1. **Clone the repository:**
 
 ```bash
-git clone https://github.com/blazorblueprint/blazorblueprint.git
+git clone https://github.com/blazorblueprintui/ui.git
 cd ui
 ```
 

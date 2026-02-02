@@ -16,7 +16,7 @@
     <!-- <PackageIcon>icon.png</PackageIcon> -->
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageProjectUrl>https://blazorblueprintui.com</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/blazorblueprint/blazorblueprint</RepositoryUrl>
+    <RepositoryUrl>https://github.com/blazorblueprintui/ui</RepositoryUrl>
     <Authors>Mathew Taylor</Authors>
     <Copyright>Copyright (c) 2025-present Mathew Taylor</Copyright>
 
