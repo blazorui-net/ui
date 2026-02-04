@@ -10,9 +10,9 @@
 /* Configure source paths for scanning Razor files */
 @source "../../Pages";
 @source "../../Shared";
-@source "../../../../src/BlazorBlueprint.Components";
-@source "../../../../src/BlazorBlueprint.Primitives";
-@source "../../../../src/BlazorBlueprint.Icons";
+@source "../../../src/BlazorBlueprint.Components";
+@source "../../../src/BlazorBlueprint.Primitives";
+@source "../../../src/BlazorBlueprint.Icons";
 
 /* Component structural variables (not part of replaceable theme) */
 @layer base {

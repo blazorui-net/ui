@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>BlazorBlueprint.Demo.Auto</RootNamespace>
+    <AssemblyName>BlazorBlueprint.Demo.Auto</AssemblyName>
+    <NoWarn>CS1591</NoWarn>
+    <!-- Exclude nested client project from compilation -->
+    <DefaultItemExcludes>$(DefaultItemExcludes);BlazorBlueprint.Demo.Auto.Client\**</DefaultItemExcludes>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="8.0.14" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\BlazorBlueprint.Demo.Shared\BlazorBlueprint.Demo.Shared.csproj" />
+    <ProjectReference Include="BlazorBlueprint.Demo.Auto.Client\BlazorBlueprint.Demo.Auto.Client.csproj" />
+  </ItemGroup>
+
+</Project>

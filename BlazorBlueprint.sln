@@ -1,4 +1,4 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
@@ -7,9 +7,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{827E0CD3-B72
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorBlueprint.Components", "src\BlazorBlueprint.Components\BlazorBlueprint.Components.csproj", "{B873D4FA-DEB5-4697-AB73-CB263F7778A6}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "demo", "demo", "{A39C23D2-F2C0-258D-165A-CF1E7FEE6E7B}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "demos", "demos", "{A39C23D2-F2C0-258D-165A-CF1E7FEE6E7B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorBlueprint.Demo", "demo\BlazorBlueprint.Demo\BlazorBlueprint.Demo.csproj", "{ACA5BA0D-B4C7-4558-9F3F-8C1AF0EF84F9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorBlueprint.Demo.Server", "demos\BlazorBlueprint.Demo.Server\BlazorBlueprint.Demo.Server.csproj", "{ACA5BA0D-B4C7-4558-9F3F-8C1AF0EF84F9}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorBlueprint.Primitives", "src\BlazorBlueprint.Primitives\BlazorBlueprint.Primitives.csproj", "{147CF313-3AE4-41EA-B876-065F3B96A503}"
 EndProject
@@ -18,6 +18,14 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorBlueprint.Icons.Heroicons", "src\BlazorBlueprint.Icons.Heroicons\BlazorBlueprint.Icons.Heroicons.csproj", "{6B3C876A-CB06-42DA-974E-6620581CE719}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorBlueprint.Icons.Feather", "src\BlazorBlueprint.Icons.Feather\BlazorBlueprint.Icons.Feather.csproj", "{078BABD8-4ACB-4002-95E8-99AB3DA3EBEA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorBlueprint.Demo.Shared", "demos\BlazorBlueprint.Demo.Shared\BlazorBlueprint.Demo.Shared.csproj", "{D1A2B3C4-E5F6-7890-ABCD-EF1234567890}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorBlueprint.Demo.Wasm", "demos\BlazorBlueprint.Demo.Wasm\BlazorBlueprint.Demo.Wasm.csproj", "{E2B3C4D5-F6A7-8901-BCDE-F12345678901}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorBlueprint.Demo.Auto", "demos\BlazorBlueprint.Demo.Auto\BlazorBlueprint.Demo.Auto.csproj", "{F3C4D5E6-A7B8-9012-CDEF-123456789012}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorBlueprint.Demo.Auto.Client", "demos\BlazorBlueprint.Demo.Auto\BlazorBlueprint.Demo.Auto.Client\BlazorBlueprint.Demo.Auto.Client.csproj", "{A4D5E6F7-B8C9-0123-DEFA-234567890123}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -57,7 +65,7 @@ Global
 		{147CF313-3AE4-41EA-B876-065F3B96A503}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{147CF313-3AE4-41EA-B876-065F3B96A503}.Debug|x64.ActiveCfg = Debug|Any CPU
 		{147CF313-3AE4-41EA-B876-065F3B96A503}.Debug|x64.Build.0 = Debug|Any CPU
-		{147CF313-3AE4-41EA-B876-065F3B96A503}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{147CF313-3AE4-41EA-B876-065F3B96a503}.Debug|x86.ActiveCfg = Debug|Any CPU
 		{147CF313-3AE4-41EA-B876-065F3B96A503}.Debug|x86.Build.0 = Debug|Any CPU
 		{147CF313-3AE4-41EA-B876-065F3B96A503}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{147CF313-3AE4-41EA-B876-065F3B96A503}.Release|Any CPU.Build.0 = Release|Any CPU
@@ -101,6 +109,54 @@ Global
 		{078BABD8-4ACB-4002-95E8-99AB3DA3EBEA}.Release|x64.Build.0 = Release|Any CPU
 		{078BABD8-4ACB-4002-95E8-99AB3DA3EBEA}.Release|x86.ActiveCfg = Release|Any CPU
 		{078BABD8-4ACB-4002-95E8-99AB3DA3EBEA}.Release|x86.Build.0 = Release|Any CPU
+		{D1A2B3C4-E5F6-7890-ABCD-EF1234567890}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D1A2B3C4-E5F6-7890-ABCD-EF1234567890}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D1A2B3C4-E5F6-7890-ABCD-EF1234567890}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{D1A2B3C4-E5F6-7890-ABCD-EF1234567890}.Debug|x64.Build.0 = Debug|Any CPU
+		{D1A2B3C4-E5F6-7890-ABCD-EF1234567890}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{D1A2B3C4-E5F6-7890-ABCD-EF1234567890}.Debug|x86.Build.0 = Debug|Any CPU
+		{D1A2B3C4-E5F6-7890-ABCD-EF1234567890}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D1A2B3C4-E5F6-7890-ABCD-EF1234567890}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D1A2B3C4-E5F6-7890-ABCD-EF1234567890}.Release|x64.ActiveCfg = Release|Any CPU
+		{D1A2B3C4-E5F6-7890-ABCD-EF1234567890}.Release|x64.Build.0 = Release|Any CPU
+		{D1A2B3C4-E5F6-7890-ABCD-EF1234567890}.Release|x86.ActiveCfg = Release|Any CPU
+		{D1A2B3C4-E5F6-7890-ABCD-EF1234567890}.Release|x86.Build.0 = Release|Any CPU
+		{E2B3C4D5-F6A7-8901-BCDE-F12345678901}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E2B3C4D5-F6A7-8901-BCDE-F12345678901}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E2B3C4D5-F6A7-8901-BCDE-F12345678901}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{E2B3C4D5-F6A7-8901-BCDE-F12345678901}.Debug|x64.Build.0 = Debug|Any CPU
+		{E2B3C4D5-F6A7-8901-BCDE-F12345678901}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{E2B3C4D5-F6A7-8901-BCDE-F12345678901}.Debug|x86.Build.0 = Debug|Any CPU
+		{E2B3C4D5-F6A7-8901-BCDE-F12345678901}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E2B3C4D5-F6A7-8901-BCDE-F12345678901}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E2B3C4D5-F6A7-8901-BCDE-F12345678901}.Release|x64.ActiveCfg = Release|Any CPU
+		{E2B3C4D5-F6A7-8901-BCDE-F12345678901}.Release|x64.Build.0 = Release|Any CPU
+		{E2B3C4D5-F6A7-8901-BCDE-F12345678901}.Release|x86.ActiveCfg = Release|Any CPU
+		{E2B3C4D5-F6A7-8901-BCDE-F12345678901}.Release|x86.Build.0 = Release|Any CPU
+		{F3C4D5E6-A7B8-9012-CDEF-123456789012}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F3C4D5E6-A7B8-9012-CDEF-123456789012}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F3C4D5E6-A7B8-9012-CDEF-123456789012}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{F3C4D5E6-A7B8-9012-CDEF-123456789012}.Debug|x64.Build.0 = Debug|Any CPU
+		{F3C4D5E6-A7B8-9012-CDEF-123456789012}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{F3C4D5E6-A7B8-9012-CDEF-123456789012}.Debug|x86.Build.0 = Debug|Any CPU
+		{F3C4D5E6-A7B8-9012-CDEF-123456789012}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F3C4D5E6-A7B8-9012-CDEF-123456789012}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F3C4D5E6-A7B8-9012-CDEF-123456789012}.Release|x64.ActiveCfg = Release|Any CPU
+		{F3C4D5E6-A7B8-9012-CDEF-123456789012}.Release|x64.Build.0 = Release|Any CPU
+		{F3C4D5E6-A7B8-9012-CDEF-123456789012}.Release|x86.ActiveCfg = Release|Any CPU
+		{F3C4D5E6-A7B8-9012-CDEF-123456789012}.Release|x86.Build.0 = Release|Any CPU
+		{A4D5E6F7-B8C9-0123-DEFA-234567890123}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A4D5E6F7-B8C9-0123-DEFA-234567890123}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A4D5E6F7-B8C9-0123-DEFA-234567890123}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{A4D5E6F7-B8C9-0123-DEFA-234567890123}.Debug|x64.Build.0 = Debug|Any CPU
+		{A4D5E6F7-B8C9-0123-DEFA-234567890123}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{A4D5E6F7-B8C9-0123-DEFA-234567890123}.Debug|x86.Build.0 = Debug|Any CPU
+		{A4D5E6F7-B8C9-0123-DEFA-234567890123}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A4D5E6F7-B8C9-0123-DEFA-234567890123}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A4D5E6F7-B8C9-0123-DEFA-234567890123}.Release|x64.ActiveCfg = Release|Any CPU
+		{A4D5E6F7-B8C9-0123-DEFA-234567890123}.Release|x64.Build.0 = Release|Any CPU
+		{A4D5E6F7-B8C9-0123-DEFA-234567890123}.Release|x86.ActiveCfg = Release|Any CPU
+		{A4D5E6F7-B8C9-0123-DEFA-234567890123}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -112,5 +168,9 @@ Global
 		{C5E92A4D-9E3B-4C1A-B8D4-E1F5A6C7B9D2} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 		{6B3C876A-CB06-42DA-974E-6620581CE719} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 		{078BABD8-4ACB-4002-95E8-99AB3DA3EBEA} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
+		{D1A2B3C4-E5F6-7890-ABCD-EF1234567890} = {A39C23D2-F2C0-258D-165A-CF1E7FEE6E7B}
+		{E2B3C4D5-F6A7-8901-BCDE-F12345678901} = {A39C23D2-F2C0-258D-165A-CF1E7FEE6E7B}
+		{F3C4D5E6-A7B8-9012-CDEF-123456789012} = {A39C23D2-F2C0-258D-165A-CF1E7FEE6E7B}
+		{A4D5E6F7-B8C9-0123-DEFA-234567890123} = {A39C23D2-F2C0-258D-165A-CF1E7FEE6E7B}
 	EndGlobalSection
 EndGlobal
