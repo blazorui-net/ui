@@ -46,7 +46,8 @@ public partial class DataTable<TData> : ComponentBase where TData : class
     {
         public string Id { get; set; } = string.Empty;
         public string Header { get; set; } = string.Empty;
-        public Func<TData, object> Property { get; set; } = null!;
+        public Func<TData, object?> Property { get; set; } = null!;
+        public string? Format { get; set; }
         public bool Sortable { get; set; }
         public bool Filterable { get; set; }
         public bool Visible { get; set; } = true;
@@ -270,11 +271,8 @@ public partial class DataTable<TData> : ComponentBase where TData : class
         {
             Id = column.Id ?? column.Header.ToLowerInvariant().Replace(" ", "-"),
             Header = column.Header,
-            Property = item =>
-            {
-                var value = column.Property(item);
-                return value ?? throw new InvalidOperationException($"Column '{column.Header}' returned null for a non-nullable type.");
-            },
+            Property = item => column.Property(item),
+            Format = column.Format,
             Sortable = column.Sortable,
             Filterable = column.Filterable,
             Visible = column.Visible,
