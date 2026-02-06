@@ -264,7 +264,7 @@ public partial class DataTable<TData> : ComponentBase where TData : class
     /// Registers a column with the data table.
     /// Called by DataTableColumn during initialization.
     /// </summary>
-    internal void RegisterColumn<TValue>(DataTableColumn<TData, TValue> column) where TValue : notnull
+    internal void RegisterColumn<TValue>(DataTableColumn<TData, TValue> column)
     {
         // Create internal column data structure (avoids BL0005 component parameter warnings)
         var columnData = new ColumnData

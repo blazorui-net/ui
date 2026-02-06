@@ -100,8 +100,7 @@ public class MockDataService
 
     private DateTimeOffset? GeneratePromotionDate()
     {
-        List<DateTimeOffset?> dates = [DateTimeOffset.UtcNow - TimeSpan.FromDays(365 * 1), DateTimeOffset.UtcNow - TimeSpan.FromDays(365 * 2), DateTimeOffset.UtcNow - TimeSpan.FromDays(365 * 3), null];
-        return dates[_random.Next(0, dates.Count)];
+        return DateTimeOffset.UtcNow - TimeSpan.FromDays(_random.Next(365, 730));
     }
 }
 
