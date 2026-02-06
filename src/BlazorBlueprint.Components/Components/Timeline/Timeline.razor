@@ -1,0 +1,12 @@
+@namespace BlazorBlueprint.Components.Timeline
+
+<ol aria-label="Timeline" class="@CssClass" @attributes="AdditionalAttributes">
+    @if (ChildContent != null)
+    {
+        @ChildContent
+    }
+    else
+    {
+        <TimelineEmpty />
+    }
+</ol>

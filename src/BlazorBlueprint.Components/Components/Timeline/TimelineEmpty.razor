@@ -1,0 +1,14 @@
+@namespace BlazorBlueprint.Components.Timeline
+
+<div class="@CssClass" @attributes="AdditionalAttributes">
+    <p class="text-sm text-muted-foreground">
+        @if (ChildContent != null)
+        {
+            @ChildContent
+        }
+        else
+        {
+            <text>No timeline items to display</text>
+        }
+    </p>
+</div>

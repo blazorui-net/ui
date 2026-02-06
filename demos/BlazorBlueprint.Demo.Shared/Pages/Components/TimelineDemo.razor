@@ -1,0 +1,553 @@
+@page "/components/timeline"
+
+<PageTitle>Timeline Component - Blazor Blueprint</PageTitle>
+
+<div class="space-y-8 max-w-4xl">
+    <div>
+        <div class="space-y-3">
+            <h1 class="text-4xl font-bold tracking-tight">Timeline Component</h1>
+            <p class="text-xl text-muted-foreground">
+                Displays a vertical timeline of events with icons, connectors, and content.
+            </p>
+        </div>
+    </div>
+
+    <!-- Default -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Default</h2>
+            <p class="text-sm text-muted-foreground">
+                A basic timeline with title, description, and date for each item.
+            </p>
+        </div>
+        <div class="border rounded-lg p-6">
+            <Timeline>
+                <TimelineItem>
+                    <TimeContent>
+                        <TimelineTime Class="text-right pr-4">Jan 2024</TimelineTime>
+                    </TimeContent>
+                    <ChildContent>
+                        <TimelineHeader>
+                            <TimelineTitle>Project Kickoff</TimelineTitle>
+                        </TimelineHeader>
+                        <TimelineDescription>Initial planning and team formation for the new product launch.</TimelineDescription>
+                    </ChildContent>
+                </TimelineItem>
+
+                <TimelineItem>
+                    <TimeContent>
+                        <TimelineTime Class="text-right pr-4">Mar 2024</TimelineTime>
+                    </TimeContent>
+                    <ChildContent>
+                        <TimelineHeader>
+                            <TimelineTitle>Design Phase</TimelineTitle>
+                        </TimelineHeader>
+                        <TimelineDescription>Completed wireframes and design system for all core features.</TimelineDescription>
+                    </ChildContent>
+                </TimelineItem>
+
+                <TimelineItem ShowConnector="false">
+                    <TimeContent>
+                        <TimelineTime Class="text-right pr-4">Jun 2024</TimelineTime>
+                    </TimeContent>
+                    <ChildContent>
+                        <TimelineHeader>
+                            <TimelineTitle>Beta Release</TimelineTitle>
+                        </TimelineHeader>
+                        <TimelineDescription>Launched beta version to early adopters for feedback.</TimelineDescription>
+                    </ChildContent>
+                </TimelineItem>
+            </Timeline>
+        </div>
+    </div>
+
+    <!-- Status Variants -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Status Variants</h2>
+            <p class="text-sm text-muted-foreground">
+                Timeline items can show completed, in-progress, or pending status with appropriate connector styling.
+            </p>
+        </div>
+        <div class="border rounded-lg p-6">
+            <Timeline>
+                <TimelineItem Status="TimelineStatus.Completed">
+                    <TimeContent>
+                        <TimelineTime Class="text-right pr-4">Step 1</TimelineTime>
+                    </TimeContent>
+                    <ChildContent>
+                        <TimelineHeader>
+                            <TimelineTitle>Order Placed</TimelineTitle>
+                        </TimelineHeader>
+                        <TimelineDescription>Your order has been confirmed and is being processed.</TimelineDescription>
+                    </ChildContent>
+                </TimelineItem>
+
+                <TimelineItem Status="TimelineStatus.Completed">
+                    <TimeContent>
+                        <TimelineTime Class="text-right pr-4">Step 2</TimelineTime>
+                    </TimeContent>
+                    <ChildContent>
+                        <TimelineHeader>
+                            <TimelineTitle>Payment Confirmed</TimelineTitle>
+                        </TimelineHeader>
+                        <TimelineDescription>Payment has been successfully processed.</TimelineDescription>
+                    </ChildContent>
+                </TimelineItem>
+
+                <TimelineItem Status="TimelineStatus.InProgress">
+                    <TimeContent>
+                        <TimelineTime Class="text-right pr-4">Step 3</TimelineTime>
+                    </TimeContent>
+                    <ChildContent>
+                        <TimelineHeader>
+                            <TimelineTitle>Shipping</TimelineTitle>
+                        </TimelineHeader>
+                        <TimelineDescription>Your package is on its way to the delivery address.</TimelineDescription>
+                    </ChildContent>
+                </TimelineItem>
+
+                <TimelineItem Status="TimelineStatus.Pending" ShowConnector="false">
+                    <TimeContent>
+                        <TimelineTime Class="text-right pr-4">Step 4</TimelineTime>
+                    </TimeContent>
+                    <ChildContent>
+                        <TimelineHeader>
+                            <TimelineTitle>Delivered</TimelineTitle>
+                        </TimelineHeader>
+                        <TimelineDescription>Package will be delivered to your doorstep.</TimelineDescription>
+                    </ChildContent>
+                </TimelineItem>
+            </Timeline>
+        </div>
+    </div>
+
+    <!-- Color Variants -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Color Variants</h2>
+            <p class="text-sm text-muted-foreground">
+                Five color themes for icons: Primary, Secondary, Muted, Accent, and Destructive.
+            </p>
+        </div>
+        <div class="border rounded-lg p-6">
+            <Timeline>
+                <TimelineItem IconColor="TimelineColor.Primary">
+                    <ChildContent>
+                        <TimelineHeader>
+                            <TimelineTitle>Primary</TimelineTitle>
+                        </TimelineHeader>
+                        <TimelineDescription>Default primary color theme.</TimelineDescription>
+                    </ChildContent>
+                </TimelineItem>
+
+                <TimelineItem IconColor="TimelineColor.Secondary">
+                    <ChildContent>
+                        <TimelineHeader>
+                            <TimelineTitle>Secondary</TimelineTitle>
+                        </TimelineHeader>
+                        <TimelineDescription>Secondary color for alternative styling.</TimelineDescription>
+                    </ChildContent>
+                </TimelineItem>
+
+                <TimelineItem IconColor="TimelineColor.Accent">
+                    <ChildContent>
+                        <TimelineHeader>
+                            <TimelineTitle>Accent</TimelineTitle>
+                        </TimelineHeader>
+                        <TimelineDescription>Accent color for highlighted items.</TimelineDescription>
+                    </ChildContent>
+                </TimelineItem>
+
+                <TimelineItem IconColor="TimelineColor.Destructive" ShowConnector="false">
+                    <ChildContent>
+                        <TimelineHeader>
+                            <TimelineTitle>Destructive</TimelineTitle>
+                        </TimelineHeader>
+                        <TimelineDescription>Destructive color for warnings or errors.</TimelineDescription>
+                    </ChildContent>
+                </TimelineItem>
+            </Timeline>
+        </div>
+    </div>
+
+    <!-- Size Variants -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Size Variants</h2>
+            <p class="text-sm text-muted-foreground">
+                Three sizes controlling the gap spacing between items and icon dimensions.
+            </p>
+        </div>
+        <div class="grid md:grid-cols-3 gap-6">
+            <!-- Small -->
+            <div class="border rounded-lg p-4">
+                <p class="text-sm font-medium mb-4">Small</p>
+                <Timeline Size="TimelineSize.Small">
+                    <TimelineItem IconSize="TimelineSize.Small">
+                        <ChildContent>
+                            <TimelineTitle>Event A</TimelineTitle>
+                        </ChildContent>
+                    </TimelineItem>
+                    <TimelineItem IconSize="TimelineSize.Small">
+                        <ChildContent>
+                            <TimelineTitle>Event B</TimelineTitle>
+                        </ChildContent>
+                    </TimelineItem>
+                    <TimelineItem IconSize="TimelineSize.Small" ShowConnector="false">
+                        <ChildContent>
+                            <TimelineTitle>Event C</TimelineTitle>
+                        </ChildContent>
+                    </TimelineItem>
+                </Timeline>
+            </div>
+
+            <!-- Medium -->
+            <div class="border rounded-lg p-4">
+                <p class="text-sm font-medium mb-4">Medium (Default)</p>
+                <Timeline Size="TimelineSize.Medium">
+                    <TimelineItem IconSize="TimelineSize.Medium">
+                        <ChildContent>
+                            <TimelineTitle>Event A</TimelineTitle>
+                        </ChildContent>
+                    </TimelineItem>
+                    <TimelineItem IconSize="TimelineSize.Medium">
+                        <ChildContent>
+                            <TimelineTitle>Event B</TimelineTitle>
+                        </ChildContent>
+                    </TimelineItem>
+                    <TimelineItem IconSize="TimelineSize.Medium" ShowConnector="false">
+                        <ChildContent>
+                            <TimelineTitle>Event C</TimelineTitle>
+                        </ChildContent>
+                    </TimelineItem>
+                </Timeline>
+            </div>
+
+            <!-- Large -->
+            <div class="border rounded-lg p-4">
+                <p class="text-sm font-medium mb-4">Large</p>
+                <Timeline Size="TimelineSize.Large">
+                    <TimelineItem IconSize="TimelineSize.Large">
+                        <ChildContent>
+                            <TimelineTitle>Event A</TimelineTitle>
+                        </ChildContent>
+                    </TimelineItem>
+                    <TimelineItem IconSize="TimelineSize.Large">
+                        <ChildContent>
+                            <TimelineTitle>Event B</TimelineTitle>
+                        </ChildContent>
+                    </TimelineItem>
+                    <TimelineItem IconSize="TimelineSize.Large" ShowConnector="false">
+                        <ChildContent>
+                            <TimelineTitle>Event C</TimelineTitle>
+                        </ChildContent>
+                    </TimelineItem>
+                </Timeline>
+            </div>
+        </div>
+    </div>
+
+    <!-- With Custom Icons -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">With Custom Icons</h2>
+            <p class="text-sm text-muted-foreground">
+                Replace the default dot indicator with custom icons using the IconContent render fragment.
+            </p>
+        </div>
+        <div class="border rounded-lg p-6">
+            <Timeline>
+                <TimelineItem Status="TimelineStatus.Completed">
+                    <IconContent>
+                        <TimelineIcon Color="TimelineColor.Primary">
+                            <LucideIcon Name="check" Size="16" />
+                        </TimelineIcon>
+                    </IconContent>
+                    <TimeContent>
+                        <TimelineTime Class="text-right pr-4">9:00 AM</TimelineTime>
+                    </TimeContent>
+                    <ChildContent>
+                        <TimelineHeader>
+                            <TimelineTitle>Code Review Approved</TimelineTitle>
+                        </TimelineHeader>
+                        <TimelineDescription>All review comments have been addressed and approved.</TimelineDescription>
+                    </ChildContent>
+                </TimelineItem>
+
+                <TimelineItem Status="TimelineStatus.Completed">
+                    <IconContent>
+                        <TimelineIcon Color="TimelineColor.Primary">
+                            <LucideIcon Name="git-merge" Size="16" />
+                        </TimelineIcon>
+                    </IconContent>
+                    <TimeContent>
+                        <TimelineTime Class="text-right pr-4">10:30 AM</TimelineTime>
+                    </TimeContent>
+                    <ChildContent>
+                        <TimelineHeader>
+                            <TimelineTitle>Branch Merged</TimelineTitle>
+                        </TimelineHeader>
+                        <TimelineDescription>Feature branch merged into main.</TimelineDescription>
+                    </ChildContent>
+                </TimelineItem>
+
+                <TimelineItem Status="TimelineStatus.InProgress">
+                    <IconContent>
+                        <TimelineIcon Color="TimelineColor.Accent">
+                            <LucideIcon Name="rocket" Size="16" />
+                        </TimelineIcon>
+                    </IconContent>
+                    <TimeContent>
+                        <TimelineTime Class="text-right pr-4">11:00 AM</TimelineTime>
+                    </TimeContent>
+                    <ChildContent>
+                        <TimelineHeader>
+                            <TimelineTitle>Deploying to Production</TimelineTitle>
+                        </TimelineHeader>
+                        <TimelineDescription>Deployment pipeline is running.</TimelineDescription>
+                    </ChildContent>
+                </TimelineItem>
+
+                <TimelineItem Status="TimelineStatus.Pending" ShowConnector="false">
+                    <IconContent>
+                        <TimelineIcon Color="TimelineColor.Muted" Status="TimelineStatus.Pending">
+                            <LucideIcon Name="circle-check" Size="16" />
+                        </TimelineIcon>
+                    </IconContent>
+                    <TimeContent>
+                        <TimelineTime Class="text-right pr-4">Pending</TimelineTime>
+                    </TimeContent>
+                    <ChildContent>
+                        <TimelineHeader>
+                            <TimelineTitle>Health Check</TimelineTitle>
+                        </TimelineHeader>
+                        <TimelineDescription>Verify all services are running correctly.</TimelineDescription>
+                    </ChildContent>
+                </TimelineItem>
+            </Timeline>
+        </div>
+    </div>
+
+    <!-- Custom Connector Colors -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Custom Connector Colors</h2>
+            <p class="text-sm text-muted-foreground">
+                Override the connector line color independently from the icon color.
+            </p>
+        </div>
+        <div class="border rounded-lg p-6">
+            <Timeline>
+                <TimelineItem IconColor="TimelineColor.Primary" ConnectorColor="TimelineColor.Accent">
+                    <ChildContent>
+                        <TimelineHeader>
+                            <TimelineTitle>Accent Connector</TimelineTitle>
+                        </TimelineHeader>
+                        <TimelineDescription>This item uses an accent-colored connector line.</TimelineDescription>
+                    </ChildContent>
+                </TimelineItem>
+
+                <TimelineItem IconColor="TimelineColor.Destructive" ConnectorColor="TimelineColor.Destructive">
+                    <ChildContent>
+                        <TimelineHeader>
+                            <TimelineTitle>Destructive Connector</TimelineTitle>
+                        </TimelineHeader>
+                        <TimelineDescription>Both icon and connector use the destructive color.</TimelineDescription>
+                    </ChildContent>
+                </TimelineItem>
+
+                <TimelineItem IconColor="TimelineColor.Secondary" ShowConnector="false">
+                    <ChildContent>
+                        <TimelineHeader>
+                            <TimelineTitle>No Connector</TimelineTitle>
+                        </TimelineHeader>
+                        <TimelineDescription>The last item hides its connector line.</TimelineDescription>
+                    </ChildContent>
+                </TimelineItem>
+            </Timeline>
+        </div>
+    </div>
+
+    <!-- Empty State -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Empty State</h2>
+            <p class="text-sm text-muted-foreground">
+                When no items are provided, a fallback message is displayed.
+            </p>
+        </div>
+        <div class="border rounded-lg p-6">
+            <Timeline />
+        </div>
+    </div>
+
+    <!-- Accessibility -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Accessibility Notes</h2>
+            <p class="text-sm text-muted-foreground">
+                Best practices for using the Timeline component accessibly.
+            </p>
+        </div>
+        <div class="border rounded-lg p-6 space-y-3 bg-muted/50">
+            <p class="text-sm">
+                ✓ <strong>Semantic HTML:</strong> Uses ordered list (&lt;ol&gt;) and list items (&lt;li&gt;) for proper structure.
+            </p>
+            <p class="text-sm">
+                ✓ <strong>ARIA label:</strong> The timeline container includes an aria-label for screen readers.
+            </p>
+            <p class="text-sm">
+                ✓ <strong>Heading hierarchy:</strong> Timeline titles use &lt;h3&gt; for proper document outline.
+            </p>
+            <p class="text-sm">
+                ✓ <strong>Time elements:</strong> Use the &lt;time&gt; element for machine-readable dates.
+            </p>
+        </div>
+    </div>
+
+    <!-- API Reference -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">API Reference</h2>
+        </div>
+
+        <!-- Timeline -->
+        <div class="border rounded-lg p-6 space-y-4">
+            <h3 class="text-lg font-semibold">Timeline</h3>
+            <p class="text-sm text-muted-foreground">Root container component rendering an ordered list.</p>
+            <div class="space-y-3">
+                <div>
+                    <h4 class="font-mono text-sm font-semibold mb-1">Size</h4>
+                    <p class="text-sm text-muted-foreground">
+                        Type: <code class="text-xs bg-muted px-1 py-0.5 rounded">TimelineSize</code> |
+                        Default: <code class="text-xs bg-muted px-1 py-0.5 rounded">Medium</code>
+                    </p>
+                    <p class="text-sm text-muted-foreground">Controls gap spacing between items (Small, Medium, Large).</p>
+                </div>
+                <Separator />
+                <div>
+                    <h4 class="font-mono text-sm font-semibold mb-1">Class</h4>
+                    <p class="text-sm text-muted-foreground">
+                        Type: <code class="text-xs bg-muted px-1 py-0.5 rounded">string?</code>
+                    </p>
+                    <p class="text-sm text-muted-foreground">Additional CSS classes for the timeline container.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- TimelineItem -->
+        <div class="border rounded-lg p-6 space-y-4">
+            <h3 class="text-lg font-semibold">TimelineItem</h3>
+            <p class="text-sm text-muted-foreground">Individual entry in the timeline with icon, connector, and content.</p>
+            <div class="space-y-3">
+                <div>
+                    <h4 class="font-mono text-sm font-semibold mb-1">Status</h4>
+                    <p class="text-sm text-muted-foreground">
+                        Type: <code class="text-xs bg-muted px-1 py-0.5 rounded">TimelineStatus</code> |
+                        Default: <code class="text-xs bg-muted px-1 py-0.5 rounded">Completed</code>
+                    </p>
+                    <p class="text-sm text-muted-foreground">Current status (Completed, InProgress, Pending).</p>
+                </div>
+                <Separator />
+                <div>
+                    <h4 class="font-mono text-sm font-semibold mb-1">IconColor</h4>
+                    <p class="text-sm text-muted-foreground">
+                        Type: <code class="text-xs bg-muted px-1 py-0.5 rounded">TimelineColor</code> |
+                        Default: <code class="text-xs bg-muted px-1 py-0.5 rounded">Primary</code>
+                    </p>
+                    <p class="text-sm text-muted-foreground">Color theme for the icon (Primary, Secondary, Muted, Accent, Destructive).</p>
+                </div>
+                <Separator />
+                <div>
+                    <h4 class="font-mono text-sm font-semibold mb-1">ConnectorColor</h4>
+                    <p class="text-sm text-muted-foreground">
+                        Type: <code class="text-xs bg-muted px-1 py-0.5 rounded">TimelineColor?</code> |
+                        Default: <code class="text-xs bg-muted px-1 py-0.5 rounded">null</code> (inherits from status)
+                    </p>
+                    <p class="text-sm text-muted-foreground">Explicit color for the connector line. When null, color is derived from Status.</p>
+                </div>
+                <Separator />
+                <div>
+                    <h4 class="font-mono text-sm font-semibold mb-1">ShowConnector</h4>
+                    <p class="text-sm text-muted-foreground">
+                        Type: <code class="text-xs bg-muted px-1 py-0.5 rounded">bool</code> |
+                        Default: <code class="text-xs bg-muted px-1 py-0.5 rounded">true</code>
+                    </p>
+                    <p class="text-sm text-muted-foreground">Whether to show the vertical connector line below this item.</p>
+                </div>
+                <Separator />
+                <div>
+                    <h4 class="font-mono text-sm font-semibold mb-1">IconSize</h4>
+                    <p class="text-sm text-muted-foreground">
+                        Type: <code class="text-xs bg-muted px-1 py-0.5 rounded">TimelineSize</code> |
+                        Default: <code class="text-xs bg-muted px-1 py-0.5 rounded">Medium</code>
+                    </p>
+                    <p class="text-sm text-muted-foreground">Size of the icon indicator.</p>
+                </div>
+                <Separator />
+                <div>
+                    <h4 class="font-mono text-sm font-semibold mb-1">IconContent</h4>
+                    <p class="text-sm text-muted-foreground">
+                        Type: <code class="text-xs bg-muted px-1 py-0.5 rounded">RenderFragment?</code>
+                    </p>
+                    <p class="text-sm text-muted-foreground">Custom icon content to replace the default icon.</p>
+                </div>
+                <Separator />
+                <div>
+                    <h4 class="font-mono text-sm font-semibold mb-1">TimeContent</h4>
+                    <p class="text-sm text-muted-foreground">
+                        Type: <code class="text-xs bg-muted px-1 py-0.5 rounded">RenderFragment?</code>
+                    </p>
+                    <p class="text-sm text-muted-foreground">Time/date content displayed in the left column.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sub-components -->
+        <div class="border rounded-lg p-6 space-y-4">
+            <h3 class="text-lg font-semibold">Sub-Components</h3>
+            <div class="space-y-3">
+                <div>
+                    <h4 class="font-mono text-sm font-semibold mb-1">TimelineIcon</h4>
+                    <p class="text-sm text-muted-foreground">Circular icon indicator. Props: Color, Size, Status, ChildContent.</p>
+                </div>
+                <Separator />
+                <div>
+                    <h4 class="font-mono text-sm font-semibold mb-1">TimelineConnector</h4>
+                    <p class="text-sm text-muted-foreground">Vertical line between items. Props: Status, Color, Class.</p>
+                </div>
+                <Separator />
+                <div>
+                    <h4 class="font-mono text-sm font-semibold mb-1">TimelineContent</h4>
+                    <p class="text-sm text-muted-foreground">Flex container for the content area. Props: Class, ChildContent.</p>
+                </div>
+                <Separator />
+                <div>
+                    <h4 class="font-mono text-sm font-semibold mb-1">TimelineHeader</h4>
+                    <p class="text-sm text-muted-foreground">Header section containing title and time. Props: Class, ChildContent.</p>
+                </div>
+                <Separator />
+                <div>
+                    <h4 class="font-mono text-sm font-semibold mb-1">TimelineTitle</h4>
+                    <p class="text-sm text-muted-foreground">Semantic heading (&lt;h3&gt;) for the item title. Props: Class, ChildContent.</p>
+                </div>
+                <Separator />
+                <div>
+                    <h4 class="font-mono text-sm font-semibold mb-1">TimelineDescription</h4>
+                    <p class="text-sm text-muted-foreground">Paragraph for item description text. Props: Class, ChildContent.</p>
+                </div>
+                <Separator />
+                <div>
+                    <h4 class="font-mono text-sm font-semibold mb-1">TimelineTime</h4>
+                    <p class="text-sm text-muted-foreground">Semantic &lt;time&gt; element for dates. Props: Class, ChildContent.</p>
+                </div>
+                <Separator />
+                <div>
+                    <h4 class="font-mono text-sm font-semibold mb-1">TimelineEmpty</h4>
+                    <p class="text-sm text-muted-foreground">Fallback displayed when no items exist. Props: Class, ChildContent.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

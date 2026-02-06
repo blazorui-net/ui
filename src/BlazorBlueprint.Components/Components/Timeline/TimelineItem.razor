@@ -1,0 +1,36 @@
+@namespace BlazorBlueprint.Components.Timeline
+
+<li class="@CssClass" @attributes="AdditionalAttributes">
+    <div class="@ContentGridClass">
+        @* Date column *@
+        <div class="flex flex-col justify-start pt-1">
+            @if (TimeContent != null)
+            {
+                @TimeContent
+            }
+        </div>
+
+        @* Icon and connector column *@
+        <div class="flex flex-col items-center">
+            <div class="relative z-10">
+                @if (IconContent != null)
+                {
+                    @IconContent
+                }
+                else
+                {
+                    <TimelineIcon Color="@IconColor" Size="@IconSize" Status="@Status" />
+                }
+            </div>
+            @if (ShowConnector)
+            {
+                <TimelineConnector Status="@Status" Color="@ConnectorColor" Class="h-16 mt-2" />
+            }
+        </div>
+
+        @* Content column *@
+        <div class="flex flex-col gap-2 pl-2">
+            @ChildContent
+        </div>
+    </div>
+</li>
