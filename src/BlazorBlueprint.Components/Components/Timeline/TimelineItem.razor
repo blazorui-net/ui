@@ -8,18 +8,18 @@
         {
             @* Left: icon + content *@
             @IconColumn
-            <div>@ContentBody</div>
+            <div class="@ContentWrapperClass">@ContentBody</div>
         }
         else if (Align == TimelineAlign.Right)
         {
             @* Right: content + icon *@
-            <div data-timeline-end>@ContentBody</div>
+            <div class="@ContentWrapperEndClass" data-timeline-end>@ContentBody</div>
             @IconColumn
         }
         else if (IsReversed)
         {
             @* Alternate odd: content (right-aligned) + icon + date *@
-            <div data-timeline-end>@ContentBody</div>
+            <div class="@ContentWrapperEndClass" data-timeline-end>@ContentBody</div>
             @IconColumn
             @DateColumn
         }
@@ -28,7 +28,7 @@
             @* Center / Alternate even: date + icon + content *@
             @DateColumn
             @IconColumn
-            <div>@ContentBody</div>
+            <div class="@ContentWrapperClass">@ContentBody</div>
         }
     </div>
 </li>
@@ -49,14 +49,14 @@
             </div>
             @if (ShowConnector)
             {
-                <TimelineConnector Status="@Status" Color="@ConnectorColor" ConnectorStyle="@ConnectorStyle" Class="h-16 mt-2" />
+                <TimelineConnector Status="@Status" Color="@ConnectorColor" ConnectorStyle="@ConnectorStyle" Class="h-16" />
             }
         </div>
     };
 
     private RenderFragment DateColumn => __builder =>
     {
-        <div class="flex flex-col justify-start pt-1">
+        <div class="@DateColumnClass">
             @if (TimeContent != null)
             {
                 @TimeContent

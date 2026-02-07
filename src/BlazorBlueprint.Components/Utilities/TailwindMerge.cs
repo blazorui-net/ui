@@ -109,6 +109,13 @@ public static class TailwindMerge
         ["items-baseline"] = "align-items",
         ["items-stretch"] = "align-items",
 
+        // Border Style
+        ["border-solid"] = "border-style",
+        ["border-dashed"] = "border-style",
+        ["border-dotted"] = "border-style",
+        ["border-double"] = "border-style",
+        ["border-none"] = "border-style",
+
         // Border Radius
         ["rounded-none"] = "border-radius",
         ["rounded-sm"] = "border-radius",
@@ -132,8 +139,9 @@ public static class TailwindMerge
     private static readonly Regex GapRegex = new(@"^(gap|gap-x|gap-y)-(\d+\.?\d*)$", RegexOptions.Compiled);
     private static readonly Regex TextColorRegex = new(@"^text-([a-z]+)(?:-(\d+))?$", RegexOptions.Compiled);
     private static readonly Regex BgColorRegex = new(@"^bg-([a-z]+)(?:-(\d+))?$", RegexOptions.Compiled);
-    private static readonly Regex BorderColorRegex = new(@"^border-([a-z]+)(?:-(\d+))?$", RegexOptions.Compiled);
+    private static readonly Regex BorderColorRegex = new(@"^border-(?!l-|r-|t-|b-|x-|y-)([a-z]+)(?:-(\d+))?$", RegexOptions.Compiled);
     private static readonly Regex BorderWidthRegex = new(@"^border(-\d+)?$", RegexOptions.Compiled);
+    private static readonly Regex BorderSideWidthRegex = new(@"^border-([lrtbxy])-(\d+)$", RegexOptions.Compiled);
     private static readonly Regex OpacityRegex = new(@"^opacity-(\d+)$", RegexOptions.Compiled);
     private static readonly Regex ZIndexRegex = new(@"^z-(\d+|auto)$", RegexOptions.Compiled);
     private static readonly Regex GridColsRegex = new(@"^grid-cols-(\d+|none)$", RegexOptions.Compiled);
@@ -271,9 +279,14 @@ public static class TailwindMerge
         if (BorderColorRegex.IsMatch(className))
             return "border-color";
 
-        // Check border width
+        // Check border width (all sides)
         if (BorderWidthRegex.IsMatch(className))
             return "border-width";
+
+        // Check directional border width (border-l-2, border-t-4, etc.)
+        var borderSideMatch = BorderSideWidthRegex.Match(className);
+        if (borderSideMatch.Success)
+            return $"border-{borderSideMatch.Groups[1].Value}-width";
 
         // Check opacity
         if (OpacityRegex.IsMatch(className))

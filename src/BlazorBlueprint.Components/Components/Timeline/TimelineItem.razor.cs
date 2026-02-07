@@ -145,4 +145,27 @@ public partial class TimelineItem : ComponentBase
         "relative z-10",
         Loading ? "animate-pulse" : null
     );
+
+    private string IconMinHeightClass => IconSize switch
+    {
+        TimelineSize.Small => "min-h-8",
+        TimelineSize.Medium => "min-h-10",
+        TimelineSize.Large => "min-h-12",
+        _ => "min-h-10"
+    };
+
+    private string ContentWrapperClass => ClassNames.cn(
+        "flex items-center",
+        IconMinHeightClass
+    );
+
+    private string ContentWrapperEndClass => ClassNames.cn(
+        "flex items-center justify-end",
+        IconMinHeightClass
+    );
+
+    private string DateColumnClass => ClassNames.cn(
+        "flex flex-col justify-center",
+        IconMinHeightClass
+    );
 }

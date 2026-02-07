@@ -86,10 +86,10 @@ public partial class Timeline : ComponentBase
         // Size variants
         Size switch
         {
-            TimelineSize.Small => "gap-4",
-            TimelineSize.Medium => "gap-6",
-            TimelineSize.Large => "gap-8",
-            _ => "gap-6"
+            TimelineSize.Small => "gap-2",
+            TimelineSize.Medium => "gap-4",
+            TimelineSize.Large => "gap-6",
+            _ => "gap-4"
         },
         Class
     );
