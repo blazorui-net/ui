@@ -57,6 +57,10 @@ public partial class DataTable<TData> : ComponentBase where TData : class
         public RenderFragment<TData>? CellTemplate { get; set; }
         public string? CellClass { get; set; }
         public string? HeaderClass { get; set; }
+        public Func<TData, string> ToStringFunc => item =>
+            Property(item) is IFormattable formattable && Format is not null
+                ? formattable.ToString(Format, null)
+                : Property(item)?.ToString() ?? string.Empty;
     }
 
     private List<ColumnData> _columns = new();
@@ -350,12 +354,12 @@ public partial class DataTable<TData> : ComponentBase where TData : class
             try
             {
                 var value = column.Property(item);
-                if (value == null)
+                if (value is null)
                 {
                     continue;
                 }
 
-                var stringValue = value.ToString();
+                var stringValue = column.ToStringFunc(item);
                 if (!string.IsNullOrEmpty(stringValue) &&
                     stringValue.Contains(searchValue, StringComparison.OrdinalIgnoreCase))
                 {
