@@ -1,12 +1,14 @@
 @namespace BlazorBlueprint.Components.Timeline
 
 <ol aria-label="Timeline" class="@CssClass" @attributes="AdditionalAttributes">
-    @if (ChildContent != null)
-    {
-        @ChildContent
-    }
-    else
-    {
-        <TimelineEmpty />
-    }
+    <CascadingValue Value="this" IsFixed="true">
+        @if (ChildContent != null)
+        {
+            @ChildContent
+        }
+        else
+        {
+            <TimelineEmpty />
+        }
+    </CascadingValue>
 </ol>

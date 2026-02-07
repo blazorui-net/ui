@@ -33,6 +33,12 @@ public partial class TimelineIcon : ComponentBase
     public TimelineSize Size { get; set; } = TimelineSize.Medium;
 
     /// <summary>
+    /// Gets or sets the visual style variant (Solid or Outline).
+    /// </summary>
+    [Parameter]
+    public TimelineIconVariant Variant { get; set; } = TimelineIconVariant.Solid;
+
+    /// <summary>
     /// Gets or sets additional CSS classes to apply.
     /// </summary>
     [Parameter]
@@ -62,15 +68,25 @@ public partial class TimelineIcon : ComponentBase
             TimelineSize.Large => "h-12 w-12",
             _ => "h-10 w-10"
         },
-        EffectiveColor switch
-        {
-            TimelineColor.Primary => "bg-primary text-primary-foreground",
-            TimelineColor.Secondary => "bg-secondary text-secondary-foreground",
-            TimelineColor.Muted => "bg-muted text-muted-foreground",
-            TimelineColor.Accent => "bg-accent text-accent-foreground",
-            TimelineColor.Destructive => "bg-destructive text-destructive-foreground",
-            _ => "bg-primary text-primary-foreground"
-        },
+        Variant == TimelineIconVariant.Outline
+            ? EffectiveColor switch
+            {
+                TimelineColor.Primary => "bg-background border-2 border-primary text-primary",
+                TimelineColor.Secondary => "bg-background border-2 border-secondary text-secondary",
+                TimelineColor.Muted => "bg-background border-2 border-muted text-muted-foreground",
+                TimelineColor.Accent => "bg-background border-2 border-accent text-accent",
+                TimelineColor.Destructive => "bg-background border-2 border-destructive text-destructive",
+                _ => "bg-background border-2 border-primary text-primary"
+            }
+            : EffectiveColor switch
+            {
+                TimelineColor.Primary => "bg-primary text-primary-foreground",
+                TimelineColor.Secondary => "bg-secondary text-secondary-foreground",
+                TimelineColor.Muted => "bg-muted text-muted-foreground",
+                TimelineColor.Accent => "bg-accent text-accent-foreground",
+                TimelineColor.Destructive => "bg-destructive text-destructive-foreground",
+                _ => "bg-primary text-primary-foreground"
+            },
         Class
     );
 

@@ -29,6 +29,12 @@ public partial class TimelineConnector : ComponentBase
     public TimelineColor? Color { get; set; }
 
     /// <summary>
+    /// Gets or sets the connector line style (Solid, Dashed, or Dotted).
+    /// </summary>
+    [Parameter]
+    public TimelineConnectorStyle ConnectorStyle { get; set; } = TimelineConnectorStyle.Solid;
+
+    /// <summary>
     /// Gets or sets additional CSS classes to apply to the connector.
     /// </summary>
     [Parameter]
@@ -40,23 +46,48 @@ public partial class TimelineConnector : ComponentBase
     [Parameter(CaptureUnmatchedValues = true)]
     public Dictionary<string, object>? AdditionalAttributes { get; set; }
 
+    private bool IsSolid => ConnectorStyle == TimelineConnectorStyle.Solid;
+
     private string CssClass => ClassNames.cn(
         "w-0.5",
-        Color switch
+        !IsSolid ? "border-l-2" : null,
+        !IsSolid ? ConnectorStyle switch
         {
-            TimelineColor.Primary => "bg-primary",
-            TimelineColor.Secondary => "bg-secondary",
-            TimelineColor.Muted => "bg-muted",
-            TimelineColor.Accent => "bg-accent",
-            TimelineColor.Destructive => "bg-destructive",
-            _ => Status switch
+            TimelineConnectorStyle.Dashed => "border-dashed",
+            TimelineConnectorStyle.Dotted => "border-dotted",
+            _ => null
+        } : null,
+        IsSolid
+            ? Color switch
             {
-                TimelineStatus.Completed => "bg-primary",
-                TimelineStatus.InProgress => "bg-linear-to-b from-primary to-muted",
-                TimelineStatus.Pending => "bg-muted",
-                _ => "bg-primary"
+                TimelineColor.Primary => "bg-primary",
+                TimelineColor.Secondary => "bg-secondary",
+                TimelineColor.Muted => "bg-muted",
+                TimelineColor.Accent => "bg-accent",
+                TimelineColor.Destructive => "bg-destructive",
+                _ => Status switch
+                {
+                    TimelineStatus.Completed => "bg-primary",
+                    TimelineStatus.InProgress => "bg-linear-to-b from-primary to-muted",
+                    TimelineStatus.Pending => "bg-muted",
+                    _ => "bg-primary"
+                }
             }
-        },
+            : Color switch
+            {
+                TimelineColor.Primary => "border-primary",
+                TimelineColor.Secondary => "border-secondary",
+                TimelineColor.Muted => "border-muted",
+                TimelineColor.Accent => "border-accent",
+                TimelineColor.Destructive => "border-destructive",
+                _ => Status switch
+                {
+                    TimelineStatus.Completed => "border-primary",
+                    TimelineStatus.InProgress => "border-primary",
+                    TimelineStatus.Pending => "border-muted",
+                    _ => "border-primary"
+                }
+            },
         Class
     );
 }

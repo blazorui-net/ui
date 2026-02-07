@@ -32,6 +32,25 @@
   }
 }
 
+/* Timeline right-aligned content */
+@layer components {
+  [data-timeline-end] {
+    text-align: right;
+  }
+
+  /* Flex-column containers (TimelineContent): align children to the right */
+  [data-timeline-end] > :where(.flex-col) {
+    align-items: flex-end;
+    padding-left: 0;
+    padding-right: 0.5rem;
+  }
+
+  /* Flex-row containers (TimelineHeader): justify items to the right */
+  [data-timeline-end] :where(.flex:not(.flex-col)) {
+    justify-content: flex-end;
+  }
+}
+
 /* Hide number input spinners (up/down arrows) - must be in base layer for proper specificity */
 @layer base {
   input[type="number"]::-webkit-outer-spin-button,

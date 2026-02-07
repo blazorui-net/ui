@@ -38,11 +38,19 @@ namespace BlazorBlueprint.Components.Timeline;
 /// </example>
 public partial class Timeline : ComponentBase
 {
+    private int _itemCounter;
+
     /// <summary>
     /// Gets or sets the size variant controlling gap spacing between items.
     /// </summary>
     [Parameter]
     public TimelineSize Size { get; set; } = TimelineSize.Medium;
+
+    /// <summary>
+    /// Gets or sets the layout alignment for timeline items.
+    /// </summary>
+    [Parameter]
+    public TimelineAlign Align { get; set; } = TimelineAlign.Center;
 
     /// <summary>
     /// Gets or sets additional CSS classes to apply to the timeline.
@@ -61,6 +69,16 @@ public partial class Timeline : ComponentBase
     /// </summary>
     [Parameter(CaptureUnmatchedValues = true)]
     public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    /// <summary>
+    /// Registers a timeline item and returns its index (used for Alternate layout).
+    /// </summary>
+    internal int RegisterItem() => _itemCounter++;
+
+    protected override void OnParametersSet()
+    {
+        _itemCounter = 0;
+    }
 
     private string CssClass => ClassNames.cn(
         // Base styles

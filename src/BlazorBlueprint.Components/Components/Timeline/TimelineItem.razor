@@ -1,36 +1,88 @@
 @namespace BlazorBlueprint.Components.Timeline
+@using BlazorBlueprint.Components.Collapsible
+@using BlazorBlueprint.Icons.Lucide.Components
 
 <li class="@CssClass" @attributes="AdditionalAttributes">
     <div class="@ContentGridClass">
-        @* Date column *@
-        <div class="flex flex-col justify-start pt-1">
-            @if (TimeContent != null)
-            {
-                @TimeContent
-            }
-        </div>
+        @if (Align == TimelineAlign.Left)
+        {
+            @* Left: icon + content *@
+            @IconColumn
+            <div>@ContentBody</div>
+        }
+        else if (Align == TimelineAlign.Right)
+        {
+            @* Right: content + icon *@
+            <div data-timeline-end>@ContentBody</div>
+            @IconColumn
+        }
+        else if (IsReversed)
+        {
+            @* Alternate odd: content (right-aligned) + icon + date *@
+            <div data-timeline-end>@ContentBody</div>
+            @IconColumn
+            @DateColumn
+        }
+        else
+        {
+            @* Center / Alternate even: date + icon + content *@
+            @DateColumn
+            @IconColumn
+            <div>@ContentBody</div>
+        }
+    </div>
+</li>
 
-        @* Icon and connector column *@
+@code {
+    private RenderFragment IconColumn => __builder =>
+    {
         <div class="flex flex-col items-center">
-            <div class="relative z-10">
+            <div class="@IconWrapperClass">
                 @if (IconContent != null)
                 {
                     @IconContent
                 }
                 else
                 {
-                    <TimelineIcon Color="@IconColor" Size="@IconSize" Status="@Status" />
+                    <TimelineIcon Color="@IconColor" Size="@IconSize" Status="@Status" Variant="@IconVariant" />
                 }
             </div>
             @if (ShowConnector)
             {
-                <TimelineConnector Status="@Status" Color="@ConnectorColor" Class="h-16 mt-2" />
+                <TimelineConnector Status="@Status" Color="@ConnectorColor" ConnectorStyle="@ConnectorStyle" Class="h-16 mt-2" />
             }
         </div>
+    };
 
-        @* Content column *@
-        <div class="flex flex-col gap-2 pl-2">
-            @ChildContent
+    private RenderFragment DateColumn => __builder =>
+    {
+        <div class="flex flex-col justify-start pt-1">
+            @if (TimeContent != null)
+            {
+                @TimeContent
+            }
         </div>
-    </div>
-</li>
+    };
+
+    private RenderFragment ContentBody => __builder =>
+    {
+        @if (IsCollapsible && DetailContent != null)
+        {
+            <Collapsible DefaultOpen="@DefaultOpen">
+                <CollapsibleTrigger Class="flex w-full items-center gap-2 cursor-pointer">
+                    <div class="flex-1">
+                        @ChildContent
+                    </div>
+                    <LucideIcon Name="chevron-down" Size="16" Class="transition-transform duration-200 group-data-[state=open]:rotate-180 shrink-0" />
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                    @DetailContent
+                </CollapsibleContent>
+            </Collapsible>
+        }
+        else
+        {
+            @ChildContent
+        }
+    };
+}

@@ -12,6 +12,14 @@ namespace BlazorBlueprint.Components.Timeline;
 /// </remarks>
 public partial class TimelineItem : ComponentBase
 {
+    private int _itemIndex;
+
+    /// <summary>
+    /// Gets or sets the parent Timeline component via cascading parameter.
+    /// </summary>
+    [CascadingParameter]
+    public Timeline? ParentTimeline { get; set; }
+
     /// <summary>
     /// Gets or sets the color theme for the icon.
     /// </summary>
@@ -43,6 +51,42 @@ public partial class TimelineItem : ComponentBase
     public TimelineSize IconSize { get; set; } = TimelineSize.Medium;
 
     /// <summary>
+    /// Gets or sets the icon style variant (Solid or Outline).
+    /// </summary>
+    [Parameter]
+    public TimelineIconVariant IconVariant { get; set; } = TimelineIconVariant.Solid;
+
+    /// <summary>
+    /// Gets or sets the connector line style (Solid, Dashed, or Dotted).
+    /// </summary>
+    [Parameter]
+    public TimelineConnectorStyle ConnectorStyle { get; set; } = TimelineConnectorStyle.Solid;
+
+    /// <summary>
+    /// Gets or sets whether the item is in a loading state (shows pulse animation on icon).
+    /// </summary>
+    [Parameter]
+    public bool Loading { get; set; }
+
+    /// <summary>
+    /// Gets or sets whether the item content is collapsible.
+    /// </summary>
+    [Parameter]
+    public bool IsCollapsible { get; set; }
+
+    /// <summary>
+    /// Gets or sets the default open state when collapsible.
+    /// </summary>
+    [Parameter]
+    public bool DefaultOpen { get; set; } = true;
+
+    /// <summary>
+    /// Gets or sets the detail content that is shown/hidden when collapsible.
+    /// </summary>
+    [Parameter]
+    public RenderFragment? DetailContent { get; set; }
+
+    /// <summary>
     /// Gets or sets additional CSS classes to apply to the item.
     /// </summary>
     [Parameter]
@@ -61,7 +105,7 @@ public partial class TimelineItem : ComponentBase
     public RenderFragment? IconContent { get; set; }
 
     /// <summary>
-    /// Gets or sets the time/date content displayed in the left column.
+    /// Gets or sets the time/date content displayed in the date column.
     /// </summary>
     [Parameter]
     public RenderFragment? TimeContent { get; set; }
@@ -72,13 +116,33 @@ public partial class TimelineItem : ComponentBase
     [Parameter(CaptureUnmatchedValues = true)]
     public Dictionary<string, object>? AdditionalAttributes { get; set; }
 
+    private TimelineAlign Align => ParentTimeline?.Align ?? TimelineAlign.Center;
+
+    private bool IsReversed => Align == TimelineAlign.Alternate && _itemIndex % 2 != 0;
+
+    protected override void OnInitialized()
+    {
+        _itemIndex = ParentTimeline?.RegisterItem() ?? 0;
+    }
+
     private string CssClass => ClassNames.cn(
-        "relative w-full mb-8 last:mb-0",
+        "relative w-full",
         Class
     );
 
     private string ContentGridClass => ClassNames.cn(
-        "grid grid-cols-[1fr_auto_1fr] gap-4 items-start",
+        "grid gap-4 items-start",
+        Align switch
+        {
+            TimelineAlign.Left => "grid-cols-[auto_1fr]",
+            TimelineAlign.Right => "grid-cols-[1fr_auto]",
+            _ => "grid-cols-[1fr_auto_1fr]"
+        },
         Status == TimelineStatus.InProgress ? "aria-current-step" : null
+    );
+
+    private string IconWrapperClass => ClassNames.cn(
+        "relative z-10",
+        Loading ? "animate-pulse" : null
     );
 }
