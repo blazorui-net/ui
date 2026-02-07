@@ -120,10 +120,8 @@ public partial class TimelineItem : ComponentBase
 
     private bool IsReversed => Align == TimelineAlign.Alternate && _itemIndex % 2 != 0;
 
-    protected override void OnInitialized()
-    {
+    protected override void OnInitialized() =>
         _itemIndex = ParentTimeline?.RegisterItem() ?? 0;
-    }
 
     private string CssClass => ClassNames.cn(
         "relative w-full",
