@@ -6,6 +6,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## 2026-02-08
+
+### Added
+- `CursorType` enum and `CursorExtensions.ToClass()` utility for mapping cursor types to Tailwind CSS classes
+- Cursor and pointer-events conflict resolution groups in TailwindMerge
+- Cursor behavior demo section on Button demo page
+
+### Changed
+- Button component now shows `cursor-pointer` by default and `disabled:cursor-not-allowed` when disabled, replacing `disabled:pointer-events-none` for better UX feedback
+
+---
+
 ## 2026-02-07
 
 ### Added
