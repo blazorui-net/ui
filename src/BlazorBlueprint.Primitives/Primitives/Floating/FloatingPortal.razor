@@ -129,14 +129,12 @@
     protected override void OnParametersSet()
     {
         base.OnParametersSet();
-
-        // Re-register portal with updated ChildContent to ensure content updates are reflected
-        // Safe because GetInitialStyle() includes the stored position,
-        // so re-renders won't lose the position styling
-        if (_isInitialized && IsOpen && !string.IsNullOrEmpty(PortalId))
-        {
-            PortalService.RegisterPortal(PortalId, RenderPortalContent());
-        }
+        // Do NOT re-register the portal here. Re-registering fires OnPortalsChanged,
+        // which triggers PortalHost to re-render all portals. When this FloatingPortal
+        // is inside another portal (e.g., Combobox in Dialog), this creates an infinite
+        // render loop. The RenderFragment delegate returned by RenderPortalContent()
+        // captures 'this', so PortalHost reads current ChildContent and style values
+        // automatically when it next renders. This matches the DialogPortal pattern.
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
