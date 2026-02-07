@@ -75,10 +75,8 @@ public partial class Timeline : ComponentBase
     /// </summary>
     internal int RegisterItem() => _itemCounter++;
 
-    protected override void OnParametersSet()
-    {
+    protected override void OnParametersSet() =>
         _itemCounter = 0;
-    }
 
     private string CssClass => ClassNames.cn(
         // Base styles

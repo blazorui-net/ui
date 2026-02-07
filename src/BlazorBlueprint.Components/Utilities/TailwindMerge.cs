@@ -302,7 +302,9 @@ public static class TailwindMerge
         // Check directional border width (border-l-2, border-t-4, etc.)
         var borderSideMatch = BorderSideWidthRegex.Match(className);
         if (borderSideMatch.Success)
+        {
             return $"border-{borderSideMatch.Groups[1].Value}-width";
+        }
 
         // Check opacity
         if (OpacityRegex.IsMatch(className))
