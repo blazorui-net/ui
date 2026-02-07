@@ -184,7 +184,7 @@
         <div class="space-y-2">
             <h2 class="text-2xl font-semibold">Disabled State</h2>
             <p class="text-sm text-muted-foreground">
-                Buttons with reduced opacity and no pointer events.
+                Buttons with reduced opacity and not-allowed cursor.
             </p>
         </div>
         <div class="flex flex-wrap gap-4">
@@ -194,6 +194,29 @@
             <Button Variant="ButtonVariant.Secondary" Disabled="true">Secondary Disabled</Button>
             <Button Variant="ButtonVariant.Ghost" Disabled="true">Ghost Disabled</Button>
             <Button Variant="ButtonVariant.Link" Disabled="true">Link Disabled</Button>
+        </div>
+    </div>
+
+    <!-- Cursor Behavior -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Cursor Behavior</h2>
+            <p class="text-sm text-muted-foreground">
+                Buttons show <code class="text-xs bg-muted px-1 py-0.5 rounded">cursor-pointer</code> by default and <code class="text-xs bg-muted px-1 py-0.5 rounded">cursor-not-allowed</code> when disabled.
+            </p>
+        </div>
+        <div class="flex flex-wrap gap-4">
+            <Button>Pointer Cursor</Button>
+            <Button Disabled="true">Not-Allowed Cursor</Button>
+            <Button Variant="ButtonVariant.Outline" Disabled="true">Disabled Outline</Button>
+            <Button Variant="ButtonVariant.Link">Link Cursor</Button>
+            <Button Href="/components/badge" Disabled="true">Disabled Link</Button>
+        </div>
+        <p class="text-sm text-muted-foreground">
+            Use the <code class="text-xs bg-muted px-1 py-0.5 rounded">Class</code> parameter to override cursor behavior (e.g., <code class="text-xs bg-muted px-1 py-0.5 rounded">Class="cursor-default"</code>).
+        </p>
+        <div class="flex flex-wrap gap-4">
+            <Button Class="cursor-default">Custom: Default Cursor</Button>
         </div>
     </div>
 

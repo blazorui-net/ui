@@ -132,6 +132,28 @@ public static class TailwindMerge
 
         // Z-Index
         ["z"] = "z-index",
+
+        // Cursor
+        ["cursor-default"] = "cursor",
+        ["cursor-pointer"] = "cursor",
+        ["cursor-not-allowed"] = "cursor",
+        ["cursor-crosshair"] = "cursor",
+        ["cursor-grab"] = "cursor",
+        ["cursor-grabbing"] = "cursor",
+        ["cursor-col-resize"] = "cursor",
+        ["cursor-row-resize"] = "cursor",
+        ["cursor-e-resize"] = "cursor",
+        ["cursor-w-resize"] = "cursor",
+        ["cursor-wait"] = "cursor",
+        ["cursor-text"] = "cursor",
+        ["cursor-move"] = "cursor",
+        ["cursor-help"] = "cursor",
+        ["cursor-none"] = "cursor",
+        ["cursor-auto"] = "cursor",
+
+        // Pointer Events
+        ["pointer-events-none"] = "pointer-events",
+        ["pointer-events-auto"] = "pointer-events",
     };
 
     private static readonly Regex SpacingRegex = new(@"^(p|px|py|pt|pr|pb|pl|m|mx|my|mt|mr|mb|ml)-(\d+\.?\d*|auto)$", RegexOptions.Compiled);
