@@ -22,6 +22,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - `Class` property on `ToastData` for custom toast styling via TailwindMerge
 
 ### Fixed
+- Infinite render loop when FloatingPortal is nested inside Dialog (e.g., Combobox in Dialog) — removed re-registration in `OnParametersSet` to match DialogPortal pattern
+- Migrated all components to `ClassNames.cn()` for proper TailwindMerge support
 - TailwindMerge incorrectly classified `border-dashed`, `border-dotted`, and `border-l-2` as border-color utilities, causing them to be dropped during class merging
 
 
