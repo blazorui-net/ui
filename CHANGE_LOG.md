@@ -6,6 +6,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## 2026-02-07
+
+### Added
+- DataTableColumn `Format` parameter for custom formatting of cell values (e.g., date/number formats via `IFormattable`)
+- DataTableColumn now supports nullable `TValue` types for columns with null values
+- Custom variant/styling examples to Button, Badge, Alert, and Toast demo pages showing how to use the `Class` parameter for project-specific variants
+- `Class` property on `ToastData` for custom toast styling via TailwindMerge
+
+
+---
+
 ## 2026-02-06
 
 ### Added
