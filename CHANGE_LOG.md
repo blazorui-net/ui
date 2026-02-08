@@ -12,14 +12,41 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - `CursorType` enum and `CursorExtensions.ToClass()` utility for mapping cursor types to Tailwind CSS classes
 - Cursor and pointer-events conflict resolution groups in TailwindMerge
 - Cursor behavior demo section on Button demo page
+- `InputField<TValue>` component — generic typed input with automatic type conversion, formatting, validation, and parse error handling
+- `InputConverter<TValue>` system with global, instance, and built-in default converter resolution for 15+ types
+- `UpdateTiming` enum for Input and InputField — `Immediate` (default), `OnChange` (blur/Enter), and `Debounced` modes
+- `DebounceInterval` parameter (default 500ms) for debounced value updates
+- `UpdateTiming` and `DebounceInterval` parameters on `Textarea`, `InputGroupInput`, and `InputGroupTextarea` — matching the `Input` component pattern
+- `DisableDebounce` and `DebounceInterval` parameters on `CommandInput`, `NumericInput<T>`, and `CurrencyInput` — debounce ON by default with selective immediate firing on blur/arrow keys
+- Update Timing / Debounce demo sections with live value displays on Textarea, InputGroup, Command, NumericInput, and CurrencyInput demo pages
+- InputField demo page with examples for all supported types and features
+- `SetPosition()` and `ResetPosition()` methods on `ToastService` for runtime toast position control
+- `TimelineConnectorFit` enum with `Spaced` and `Connected` options for controlling how connector lines fit between icons
+- `ConnectorFit` parameter on `Timeline` component
+- `ConnectorClass` parameter on `TimelineItem` for custom connector height overrides
+- `Loading` parameter on `TimelineIcon` for isolated pulse animation
+- Rich Content, Connector Fit, and Custom Connector Height demo sections for Timeline
 
 ### Changed
 - Button component now shows `cursor-pointer` by default and `disabled:cursor-not-allowed` when disabled, replacing `disabled:pointer-events-none` for better UX feedback
 - Added Salary column with currency format (`C0`) to the DataTable demo Basic Table example
+- Command palette keyboard shortcut changed from `Ctrl+K` to `Ctrl+I` across demo pages to avoid browser address bar conflict
+- `CommandDemo` refactored to use `IKeyboardShortcutService` instead of raw JS interop for Ctrl+I shortcut registration
 
 ### Fixed
 - DataTable global search now uses the column's `Format` string when converting values for search matching, consistent with how cell values are rendered
 - Text input components (`Input`, `Textarea`, `InputGroupInput`, `InputGroupTextarea`) now normalize empty/whitespace strings to `null`, preventing inconsistent validation on nullable string properties (#99)
+- Dropdown mispositioning when switching between multiple open MultiSelect components
+- Stale portal content when interacting inside open popovers
+- ContextMenu keyboard navigation breaking on repeated right-clicks on the same trigger
+- Toast positioning demo now interactive with live position switching
+- Timeline connector line no longer uses fixed height — dynamically stretches to match content height (#104)
+- Timeline connector gap asymmetry between top and bottom icons resolved with symmetric spacing
+- Timeline loading pulse animation no longer bleeds through icon ring onto connector line
+- Timeline collapsible item chevrons now align consistently regardless of title length
+- Menubar demo icon name corrected from `check-circle` to `circle-check`
+- Timeline connector `z-index` changed from `z-10` to `z-[1]` to prevent overlap with overlays
+- Timeline connector minimum height increased from `min-h-8` to `min-h-16` for better spacing
 
 ---
 

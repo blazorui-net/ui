@@ -6,6 +6,9 @@
 @using BlazorBlueprint.Icons.Heroicons.Data
 @using BlazorBlueprint.Icons.Feather.Components
 @using BlazorBlueprint.Icons.Heroicons.Components
+@using BlazorBlueprint.Primitives.Services
+@inject IKeyboardShortcutService KeyboardShortcuts
+@implements IDisposable
 
 <PageTitle>Command Component - Blazor Blueprint</PageTitle>
 
@@ -26,14 +29,14 @@
     <section class="space-y-4">
         <h2 class="text-2xl font-semibold">Command Palette (Overlay)</h2>
         <p class="text-sm text-muted-foreground">
-            A proper command palette that appears as an overlay on the screen. Click the button or press <Kbd>Ctrl+K</Kbd> to open.
+            A proper command palette that appears as an overlay on the screen. Click the button or press <Kbd>Ctrl+I</Kbd> to open.
         </p>
 
         <div class="flex flex-col gap-2">
             <Button Variant="ButtonVariant.Outline" OnClick="@(() => isCommandPaletteOpen = true)">
                 <LucideIcon Name="command" Size="16" Class="mr-2" />
                 Open Command Palette
-                <span class="ml-auto text-xs text-muted-foreground">Ctrl+K</span>
+                <span class="ml-auto text-xs text-muted-foreground">Ctrl+I</span>
             </Button>
             @if (!string.IsNullOrEmpty(paletteSelected))
             {
@@ -427,6 +430,54 @@
         </div>
     </section>
 
+    <!-- Debounce -->
+    <section class="space-y-4">
+        <h2 class="text-2xl font-semibold">Debounce</h2>
+        <p class="text-sm text-muted-foreground">
+            By default, CommandInput debounces search filtering to reduce re-renders on every keystroke.
+            Set <code class="text-xs bg-muted px-1 py-0.5 rounded">DisableDebounce="true"</code> to restore immediate filtering.
+        </p>
+
+        <div class="grid gap-6 md:grid-cols-2 max-w-4xl">
+            <div class="space-y-2">
+                <p class="text-sm font-medium">Debounced (default, 500ms)</p>
+                <div class="border rounded-lg shadow-sm">
+                    <BlazorBlueprint.Components.Command.Command>
+                        <CommandInput Placeholder="Search (debounced)..." />
+                        <CommandList>
+                            <CommandEmpty>No results found.</CommandEmpty>
+                            <CommandGroup>
+                                <CommandItem Value="apple">Apple</CommandItem>
+                                <CommandItem Value="banana">Banana</CommandItem>
+                                <CommandItem Value="cherry">Cherry</CommandItem>
+                                <CommandItem Value="date">Date</CommandItem>
+                            </CommandGroup>
+                        </CommandList>
+                    </BlazorBlueprint.Components.Command.Command>
+                </div>
+                <p class="text-xs text-muted-foreground">Filtering happens after you stop typing for 500ms.</p>
+            </div>
+            <div class="space-y-2">
+                <p class="text-sm font-medium">Immediate (DisableDebounce)</p>
+                <div class="border rounded-lg shadow-sm">
+                    <BlazorBlueprint.Components.Command.Command>
+                        <CommandInput Placeholder="Search (immediate)..." DisableDebounce="true" />
+                        <CommandList>
+                            <CommandEmpty>No results found.</CommandEmpty>
+                            <CommandGroup>
+                                <CommandItem Value="apple">Apple</CommandItem>
+                                <CommandItem Value="banana">Banana</CommandItem>
+                                <CommandItem Value="cherry">Cherry</CommandItem>
+                                <CommandItem Value="date">Date</CommandItem>
+                            </CommandGroup>
+                        </CommandList>
+                    </BlazorBlueprint.Components.Command.Command>
+                </div>
+                <p class="text-xs text-muted-foreground">Filtering happens on every keystroke.</p>
+            </div>
+        </div>
+    </section>
+
     <!-- Keyboard Navigation Info -->
     <section class="space-y-4">
         <h2 class="text-2xl font-semibold">Keyboard Navigation</h2>
@@ -455,6 +506,8 @@
         .ToArray();
     private static int TotalIconCount => _lucideIcons.Length + _featherIcons.Length + _heroIcons.Length;
 
+    private IDisposable? _shortcutRegistration;
+
     // Independent state for each section
     private bool isCommandPaletteOpen;
     private string? paletteSelected;
@@ -478,4 +531,22 @@
     private void HandleDisabledSelect(string value) => disabledSelected = value;
     private void HandleComplexSelect(string value) => complexSelected = value;
     private void HandleLazySelect(string value) => lazySelected = value;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _shortcutRegistration = await KeyboardShortcuts.RegisterAsync("Ctrl+I", () =>
+            {
+                isCommandPaletteOpen = true;
+                StateHasChanged();
+                return Task.CompletedTask;
+            });
+        }
+    }
+
+    public void Dispose()
+    {
+        _shortcutRegistration?.Dispose();
+    }
 }

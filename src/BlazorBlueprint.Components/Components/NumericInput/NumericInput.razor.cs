@@ -12,13 +12,14 @@ namespace BlazorBlueprint.Components.NumericInput;
 /// A generic numeric input component supporting int, double, decimal, float, long, and short.
 /// </summary>
 /// <typeparam name="TValue">The numeric type (must implement INumber&lt;TValue&gt;).</typeparam>
-public partial class NumericInput<TValue> : ComponentBase where TValue : struct, INumber<TValue>
+public partial class NumericInput<TValue> : ComponentBase, IDisposable where TValue : struct, INumber<TValue>
 {
     private ElementReference _inputRef;
     private string _editingValue = string.Empty;
     private bool _isEditing;
     private FieldIdentifier _fieldIdentifier;
     private EditContext? _editContext;
+    private CancellationTokenSource? _debounceCts;
 
     /// <summary>
     /// Gets or sets the cascaded EditContext from a parent EditForm.
@@ -179,6 +180,18 @@ public partial class NumericInput<TValue> : ComponentBase where TValue : struct,
     [Parameter]
     public string? Format { get; set; }
 
+    /// <summary>
+    /// Gets or sets whether debounce is disabled. When false (default), <see cref="ValueChanged"/> is debounced during typing.
+    /// </summary>
+    [Parameter]
+    public bool DisableDebounce { get; set; }
+
+    /// <summary>
+    /// Gets or sets the debounce delay in milliseconds. Default is 500 ms.
+    /// </summary>
+    [Parameter]
+    public int DebounceInterval { get; set; } = 500;
+
     /// <inheritdoc />
     protected override void OnParametersSet()
     {
@@ -273,7 +286,16 @@ public partial class NumericInput<TValue> : ComponentBase where TValue : struct,
             if (!clampedValue.Equals(Value))
             {
                 Value = clampedValue;
-                ValueChanged.InvokeAsync(clampedValue);
+
+                if (DisableDebounce)
+                {
+                    ValueChanged.InvokeAsync(clampedValue);
+                }
+                else
+                {
+                    DebounceValueChanged(clampedValue);
+                }
+
                 NotifyFieldChanged();
             }
         }
@@ -283,6 +305,11 @@ public partial class NumericInput<TValue> : ComponentBase where TValue : struct,
     {
         _isEditing = false;
 
+        // Cancel pending debounce — blur commits immediately
+        _debounceCts?.Cancel();
+        _debounceCts?.Dispose();
+        _debounceCts = null;
+
         // On blur, ensure we have a valid value
         if (TryParseValue(_editingValue, out var parsedValue))
         {
@@ -290,9 +317,10 @@ public partial class NumericInput<TValue> : ComponentBase where TValue : struct,
             if (!clampedValue.Equals(Value))
             {
                 Value = clampedValue;
-                ValueChanged.InvokeAsync(clampedValue);
-                NotifyFieldChanged();
             }
+            // Always fire on blur to ensure parent is in sync
+            ValueChanged.InvokeAsync(clampedValue);
+            NotifyFieldChanged();
         }
 
         StateHasChanged();
@@ -429,5 +457,33 @@ public partial class NumericInput<TValue> : ComponentBase where TValue : struct,
         }
 
         return TValue.TryParse(input, CultureInfo.InvariantCulture, out result);
+    }
+
+    private async void DebounceValueChanged(TValue value)
+    {
+        _debounceCts?.Cancel();
+        _debounceCts?.Dispose();
+        _debounceCts = new CancellationTokenSource();
+
+        try
+        {
+            await Task.Delay(DebounceInterval, _debounceCts.Token);
+
+            if (ValueChanged.HasDelegate)
+            {
+                await ValueChanged.InvokeAsync(value);
+            }
+        }
+        catch (TaskCanceledException)
+        {
+            // Timer was cancelled — either by a new keystroke or disposal.
+        }
+    }
+
+    public void Dispose()
+    {
+        _debounceCts?.Cancel();
+        _debounceCts?.Dispose();
+        GC.SuppressFinalize(this);
     }
 }

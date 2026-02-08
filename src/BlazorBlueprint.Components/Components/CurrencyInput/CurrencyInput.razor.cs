@@ -10,7 +10,7 @@ namespace BlazorBlueprint.Components.CurrencyInput;
 /// <summary>
 /// A currency input component with locale-aware formatting.
 /// </summary>
-public partial class CurrencyInput : ComponentBase
+public partial class CurrencyInput : ComponentBase, IDisposable
 {
     private ElementReference _inputRef;
     private string _editingValue = string.Empty;
@@ -19,6 +19,7 @@ public partial class CurrencyInput : ComponentBase
     private CultureInfo? _cultureInfo;
     private FieldIdentifier _fieldIdentifier;
     private EditContext? _editContext;
+    private CancellationTokenSource? _debounceCts;
 
     /// <summary>
     /// Gets or sets the cascaded EditContext from a parent EditForm.
@@ -170,6 +171,18 @@ public partial class CurrencyInput : ComponentBase
     [Parameter]
     public bool UseThousandSeparator { get; set; } = true;
 
+    /// <summary>
+    /// Gets or sets whether debounce is disabled. When false (default), <see cref="ValueChanged"/> is debounced during typing.
+    /// </summary>
+    [Parameter]
+    public bool DisableDebounce { get; set; }
+
+    /// <summary>
+    /// Gets or sets the debounce delay in milliseconds. Default is 500 ms.
+    /// </summary>
+    [Parameter]
+    public int DebounceInterval { get; set; } = 500;
+
     private CurrencyDefinition Currency => _currency ??= CurrencyCatalog.GetCurrency(CurrencyCode);
 
     private CultureInfo CultureInfo
@@ -273,7 +286,16 @@ public partial class CurrencyInput : ComponentBase
             if (clampedValue != Value)
             {
                 Value = clampedValue;
-                ValueChanged.InvokeAsync(clampedValue);
+
+                if (DisableDebounce)
+                {
+                    ValueChanged.InvokeAsync(clampedValue);
+                }
+                else
+                {
+                    DebounceValueChanged(clampedValue);
+                }
+
                 NotifyFieldChanged();
             }
         }
@@ -283,6 +305,11 @@ public partial class CurrencyInput : ComponentBase
     {
         _isEditing = false;
 
+        // Cancel pending debounce — blur commits immediately
+        _debounceCts?.Cancel();
+        _debounceCts?.Dispose();
+        _debounceCts = null;
+
         // On blur, ensure we have a valid value
         if (TryParseValue(_editingValue, out var parsedValue))
         {
@@ -290,9 +317,10 @@ public partial class CurrencyInput : ComponentBase
             if (clampedValue != Value)
             {
                 Value = clampedValue;
-                ValueChanged.InvokeAsync(clampedValue);
-                NotifyFieldChanged();
             }
+            // Always fire on blur to ensure parent is in sync
+            ValueChanged.InvokeAsync(clampedValue);
+            NotifyFieldChanged();
         }
 
         StateHasChanged();
@@ -396,5 +424,33 @@ public partial class CurrencyInput : ComponentBase
         }
 
         return decimal.TryParse(input, NumberStyles.Number, CultureInfo.InvariantCulture, out result);
+    }
+
+    private async void DebounceValueChanged(decimal value)
+    {
+        _debounceCts?.Cancel();
+        _debounceCts?.Dispose();
+        _debounceCts = new CancellationTokenSource();
+
+        try
+        {
+            await Task.Delay(DebounceInterval, _debounceCts.Token);
+
+            if (ValueChanged.HasDelegate)
+            {
+                await ValueChanged.InvokeAsync(value);
+            }
+        }
+        catch (TaskCanceledException)
+        {
+            // Timer was cancelled — either by a new keystroke or disposal.
+        }
+    }
+
+    public void Dispose()
+    {
+        _debounceCts?.Cancel();
+        _debounceCts?.Dispose();
+        GC.SuppressFinalize(this);
     }
 }

@@ -17,7 +17,23 @@
         </div>
     </div>
 
-    <div class="space-y-6">
+    <!-- When to use -->
+    <div class="rounded-lg border bg-card p-6 space-y-4">
+        <h2 class="text-lg font-semibold">When to use Input</h2>
+        <p class="text-sm text-muted-foreground">
+            Use <code class="text-xs bg-muted px-1 py-0.5 rounded">Input</code> when you need a
+            straightforward string-based text field. The bound value is always <code class="text-xs bg-muted px-1 py-0.5 rounded">string?</code>
+            &mdash; what the user types is exactly what you get back. No parsing, no formatting, no conversion.
+        </p>
+        <div class="bg-muted rounded-md p-4">
+            <pre class="text-sm font-mono whitespace-pre-wrap">&lt;Input Type="InputType.Email" @("@")bind-Value="email" Placeholder="you@example.com" /&gt;</pre>
+        </div>
+        <p class="text-sm text-muted-foreground">
+            If you need to bind to a typed value like <code class="text-xs bg-muted px-1 py-0.5 rounded">int</code>,
+            <code class="text-xs bg-muted px-1 py-0.5 rounded">decimal</code>, or
+            <code class="text-xs bg-muted px-1 py-0.5 rounded">DateTime</code> with automatic parsing and
+            display formatting, use <a href="/components/input-field" class="text-primary underline underline-offset-4 hover:text-primary/80">InputField&lt;TValue&gt;</a> instead.
+        </p>
     </div>
 
     <!-- Default Input -->
@@ -253,6 +269,56 @@
         </div>
     </div>
 
+    <!-- Update Timing -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Update Timing</h2>
+            <p class="text-sm text-muted-foreground">
+                Control when <code class="text-xs bg-muted px-1 py-0.5 rounded">ValueChanged</code> fires using the
+                <code class="text-xs bg-muted px-1 py-0.5 rounded">UpdateTiming</code> parameter.
+            </p>
+        </div>
+        <div class="grid gap-6 md:grid-cols-3 max-w-4xl">
+            <div class="space-y-2">
+                <label class="text-sm font-medium">Immediate (default)</label>
+                <Input Type="InputType.Text"
+                       UpdateTiming="UpdateTiming.Immediate"
+                       Value="@_immediateValue"
+                       ValueChanged="@((v) => _immediateValue = v)"
+                       Placeholder="Fires on every keystroke" />
+                <div class="rounded-lg border p-3 bg-muted/50">
+                    <p class="text-xs text-muted-foreground mb-1">Value:</p>
+                    <p class="text-sm font-mono">@(string.IsNullOrEmpty(_immediateValue) ? "(empty)" : _immediateValue)</p>
+                </div>
+            </div>
+            <div class="space-y-2">
+                <label class="text-sm font-medium">OnChange (blur / Enter)</label>
+                <Input Type="InputType.Text"
+                       UpdateTiming="UpdateTiming.OnChange"
+                       Value="@_onChangeValue"
+                       ValueChanged="@((v) => _onChangeValue = v)"
+                       Placeholder="Fires on blur or Enter" />
+                <div class="rounded-lg border p-3 bg-muted/50">
+                    <p class="text-xs text-muted-foreground mb-1">Value:</p>
+                    <p class="text-sm font-mono">@(string.IsNullOrEmpty(_onChangeValue) ? "(empty)" : _onChangeValue)</p>
+                </div>
+            </div>
+            <div class="space-y-2">
+                <label class="text-sm font-medium">Debounced (500ms)</label>
+                <Input Type="InputType.Text"
+                       UpdateTiming="UpdateTiming.Debounced"
+                       DebounceInterval="500"
+                       Value="@_debouncedValue"
+                       ValueChanged="@((v) => _debouncedValue = v)"
+                       Placeholder="Fires after typing pauses" />
+                <div class="rounded-lg border p-3 bg-muted/50">
+                    <p class="text-xs text-muted-foreground mb-1">Value:</p>
+                    <p class="text-sm font-mono">@(string.IsNullOrEmpty(_debouncedValue) ? "(empty)" : _debouncedValue)</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Form Validation with EditForm -->
     <div class="space-y-4">
         <div class="space-y-2">
@@ -362,6 +428,9 @@
 
 @code {
     private string? boundValue;
+    private string? _immediateValue;
+    private string? _onChangeValue;
+    private string? _debouncedValue;
     private InputFormModel formModel = new();
     private string? formMessage;
 

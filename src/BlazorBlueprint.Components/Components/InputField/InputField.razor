@@ -1,17 +1,18 @@
-@namespace BlazorBlueprint.Components.Input
+@namespace BlazorBlueprint.Components.InputField
+@typeparam TValue
 @implements IDisposable
 
 <input
     id="@Id"
-    name="@EffectiveName"
     type="@HtmlType"
     class="@CssClass"
-    value="@Value"
+    value="@DisplayValue"
     placeholder="@Placeholder"
     disabled="@Disabled"
     required="@Required"
     aria-label="@AriaLabel"
     aria-describedby="@AriaDescribedBy"
-    aria-invalid="@EffectiveAriaInvalid"
+    aria-invalid="@(ComputedAriaInvalid?.ToString().ToLower())"
     @oninput="HandleInput"
-    @onchange="HandleChange" />
+    @onfocus="HandleFocus"
+    @onblur="HandleBlur" />

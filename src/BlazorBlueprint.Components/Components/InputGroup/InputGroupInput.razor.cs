@@ -32,11 +32,12 @@ namespace BlazorBlueprint.Components.InputGroup;
 /// &lt;/InputGroup&gt;
 /// </code>
 /// </example>
-public partial class InputGroupInput : ComponentBase
+public partial class InputGroupInput : ComponentBase, IDisposable
 {
     private ElementReference _inputRef;
     private FieldIdentifier _fieldIdentifier;
     private EditContext? _editContext;
+    private CancellationTokenSource? _debounceCts;
 
     /// <summary>
     /// Gets or sets the cascaded EditContext from a parent EditForm.
@@ -125,6 +126,18 @@ public partial class InputGroupInput : ComponentBase
     /// </summary>
     [Parameter]
     public Expression<Func<string?>>? ValueExpression { get; set; }
+
+    /// <summary>
+    /// Gets or sets when <see cref="ValueChanged"/> fires.
+    /// </summary>
+    [Parameter]
+    public UpdateTiming UpdateTiming { get; set; } = UpdateTiming.Immediate;
+
+    /// <summary>
+    /// Gets or sets the debounce delay in milliseconds when <see cref="UpdateTiming"/> is <see cref="UpdateTiming.Debounced"/>.
+    /// </summary>
+    [Parameter]
+    public int DebounceInterval { get; set; } = 500;
 
     private bool IsInvalid
     {
@@ -233,9 +246,21 @@ public partial class InputGroupInput : ComponentBase
 
         Value = newValue;
 
-        if (ValueChanged.HasDelegate)
+        switch (UpdateTiming)
         {
-            await ValueChanged.InvokeAsync(newValue);
+            case UpdateTiming.Immediate:
+                if (ValueChanged.HasDelegate)
+                {
+                    await ValueChanged.InvokeAsync(newValue);
+                }
+                break;
+
+            case UpdateTiming.OnChange:
+                break;
+
+            case UpdateTiming.Debounced:
+                DebounceValueChanged(newValue);
+                break;
         }
 
         if (_editContext != null && ValueExpression != null && _fieldIdentifier.FieldName != null)
@@ -247,8 +272,40 @@ public partial class InputGroupInput : ComponentBase
     /// <summary>
     /// Handles the change event (fired when input loses focus).
     /// </summary>
-    private static async Task HandleChange(ChangeEventArgs args) =>
-        await Task.CompletedTask;
+    private async Task HandleChange(ChangeEventArgs args)
+    {
+        if (UpdateTiming == UpdateTiming.OnChange)
+        {
+            var newValue = args.Value?.ToString();
+            Value = newValue;
+
+            if (ValueChanged.HasDelegate)
+            {
+                await ValueChanged.InvokeAsync(newValue);
+            }
+        }
+    }
+
+    private async void DebounceValueChanged(string? value)
+    {
+        _debounceCts?.Cancel();
+        _debounceCts?.Dispose();
+        _debounceCts = new CancellationTokenSource();
+
+        try
+        {
+            await Task.Delay(DebounceInterval, _debounceCts.Token);
+
+            if (ValueChanged.HasDelegate)
+            {
+                await ValueChanged.InvokeAsync(value);
+            }
+        }
+        catch (TaskCanceledException)
+        {
+            // Timer was cancelled — either by a new keystroke or disposal.
+        }
+    }
 
     /// <summary>
     /// Invokes the OnInputRef callback after first render.
@@ -259,5 +316,12 @@ public partial class InputGroupInput : ComponentBase
         {
             OnInputRef.Invoke(_inputRef);
         }
+    }
+
+    public void Dispose()
+    {
+        _debounceCts?.Cancel();
+        _debounceCts?.Dispose();
+        GC.SuppressFinalize(this);
     }
 }

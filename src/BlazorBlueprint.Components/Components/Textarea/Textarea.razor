@@ -1,4 +1,5 @@
 @namespace BlazorBlueprint.Components.Textarea
+@implements IDisposable
 
 <textarea
     id="@Id"
@@ -13,4 +14,5 @@
     aria-describedby="@AriaDescribedBy"
     aria-invalid="@EffectiveAriaInvalid"
     data-slot="textarea-control"
-    @oninput="HandleInput"></textarea>
+    @oninput="HandleInput"
+    @onchange="HandleChange"></textarea>
