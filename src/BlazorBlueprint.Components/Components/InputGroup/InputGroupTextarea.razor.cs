@@ -1,3 +1,4 @@
+using BlazorBlueprint.Components.Input;
 using BlazorBlueprint.Components.Utilities;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
@@ -32,8 +33,9 @@ namespace BlazorBlueprint.Components.InputGroup;
 /// &lt;/InputGroup&gt;
 /// </code>
 /// </example>
-public partial class InputGroupTextarea : ComponentBase
+public partial class InputGroupTextarea : ComponentBase, IDisposable
 {
+    private CancellationTokenSource? _debounceCts;
     /// <summary>
     /// Gets or sets the current value of the textarea.
     /// </summary>
@@ -104,6 +106,18 @@ public partial class InputGroupTextarea : ComponentBase
     public bool? AriaInvalid { get; set; }
 
     /// <summary>
+    /// Gets or sets when <see cref="ValueChanged"/> fires.
+    /// </summary>
+    [Parameter]
+    public UpdateTiming UpdateTiming { get; set; } = UpdateTiming.Immediate;
+
+    /// <summary>
+    /// Gets or sets the debounce delay in milliseconds when <see cref="UpdateTiming"/> is <see cref="UpdateTiming.Debounced"/>.
+    /// </summary>
+    [Parameter]
+    public int DebounceInterval { get; set; } = 500;
+
+    /// <summary>
     /// Gets or sets additional attributes.
     /// </summary>
     [Parameter(CaptureUnmatchedValues = true)]
@@ -143,15 +157,66 @@ public partial class InputGroupTextarea : ComponentBase
 
         Value = newValue;
 
-        if (ValueChanged.HasDelegate)
+        switch (UpdateTiming)
         {
-            await ValueChanged.InvokeAsync(newValue);
+            case UpdateTiming.Immediate:
+                if (ValueChanged.HasDelegate)
+                {
+                    await ValueChanged.InvokeAsync(newValue);
+                }
+                break;
+
+            case UpdateTiming.OnChange:
+                break;
+
+            case UpdateTiming.Debounced:
+                DebounceValueChanged(newValue);
+                break;
         }
     }
 
     /// <summary>
     /// Handles the change event (fired when textarea loses focus).
     /// </summary>
-    private static async Task HandleChange(ChangeEventArgs args) =>
-        await Task.CompletedTask;
+    private async Task HandleChange(ChangeEventArgs args)
+    {
+        if (UpdateTiming == UpdateTiming.OnChange)
+        {
+            var newValue = args.Value?.ToString();
+            Value = newValue;
+
+            if (ValueChanged.HasDelegate)
+            {
+                await ValueChanged.InvokeAsync(newValue);
+            }
+        }
+    }
+
+    private async void DebounceValueChanged(string? value)
+    {
+        _debounceCts?.Cancel();
+        _debounceCts?.Dispose();
+        _debounceCts = new CancellationTokenSource();
+
+        try
+        {
+            await Task.Delay(DebounceInterval, _debounceCts.Token);
+
+            if (ValueChanged.HasDelegate)
+            {
+                await ValueChanged.InvokeAsync(value);
+            }
+        }
+        catch (TaskCanceledException)
+        {
+            // Timer was cancelled — either by a new keystroke or disposal.
+        }
+    }
+
+    public void Dispose()
+    {
+        _debounceCts?.Cancel();
+        _debounceCts?.Dispose();
+        GC.SuppressFinalize(this);
+    }
 }
