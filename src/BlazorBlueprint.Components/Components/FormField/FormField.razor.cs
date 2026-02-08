@@ -243,6 +243,8 @@ public partial class FormField<TValue> : ComponentBase, IDisposable
     {
         var underlying = Nullable.GetUnderlyingType(type) ?? type;
 
+        if (underlying == typeof(string))
+            return "text value";
         if (underlying == typeof(int) || underlying == typeof(long))
             return "whole number";
         if (underlying == typeof(float) || underlying == typeof(double) || underlying == typeof(decimal))
