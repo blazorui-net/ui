@@ -4,6 +4,8 @@
 # Usage: ./run-demo.sh [server|wasm|auto]
 # If no argument provided, shows interactive selection menu
 
+clear
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
