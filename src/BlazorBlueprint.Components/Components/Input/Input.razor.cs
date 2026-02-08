@@ -203,6 +203,11 @@ public partial class Input : ComponentBase
     private async Task HandleInput(ChangeEventArgs args)
     {
         var newValue = args.Value?.ToString();
+        if (string.IsNullOrWhiteSpace(newValue))
+        {
+            newValue = null;
+        }
+
         Value = newValue;
 
         if (ValueChanged.HasDelegate)
