@@ -34,8 +34,10 @@ namespace BlazorBlueprint.Components.Input;
 /// &lt;Input Type="InputType.Email" Value="@email" ValueChanged="HandleEmailChange" Required="true" AriaInvalid="@hasError" /&gt;
 /// </code>
 /// </example>
-public partial class Input : ComponentBase
+public partial class Input : ComponentBase, IDisposable
 {
+    private CancellationTokenSource? _debounceCts;
+
     /// <summary>
     /// Gets or sets the type of input.
     /// </summary>
@@ -149,6 +151,28 @@ public partial class Input : ComponentBase
     public bool? AriaInvalid { get; set; }
 
     /// <summary>
+    /// Gets or sets when <see cref="ValueChanged"/> fires.
+    /// </summary>
+    /// <remarks>
+    /// <list type="bullet">
+    /// <item><see cref="UpdateTiming.Immediate"/> — every keystroke (default, current behavior).</item>
+    /// <item><see cref="UpdateTiming.OnChange"/> — only on blur / Enter.</item>
+    /// <item><see cref="UpdateTiming.Debounced"/> — after typing pauses for <see cref="DebounceInterval"/> ms.</item>
+    /// </list>
+    /// </remarks>
+    [Parameter]
+    public UpdateTiming UpdateTiming { get; set; } = UpdateTiming.Immediate;
+
+    /// <summary>
+    /// Gets or sets the debounce delay in milliseconds when <see cref="UpdateTiming"/> is <see cref="UpdateTiming.Debounced"/>.
+    /// </summary>
+    /// <remarks>
+    /// Ignored when <see cref="UpdateTiming"/> is not <see cref="UpdateTiming.Debounced"/>. Default is 500 ms.
+    /// </remarks>
+    [Parameter]
+    public int DebounceInterval { get; set; } = 500;
+
+    /// <summary>
     /// Gets the computed CSS classes for the input element.
     /// </summary>
     /// <remarks>
@@ -199,24 +223,75 @@ public partial class Input : ComponentBase
     /// <summary>
     /// Handles the input event (fired on every keystroke).
     /// </summary>
-    /// <param name="args">The change event arguments.</param>
     private async Task HandleInput(ChangeEventArgs args)
     {
         var newValue = args.Value?.ToString();
         Value = newValue;
 
-        if (ValueChanged.HasDelegate)
+        switch (UpdateTiming)
         {
-            await ValueChanged.InvokeAsync(newValue);
+            case UpdateTiming.Immediate:
+                if (ValueChanged.HasDelegate)
+                {
+                    await ValueChanged.InvokeAsync(newValue);
+                }
+                break;
+
+            case UpdateTiming.OnChange:
+                // Display updates via Value assignment above; ValueChanged deferred to HandleChange.
+                break;
+
+            case UpdateTiming.Debounced:
+                DebounceValueChanged(newValue);
+                break;
         }
     }
 
     /// <summary>
-    /// Handles the change event (fired when input loses focus).
+    /// Handles the change event (fired when input loses focus or Enter is pressed).
     /// </summary>
-    /// <param name="args">The change event arguments.</param>
-    private static async Task HandleChange(ChangeEventArgs args) =>
-        // Change event is already handled by HandleInput for immediate updates
-        // This is here for compatibility and potential future use
-        await Task.CompletedTask;
+    private async Task HandleChange(ChangeEventArgs args)
+    {
+        if (UpdateTiming == UpdateTiming.OnChange)
+        {
+            var newValue = args.Value?.ToString();
+            Value = newValue;
+
+            if (ValueChanged.HasDelegate)
+            {
+                await ValueChanged.InvokeAsync(newValue);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Starts (or restarts) a debounce timer that fires <see cref="ValueChanged"/> after <see cref="DebounceInterval"/> ms.
+    /// </summary>
+    private async void DebounceValueChanged(string? value)
+    {
+        _debounceCts?.Cancel();
+        _debounceCts?.Dispose();
+        _debounceCts = new CancellationTokenSource();
+
+        try
+        {
+            await Task.Delay(DebounceInterval, _debounceCts.Token);
+
+            if (ValueChanged.HasDelegate)
+            {
+                await ValueChanged.InvokeAsync(value);
+            }
+        }
+        catch (TaskCanceledException)
+        {
+            // Timer was cancelled — either by a new keystroke or disposal.
+        }
+    }
+
+    public void Dispose()
+    {
+        _debounceCts?.Cancel();
+        _debounceCts?.Dispose();
+        GC.SuppressFinalize(this);
+    }
 }

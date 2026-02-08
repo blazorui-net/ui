@@ -1,0 +1,356 @@
+@page "/components/input-field"
+@using BlazorBlueprint.Components.InputField
+@using BlazorBlueprint.Components.Input
+@using BlazorBlueprint.Components.Converters
+
+<PageTitle>InputField Component - Blazor Blueprint</PageTitle>
+
+<div class="space-y-8 max-w-4xl">
+    <div>
+        <div class="space-y-3">
+            <h1 class="text-4xl font-bold tracking-tight">InputField Component</h1>
+            <p class="text-xl text-muted-foreground">
+                A generic typed input with automatic type conversion, formatting, and validation.
+            </p>
+        </div>
+    </div>
+
+    <!-- When to use -->
+    <div class="rounded-lg border bg-card p-6 space-y-4">
+        <h2 class="text-lg font-semibold">When to use InputField</h2>
+        <p class="text-sm text-muted-foreground">
+            Use <code class="text-xs bg-muted px-1 py-0.5 rounded">InputField&lt;TValue&gt;</code> when you need
+            two-way binding to a typed value. It automatically converts between the string in the HTML input
+            and your C# type, handles display formatting on blur, and reports parse errors.
+        </p>
+        <div class="bg-muted rounded-md p-4 space-y-2">
+            <pre class="text-sm font-mono whitespace-pre-wrap">&lt;InputField TValue="int" @("@")bind-Value="age" Placeholder="Enter age" /&gt;
+&lt;InputField TValue="decimal" @("@")bind-Value="price" Format="N2" /&gt;
+&lt;InputField TValue="DateTime?" @("@")bind-Value="date" Format="yyyy-MM-dd" Type="InputType.Date" /&gt;</pre>
+        </div>
+        <p class="text-sm text-muted-foreground">
+            If you only need a plain string value with no type conversion, use the simpler
+            <a href="/components/input" class="text-primary underline underline-offset-4 hover:text-primary/80">Input</a> component instead.
+        </p>
+    </div>
+
+    <!-- Basic Integer -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Basic Integer</h2>
+            <p class="text-sm text-muted-foreground">
+                Two-way binding to an <code class="text-xs bg-muted px-1 py-0.5 rounded">int</code> value with automatic parsing.
+            </p>
+        </div>
+        <div class="max-w-md">
+            <InputField TValue="int" @bind-Value="_intValue" Placeholder="Enter a number" />
+        </div>
+        <div class="rounded-lg border p-4 bg-muted/50">
+            <p class="text-sm font-medium mb-1">Current value:</p>
+            <p class="text-sm font-mono">@_intValue</p>
+        </div>
+    </div>
+
+    <!-- Nullable DateTime with Format -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Nullable DateTime with Format</h2>
+            <p class="text-sm text-muted-foreground">
+                Binding to a <code class="text-xs bg-muted px-1 py-0.5 rounded">DateTime?</code> with a display format.
+                The formatted value is shown when blurred; the raw value is shown when focused.
+            </p>
+        </div>
+        <div class="max-w-md">
+            <InputField TValue="DateTime?" @bind-Value="_dateValue" Format="yyyy-MM-dd" Type="InputType.Date" />
+        </div>
+        <div class="rounded-lg border p-4 bg-muted/50">
+            <p class="text-sm font-medium mb-1">Current value:</p>
+            <p class="text-sm font-mono">@(_dateValue?.ToString("yyyy-MM-dd") ?? "(null)")</p>
+        </div>
+    </div>
+
+    <!-- Decimal -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Decimal with Format</h2>
+            <p class="text-sm text-muted-foreground">
+                Binding to <code class="text-xs bg-muted px-1 py-0.5 rounded">decimal</code> with a <code class="text-xs bg-muted px-1 py-0.5 rounded">N2</code> display format.
+            </p>
+        </div>
+        <div class="max-w-md">
+            <InputField TValue="decimal" @bind-Value="_decimalValue" Format="N2" Placeholder="0.00" />
+        </div>
+        <div class="rounded-lg border p-4 bg-muted/50">
+            <p class="text-sm font-medium mb-1">Current value:</p>
+            <p class="text-sm font-mono">@_decimalValue</p>
+        </div>
+    </div>
+
+    <!-- Guid -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Guid</h2>
+            <p class="text-sm text-muted-foreground">
+                Binding to <code class="text-xs bg-muted px-1 py-0.5 rounded">Guid</code>. Try entering an invalid GUID to see error handling.
+            </p>
+        </div>
+        <div class="max-w-md">
+            <InputField @ref="_guidInput" TValue="Guid" @bind-Value="_guidValue" OnParseError="HandleGuidError" Placeholder="00000000-0000-0000-0000-000000000000" />
+            @if (_guidInput?.HasParseError == true)
+            {
+                <p class="text-sm text-destructive mt-2">Invalid GUID format.</p>
+            }
+        </div>
+        <div class="rounded-lg border p-4 bg-muted/50">
+            <p class="text-sm font-medium mb-1">Current value:</p>
+            <p class="text-sm font-mono">@_guidValue</p>
+        </div>
+    </div>
+
+    <!-- Parse Error Handling -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Parse Error Handling</h2>
+            <p class="text-sm text-muted-foreground">
+                Type a non-numeric value and leave the field to see the error state. The border turns red
+                via <code class="text-xs bg-muted px-1 py-0.5 rounded">aria-invalid</code> and
+                <code class="text-xs bg-muted px-1 py-0.5 rounded">OnParseError</code> fires.
+                Errors auto-clear when a valid value is entered.
+            </p>
+        </div>
+        <div class="max-w-md">
+            <InputField @ref="_errorInput" TValue="int" @bind-Value="_errorDemoValue" OnParseError="HandleParseError" Placeholder="Type 'abc' then blur" />
+            @if (_errorInput?.HasParseError == true)
+            {
+                <p class="text-sm text-destructive mt-2">@_parseErrorMessage</p>
+            }
+        </div>
+        <div class="rounded-lg border p-4 bg-muted/50">
+            <p class="text-sm font-medium mb-1">Current value:</p>
+            <p class="text-sm font-mono">@_errorDemoValue</p>
+        </div>
+    </div>
+
+    <!-- Nullable Types -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Nullable Types</h2>
+            <p class="text-sm text-muted-foreground">
+                Nullable value types resolve to <code class="text-xs bg-muted px-1 py-0.5 rounded">null</code> when the input is empty,
+                while non-nullable types resolve to <code class="text-xs bg-muted px-1 py-0.5 rounded">default(TValue)</code>.
+            </p>
+        </div>
+        <div class="max-w-md space-y-4">
+            <div class="space-y-2">
+                <label class="text-sm font-medium">Nullable int (int?)</label>
+                <InputField TValue="int?" @bind-Value="_nullableIntValue" Placeholder="Clear to get null" />
+                <p class="text-sm text-muted-foreground">Value: @(_nullableIntValue?.ToString() ?? "null")</p>
+            </div>
+            <div class="space-y-2">
+                <label class="text-sm font-medium">Non-nullable int</label>
+                <InputField TValue="int" @bind-Value="_nonNullableIntValue" Placeholder="Clear to get 0" />
+                <p class="text-sm text-muted-foreground">Value: @_nonNullableIntValue</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- String Binding -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">String Binding</h2>
+            <p class="text-sm text-muted-foreground">
+                Works as a drop-in replacement for <code class="text-xs bg-muted px-1 py-0.5 rounded">Input</code> when you need
+                the converter infrastructure with a string type.
+            </p>
+        </div>
+        <div class="max-w-md">
+            <InputField TValue="string" @bind-Value="_stringValue" Placeholder="Type anything..." />
+        </div>
+        <div class="rounded-lg border p-4 bg-muted/50">
+            <p class="text-sm font-medium mb-1">Current value:</p>
+            <p class="text-sm font-mono">@(string.IsNullOrEmpty(_stringValue) ? "(empty)" : _stringValue)</p>
+        </div>
+    </div>
+
+    <!-- Custom Converter -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Custom Converter</h2>
+            <p class="text-sm text-muted-foreground">
+                Provide a custom <code class="text-xs bg-muted px-1 py-0.5 rounded">InputConverter&lt;TValue&gt;</code> instance
+                to override parsing and formatting behavior.
+            </p>
+        </div>
+        <div class="max-w-md">
+            <InputField TValue="double" @bind-Value="_customConverterValue" Converter="_percentConverter" Placeholder="Enter percentage (e.g. 50)" />
+        </div>
+        <div class="rounded-lg border p-4 bg-muted/50">
+            <p class="text-sm font-medium mb-1">Stored value (as decimal fraction):</p>
+            <p class="text-sm font-mono">@_customConverterValue</p>
+        </div>
+    </div>
+
+    <!-- Disabled State -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Disabled</h2>
+            <p class="text-sm text-muted-foreground">
+                A disabled InputField.
+            </p>
+        </div>
+        <div class="max-w-md">
+            <InputField TValue="int" Value="42" Disabled="true" />
+        </div>
+    </div>
+
+    <!-- ARIA / Accessibility -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Accessibility (ARIA)</h2>
+            <p class="text-sm text-muted-foreground">
+                ARIA attributes work the same as the Input component. The <code class="text-xs bg-muted px-1 py-0.5 rounded">AriaInvalid</code> parameter
+                is combined with <code class="text-xs bg-muted px-1 py-0.5 rounded">HasParseError</code> so either condition shows the error styling.
+            </p>
+        </div>
+        <div class="max-w-md space-y-4">
+            <div class="space-y-2">
+                <label class="text-sm font-medium">Forced invalid state</label>
+                <InputField TValue="string" AriaInvalid="true" Value="@("Always invalid")" />
+                <p class="text-sm text-destructive">This field has AriaInvalid set to true.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Update Timing -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Update Timing</h2>
+            <p class="text-sm text-muted-foreground">
+                Control when <code class="text-xs bg-muted px-1 py-0.5 rounded">ValueChanged</code> fires using the
+                <code class="text-xs bg-muted px-1 py-0.5 rounded">UpdateTiming</code> parameter. Works with typed values too.
+            </p>
+        </div>
+        <div class="grid gap-6 md:grid-cols-3 max-w-4xl">
+            <div class="space-y-2">
+                <label class="text-sm font-medium">Immediate (default)</label>
+                <InputField TValue="int"
+                            UpdateTiming="UpdateTiming.Immediate"
+                            @bind-Value="_immediateIntValue"
+                            Placeholder="Fires on every keystroke" />
+                <div class="rounded-lg border p-3 bg-muted/50">
+                    <p class="text-xs text-muted-foreground mb-1">Value:</p>
+                    <p class="text-sm font-mono">@_immediateIntValue</p>
+                </div>
+            </div>
+            <div class="space-y-2">
+                <label class="text-sm font-medium">OnChange (blur)</label>
+                <InputField TValue="int"
+                            UpdateTiming="UpdateTiming.OnChange"
+                            @bind-Value="_onChangeIntValue"
+                            Placeholder="Fires on blur" />
+                <div class="rounded-lg border p-3 bg-muted/50">
+                    <p class="text-xs text-muted-foreground mb-1">Value:</p>
+                    <p class="text-sm font-mono">@_onChangeIntValue</p>
+                </div>
+            </div>
+            <div class="space-y-2">
+                <label class="text-sm font-medium">Debounced (500ms)</label>
+                <InputField TValue="int"
+                            UpdateTiming="UpdateTiming.Debounced"
+                            DebounceInterval="500"
+                            @bind-Value="_debouncedIntValue"
+                            Placeholder="Fires after typing pauses" />
+                <div class="rounded-lg border p-3 bg-muted/50">
+                    <p class="text-xs text-muted-foreground mb-1">Value:</p>
+                    <p class="text-sm font-mono">@_debouncedIntValue</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- API Reference -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">API Reference</h2>
+        </div>
+        <div class="border rounded-lg p-6 space-y-4">
+            <div>
+                <h3 class="font-mono text-sm font-semibold mb-2">InputField&lt;TValue&gt; Parameters</h3>
+                <div class="space-y-2 text-sm">
+                    <p><strong>TValue:</strong> The value type (no constraint). Works with value types, reference types, and nullables.</p>
+                    <p><strong>Value:</strong> <code class="bg-muted px-1 py-0.5 rounded">TValue?</code> - Current typed value. Supports @("@")bind-Value.</p>
+                    <p><strong>Converter:</strong> <code class="bg-muted px-1 py-0.5 rounded">InputConverter&lt;TValue&gt;?</code> - Optional custom converter instance.</p>
+                    <p><strong>Format:</strong> <code class="bg-muted px-1 py-0.5 rounded">string?</code> - Display format string (e.g., "yyyy-MM-dd", "N2").</p>
+                    <p><strong>Type:</strong> <code class="bg-muted px-1 py-0.5 rounded">InputType</code> - HTML input type. Default: Text.</p>
+                    <p><strong>Placeholder:</strong> <code class="bg-muted px-1 py-0.5 rounded">string?</code> - Placeholder text.</p>
+                    <p><strong>Disabled:</strong> <code class="bg-muted px-1 py-0.5 rounded">bool</code> - Whether the input is disabled.</p>
+                    <p><strong>Required:</strong> <code class="bg-muted px-1 py-0.5 rounded">bool</code> - Whether the input is required.</p>
+                    <p><strong>Validation:</strong> <code class="bg-muted px-1 py-0.5 rounded">Func&lt;TValue, bool&gt;?</code> - Post-parse value validation.</p>
+                    <p><strong>ValidationPattern:</strong> <code class="bg-muted px-1 py-0.5 rounded">string?</code> - Pre-parse regex validation on raw string.</p>
+                </div>
+            </div>
+            <Separator />
+            <div>
+                <h3 class="font-mono text-sm font-semibold mb-2">Events &amp; State</h3>
+                <div class="space-y-2 text-sm">
+                    <p><strong>OnParseError:</strong> <code class="bg-muted px-1 py-0.5 rounded">EventCallback&lt;InputParseException&gt;</code> - Fires on blur when parsing fails.</p>
+                    <p><strong>HasParseError:</strong> <code class="bg-muted px-1 py-0.5 rounded">bool</code> (read-only) - Whether the input currently has a parse error. Auto-clears on valid input.</p>
+                </div>
+            </div>
+            <Separator />
+            <div>
+                <h3 class="font-mono text-sm font-semibold mb-2">Converter Resolution</h3>
+                <div class="space-y-2 text-sm text-muted-foreground">
+                    <p>1. Instance converter (<code class="bg-muted px-1 py-0.5 rounded">Converter.GetFunc / SetFunc</code>)</p>
+                    <p>2. Global converter (<code class="bg-muted px-1 py-0.5 rounded">InputConverter&lt;T&gt;.GlobalGetFunc / GlobalSetFunc</code>)</p>
+                    <p>3. Built-in default (string, int, long, float, double, decimal, bool, DateTime, DateTimeOffset, DateOnly, TimeOnly, Guid + nullable variants)</p>
+                </div>
+            </div>
+            <Separator />
+            <div>
+                <h3 class="font-mono text-sm font-semibold mb-2">Focus/Blur Behavior</h3>
+                <div class="space-y-2 text-sm text-muted-foreground">
+                    <p><strong>Focused:</strong> Shows raw (unformatted) value for editing.</p>
+                    <p><strong>Blurred:</strong> Shows formatted value. Parse errors fire OnParseError.</p>
+                    <p><strong>During typing:</strong> Parse errors are silently ignored (no error spam).</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private int _intValue;
+    private DateTime? _dateValue = DateTime.Today;
+    private decimal _decimalValue = 1234.56m;
+    private Guid _guidValue = Guid.Empty;
+    private int _errorDemoValue;
+    private int? _nullableIntValue = 42;
+    private int _nonNullableIntValue = 42;
+    private string? _stringValue = "";
+    private double _customConverterValue = 0.5;
+    private int _immediateIntValue;
+    private int _onChangeIntValue;
+    private int _debouncedIntValue;
+
+    private InputField<Guid>? _guidInput;
+    private InputField<int>? _errorInput;
+    private string _parseErrorMessage = "";
+
+    // Custom converter: stores as decimal fraction (0.5), displays as percentage (50)
+    private readonly InputConverter<double> _percentConverter = new()
+    {
+        GetFunc = input => double.Parse(input, System.Globalization.CultureInfo.InvariantCulture) / 100.0,
+        SetFunc = value => (value * 100.0).ToString(System.Globalization.CultureInfo.InvariantCulture)
+    };
+
+    private void HandleGuidError(InputParseException ex)
+    {
+        // Error state is shown via HasParseError
+    }
+
+    private void HandleParseError(InputParseException ex)
+    {
+        _parseErrorMessage = $"Could not parse '{ex.RawInput}' as {ex.TargetType.Name}.";
+    }
+}
