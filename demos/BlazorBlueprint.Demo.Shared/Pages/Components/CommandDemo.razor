@@ -6,6 +6,8 @@
 @using BlazorBlueprint.Icons.Heroicons.Data
 @using BlazorBlueprint.Icons.Feather.Components
 @using BlazorBlueprint.Icons.Heroicons.Components
+@inject IJSRuntime JS
+@implements IAsyncDisposable
 
 <PageTitle>Command Component - Blazor Blueprint</PageTitle>
 
@@ -26,14 +28,14 @@
     <section class="space-y-4">
         <h2 class="text-2xl font-semibold">Command Palette (Overlay)</h2>
         <p class="text-sm text-muted-foreground">
-            A proper command palette that appears as an overlay on the screen. Click the button or press <Kbd>Ctrl+K</Kbd> to open.
+            A proper command palette that appears as an overlay on the screen. Click the button or press <Kbd>Ctrl+I</Kbd> to open.
         </p>
 
         <div class="flex flex-col gap-2">
             <Button Variant="ButtonVariant.Outline" OnClick="@(() => isCommandPaletteOpen = true)">
                 <LucideIcon Name="command" Size="16" Class="mr-2" />
                 Open Command Palette
-                <span class="ml-auto text-xs text-muted-foreground">Ctrl+K</span>
+                <span class="ml-auto text-xs text-muted-foreground">Ctrl+I</span>
             </Button>
             @if (!string.IsNullOrEmpty(paletteSelected))
             {
@@ -455,6 +457,8 @@
         .ToArray();
     private static int TotalIconCount => _lucideIcons.Length + _featherIcons.Length + _heroIcons.Length;
 
+    private DotNetObjectReference<CommandDemo>? _dotNetRef;
+
     // Independent state for each section
     private bool isCommandPaletteOpen;
     private string? paletteSelected;
@@ -478,4 +482,45 @@
     private void HandleDisabledSelect(string value) => disabledSelected = value;
     private void HandleComplexSelect(string value) => complexSelected = value;
     private void HandleLazySelect(string value) => lazySelected = value;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _dotNetRef = DotNetObjectReference.Create(this);
+
+            await JS.InvokeVoidAsync("eval", @"
+                if (window.commandDemoKeyHandler) {
+                    document.removeEventListener('keydown', window.commandDemoKeyHandler);
+                }
+                window.registerCommandDemoRef = function(dotNetRef) {
+                    window.commandDemoDotNetRef = dotNetRef;
+                    window.commandDemoKeyHandler = function(e) {
+                        if ((e.ctrlKey || e.metaKey) && e.key === 'i') {
+                            e.preventDefault();
+                            if (window.commandDemoDotNetRef) {
+                                window.commandDemoDotNetRef.invokeMethodAsync('OpenCommandPalette');
+                            }
+                        }
+                    };
+                    document.addEventListener('keydown', window.commandDemoKeyHandler);
+                };
+            ");
+
+            await JS.InvokeVoidAsync("registerCommandDemoRef", _dotNetRef);
+        }
+    }
+
+    [JSInvokable]
+    public void OpenCommandPalette()
+    {
+        isCommandPaletteOpen = true;
+        StateHasChanged();
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        await JS.InvokeVoidAsync("eval", "document.removeEventListener('keydown', window.commandDemoKeyHandler);");
+        _dotNetRef?.Dispose();
+    }
 }

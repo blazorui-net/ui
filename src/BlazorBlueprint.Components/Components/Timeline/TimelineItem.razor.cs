@@ -146,7 +146,7 @@ public partial class TimelineItem : ComponentBase
         Status == TimelineStatus.InProgress ? "aria-current-step" : null
     );
 
-    private const string IconWrapperClass = "relative z-10";
+    private const string IconWrapperClass = "relative z-[1]";
 
     private string IconMinHeightClass => IconSize switch
     {
@@ -175,7 +175,7 @@ public partial class TimelineItem : ComponentBase
     };
 
     private string ComputedConnectorClass => ClassNames.cn(
-        "flex-1 min-h-8",
+        "flex-1 min-h-16",
         ConnectorGapClass,
         ConnectorClass
     );
