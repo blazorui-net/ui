@@ -37,7 +37,7 @@
             <span>Search library...</span>
             <span class="ml-auto flex items-center gap-1 text-xs">
                 <Kbd>Ctrl</Kbd>
-                <Kbd>K</Kbd>
+                <Kbd>I</Kbd>
             </span>
         </button>
     </section>
@@ -276,7 +276,7 @@
                 window.registerCommandLibraryRef = function(dotNetRef) {
                     window.commandLibraryDotNetRef = dotNetRef;
                     window.commandLibraryKeyHandler = function(e) {
-                        if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                        if ((e.ctrlKey || e.metaKey) && e.key === 'i') {
                             e.preventDefault();
                             if (window.commandLibraryDotNetRef) {
                                 window.commandLibraryDotNetRef.invokeMethodAsync('OpenCommandLibrary');
