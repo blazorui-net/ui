@@ -1,4 +1,5 @@
 @namespace BlazorBlueprint.Components.Command
+@implements IDisposable
 
 <div class="@CssClass">
     <svg xmlns="http://www.w3.org/2000/svg"
@@ -18,7 +19,7 @@
            type="text"
            placeholder="@Placeholder"
            disabled="@Disabled"
-           value="@Context?.SearchQuery"
+           value="@_displayValue"
            @oninput="HandleInput"
            @onkeydown="HandleKeyDown"
            class="flex h-11 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 ml-2"
@@ -29,6 +30,10 @@
 </div>
 
 @code {
+    private CancellationTokenSource? _debounceCts;
+    private string _displayValue = string.Empty;
+    private bool _isDebouncing;
+
     [CascadingParameter]
     public CommandContext? Context { get; set; }
 
@@ -55,6 +60,18 @@
     /// </summary>
     [Parameter]
     public bool AutoFocus { get; set; }
+
+    /// <summary>
+    /// Gets or sets whether debounce is disabled. When false (default), input is debounced.
+    /// </summary>
+    [Parameter]
+    public bool DisableDebounce { get; set; }
+
+    /// <summary>
+    /// Gets or sets the debounce delay in milliseconds. Default is 500 ms.
+    /// </summary>
+    [Parameter]
+    public int DebounceInterval { get; set; } = 500;
 
     private ElementReference _inputRef;
     private bool _previousAutoFocus;
@@ -91,6 +108,12 @@
             _shouldFocus = true;
         }
         _previousAutoFocus = AutoFocus;
+
+        // Sync display value from context when not actively debouncing
+        if (!_isDebouncing)
+        {
+            _displayValue = Context?.SearchQuery ?? string.Empty;
+        }
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -115,7 +138,36 @@
     private void HandleInput(ChangeEventArgs args)
     {
         var value = args.Value?.ToString() ?? string.Empty;
-        Context?.SetSearchQuery(value);
+        _displayValue = value;
+
+        if (DisableDebounce)
+        {
+            Context?.SetSearchQuery(value);
+        }
+        else
+        {
+            _isDebouncing = true;
+            DebounceSetSearchQuery(value);
+        }
+    }
+
+    private async void DebounceSetSearchQuery(string value)
+    {
+        _debounceCts?.Cancel();
+        _debounceCts?.Dispose();
+        _debounceCts = new CancellationTokenSource();
+
+        try
+        {
+            await Task.Delay(DebounceInterval, _debounceCts.Token);
+
+            _isDebouncing = false;
+            Context?.SetSearchQuery(value);
+        }
+        catch (TaskCanceledException)
+        {
+            // Timer was cancelled — either by a new keystroke or disposal.
+        }
     }
 
     private async Task HandleKeyDown(KeyboardEventArgs args)
@@ -140,5 +192,12 @@
                 await Context.SelectFocusedItemAsync();
                 break;
         }
+    }
+
+    public void Dispose()
+    {
+        _debounceCts?.Cancel();
+        _debounceCts?.Dispose();
+        GC.SuppressFinalize(this);
     }
 }

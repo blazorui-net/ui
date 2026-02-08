@@ -1,5 +1,6 @@
 @namespace BlazorBlueprint.Components.NumericInput
 @typeparam TValue where TValue : struct, System.Numerics.INumber<TValue>
+@implements IDisposable
 
 <div class="@ContainerClass">
     <input
