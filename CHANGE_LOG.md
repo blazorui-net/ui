@@ -12,6 +12,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - `CursorType` enum and `CursorExtensions.ToClass()` utility for mapping cursor types to Tailwind CSS classes
 - Cursor and pointer-events conflict resolution groups in TailwindMerge
 - Cursor behavior demo section on Button demo page
+- `SetPosition()` and `ResetPosition()` methods on `ToastService` for runtime toast position control
 
 ### Changed
 - Button component now shows `cursor-pointer` by default and `disabled:cursor-not-allowed` when disabled, replacing `disabled:pointer-events-none` for better UX feedback
@@ -20,6 +21,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ### Fixed
 - DataTable global search now uses the column's `Format` string when converting values for search matching, consistent with how cell values are rendered
 - Text input components (`Input`, `Textarea`, `InputGroupInput`, `InputGroupTextarea`) now normalize empty/whitespace strings to `null`, preventing inconsistent validation on nullable string properties (#99)
+- Dropdown mispositioning when switching between multiple open MultiSelect components
+- Stale portal content when interacting inside open popovers
+- ContextMenu keyboard navigation breaking on repeated right-clicks on the same trigger
+- Toast positioning demo now interactive with live position switching
 
 ---
 
