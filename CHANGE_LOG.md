@@ -26,6 +26,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - `ConnectorClass` parameter on `TimelineItem` for custom connector height overrides
 - `Loading` parameter on `TimelineIcon` for isolated pulse animation
 - Rich Content, Connector Fit, and Custom Connector Height demo sections for Timeline
+- EditForm and EditContext integration for 14 input components (`Input`, `Textarea`, `InputGroupInput`, `InputGroupTextarea`, `NumericInput`, `CurrencyInput`, `MaskedInput`, `Select`, `Combobox`, `NativeSelect`, `DatePicker`, `TimePicker`, `ColorPicker`, `InputOTP`) — cascading `EditContext`, `ValueExpression`, field validation tracking, and merged `aria-invalid` state
+- `Name` parameter on text input components with auto-fallback to `FieldIdentifier` for SSR form postback support
+- Form Validation demo sections on 12 component demo pages showing EditForm with `DataAnnotationsValidator` and `ValidationMessage`
 
 ### Changed
 - Button component now shows `cursor-pointer` by default and `disabled:cursor-not-allowed` when disabled, replacing `disabled:pointer-events-none` for better UX feedback
