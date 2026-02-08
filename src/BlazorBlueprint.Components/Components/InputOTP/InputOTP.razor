@@ -1,4 +1,6 @@
 @namespace BlazorBlueprint.Components.InputOTP
+@using Microsoft.AspNetCore.Components.Forms
+@using System.Linq.Expressions
 @inject IJSRuntime JSRuntime
 
 <div class="@ContainerClass" @onpaste="HandlePaste">
@@ -32,6 +34,12 @@
 </div>
 
 @code {
+    private FieldIdentifier _fieldIdentifier;
+    private EditContext? _editContext;
+
+    [CascadingParameter]
+    private EditContext? CascadedEditContext { get; set; }
+
     /// <summary>
     /// The number of OTP digits.
     /// </summary>
@@ -49,6 +57,12 @@
     /// </summary>
     [Parameter]
     public EventCallback<string> ValueChanged { get; set; }
+
+    /// <summary>
+    /// Gets or sets an expression that identifies the bound value.
+    /// </summary>
+    [Parameter]
+    public Expression<Func<string?>>? ValueExpression { get; set; }
 
     /// <summary>
     /// Event callback when all digits are filled.
@@ -124,6 +138,12 @@
                 _values[i] = i < Value.Length ? Value[i].ToString() : "";
             }
         }
+
+        if (CascadedEditContext != null && ValueExpression != null)
+        {
+            _editContext = CascadedEditContext;
+            _fieldIdentifier = FieldIdentifier.Create(ValueExpression);
+        }
     }
 
     private string GetValueAt(int index)
@@ -145,6 +165,11 @@
 
         var newValue = string.Join("", _values);
         await ValueChanged.InvokeAsync(newValue);
+
+        if (_editContext != null && ValueExpression != null && _fieldIdentifier.FieldName != null)
+        {
+            _editContext.NotifyFieldChanged(_fieldIdentifier);
+        }
 
         // Move to next input if value entered
         if (!string.IsNullOrEmpty(_values[index]) && index < Length - 1)

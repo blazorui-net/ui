@@ -17,7 +17,7 @@
         required="@Required"
         aria-label="@(AriaLabel ?? $"Amount in {Currency.Name}")"
         aria-describedby="@AriaDescribedBy"
-        aria-invalid="@(AriaInvalid?.ToString().ToLower())"
+        aria-invalid="@EffectiveAriaInvalid"
         @oninput="HandleInput"
         @onblur="HandleBlur"
         @onfocus="HandleFocus"

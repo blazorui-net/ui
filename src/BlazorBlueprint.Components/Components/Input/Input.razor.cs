@@ -1,6 +1,8 @@
 using BlazorBlueprint.Components.Utilities;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components.Web;
+using System.Linq.Expressions;
 
 namespace BlazorBlueprint.Components.Input;
 
@@ -36,6 +38,15 @@ namespace BlazorBlueprint.Components.Input;
 /// </example>
 public partial class Input : ComponentBase
 {
+    private FieldIdentifier _fieldIdentifier;
+    private EditContext? _editContext;
+
+    /// <summary>
+    /// Gets or sets the cascaded EditContext from a parent EditForm.
+    /// </summary>
+    [CascadingParameter]
+    private EditContext? CascadedEditContext { get; set; }
+
     /// <summary>
     /// Gets or sets the type of input.
     /// </summary>
@@ -149,6 +160,46 @@ public partial class Input : ComponentBase
     public bool? AriaInvalid { get; set; }
 
     /// <summary>
+    /// Gets or sets an expression that identifies the bound value.
+    /// </summary>
+    /// <remarks>
+    /// Used for form validation integration. When provided, the input
+    /// registers with the EditContext and participates in form validation.
+    /// </remarks>
+    [Parameter]
+    public Expression<Func<string?>>? ValueExpression { get; set; }
+
+    /// <summary>
+    /// Gets whether the input is in an invalid state based on EditContext validation.
+    /// </summary>
+    private bool IsInvalid
+    {
+        get
+        {
+            if (_editContext != null && ValueExpression != null && _fieldIdentifier.FieldName != null)
+            {
+                return _editContext.GetValidationMessages(_fieldIdentifier).Any();
+            }
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// Gets the effective aria-invalid value combining manual AriaInvalid and EditContext validation.
+    /// </summary>
+    private string? EffectiveAriaInvalid
+    {
+        get
+        {
+            if (AriaInvalid == true || IsInvalid)
+            {
+                return "true";
+            }
+            return AriaInvalid?.ToString().ToLowerInvariant();
+        }
+    }
+
+    /// <summary>
     /// Gets the computed CSS classes for the input element.
     /// </summary>
     /// <remarks>
@@ -196,6 +247,18 @@ public partial class Input : ComponentBase
         _ => "text"
     };
 
+    /// <inheritdoc />
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+
+        if (CascadedEditContext != null && ValueExpression != null)
+        {
+            _editContext = CascadedEditContext;
+            _fieldIdentifier = FieldIdentifier.Create(ValueExpression);
+        }
+    }
+
     /// <summary>
     /// Handles the input event (fired on every keystroke).
     /// </summary>
@@ -213,6 +276,11 @@ public partial class Input : ComponentBase
         if (ValueChanged.HasDelegate)
         {
             await ValueChanged.InvokeAsync(newValue);
+        }
+
+        if (_editContext != null && ValueExpression != null && _fieldIdentifier.FieldName != null)
+        {
+            _editContext.NotifyFieldChanged(_fieldIdentifier);
         }
     }
 

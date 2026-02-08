@@ -4,6 +4,8 @@
 @using BlazorBlueprint.Components.Popover
 @using BlazorBlueprint.Icons.Lucide.Components
 @using BlazorBlueprint.Primitives.Services
+@using Microsoft.AspNetCore.Components.Forms
+@using System.Linq.Expressions
 
 <Popover @bind-Open="_isOpen">
     <PopoverTrigger AsChild="true">
@@ -157,6 +159,11 @@
     private int _internalMinute = 0;
     private int _internalSecond = 0;
     private bool _isAm = true;
+    private FieldIdentifier _fieldIdentifier;
+    private EditContext? _editContext;
+
+    [CascadingParameter]
+    private EditContext? CascadedEditContext { get; set; }
 
     /// <summary>
     /// The selected time value.
@@ -169,6 +176,12 @@
     /// </summary>
     [Parameter]
     public EventCallback<TimeSpan?> ValueChanged { get; set; }
+
+    /// <summary>
+    /// Gets or sets an expression that identifies the bound value.
+    /// </summary>
+    [Parameter]
+    public Expression<Func<TimeSpan?>>? ValueExpression { get; set; }
 
     /// <summary>
     /// The time format (12-hour or 24-hour).
@@ -253,6 +266,20 @@
             _internalSecond = 0;
             _isAm = true;
         }
+
+        if (CascadedEditContext != null && ValueExpression != null)
+        {
+            _editContext = CascadedEditContext;
+            _fieldIdentifier = FieldIdentifier.Create(ValueExpression);
+        }
+    }
+
+    private void NotifyFieldChanged()
+    {
+        if (_editContext != null && ValueExpression != null && _fieldIdentifier.FieldName != null)
+        {
+            _editContext.NotifyFieldChanged(_fieldIdentifier);
+        }
     }
 
     private string FormatTime(TimeSpan time)
@@ -282,12 +309,17 @@
 
         // Apply constraints
         if (MinTime.HasValue && newTime < MinTime.Value)
+        {
             newTime = MinTime.Value;
+        }
         if (MaxTime.HasValue && newTime > MaxTime.Value)
+        {
             newTime = MaxTime.Value;
+        }
 
         Value = newTime;
         await ValueChanged.InvokeAsync(newTime);
+        NotifyFieldChanged();
         StateHasChanged();
     }
 
@@ -380,6 +412,7 @@
         _internalSecond = 0;
         _isAm = true;
         await ValueChanged.InvokeAsync(null);
+        NotifyFieldChanged();
         StateHasChanged();
     }
 

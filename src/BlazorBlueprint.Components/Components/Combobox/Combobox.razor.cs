@@ -1,6 +1,8 @@
 using BlazorBlueprint.Components.Command;
 using BlazorBlueprint.Components.Utilities;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Forms;
+using System.Linq.Expressions;
 
 namespace BlazorBlueprint.Components.Combobox;
 
@@ -40,6 +42,15 @@ namespace BlazorBlueprint.Components.Combobox;
 /// </example>
 public partial class Combobox<TItem> : ComponentBase
 {
+    private FieldIdentifier _fieldIdentifier;
+    private EditContext? _editContext;
+
+    /// <summary>
+    /// Gets or sets the cascaded EditContext from a parent EditForm.
+    /// </summary>
+    [CascadingParameter]
+    private EditContext? CascadedEditContext { get; set; }
+
     /// <summary>
     /// Gets or sets the collection of items to display in the combobox.
     /// </summary>
@@ -57,6 +68,12 @@ public partial class Combobox<TItem> : ComponentBase
     /// </summary>
     [Parameter]
     public EventCallback<string?> ValueChanged { get; set; }
+
+    /// <summary>
+    /// Gets or sets an expression that identifies the bound value.
+    /// </summary>
+    [Parameter]
+    public Expression<Func<string?>>? ValueExpression { get; set; }
 
     /// <summary>
     /// Gets or sets the function to extract the value from an item.
@@ -172,6 +189,12 @@ public partial class Combobox<TItem> : ComponentBase
 
         // Filter out null items for safety
         Items = Items?.Where(item => item != null) ?? Enumerable.Empty<TItem>();
+
+        if (CascadedEditContext != null && ValueExpression != null)
+        {
+            _editContext = CascadedEditContext;
+            _fieldIdentifier = FieldIdentifier.Create(ValueExpression);
+        }
     }
 
     /// <summary>
@@ -249,6 +272,11 @@ public partial class Combobox<TItem> : ComponentBase
 
         Value = newValue;
         await ValueChanged.InvokeAsync(newValue);
+
+        if (_editContext != null && ValueExpression != null && _fieldIdentifier.FieldName != null)
+        {
+            _editContext.NotifyFieldChanged(_fieldIdentifier);
+        }
 
         // Close the popover after selection
         _isOpen = false;

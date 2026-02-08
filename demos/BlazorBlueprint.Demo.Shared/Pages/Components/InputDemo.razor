@@ -1,5 +1,9 @@
 @page "/components/input"
 @using BlazorBlueprint.Components.Input
+@using BlazorBlueprint.Components.Textarea
+@using BlazorBlueprint.Components.Select
+@using BlazorBlueprint.Components.Button
+@using System.ComponentModel.DataAnnotations
 
 <PageTitle>Input Component - Blazor Blueprint</PageTitle>
 
@@ -249,6 +253,45 @@
         </div>
     </div>
 
+    <!-- Form Validation with EditForm -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Form Validation</h2>
+            <p class="text-sm text-muted-foreground">
+                Input components integrate with Blazor's EditForm and EditContext for model validation.
+                Use <code class="text-xs bg-muted px-1 py-0.5 rounded">@@bind-Value</code> within an EditForm and
+                validation errors will automatically apply error styling via <code class="text-xs bg-muted px-1 py-0.5 rounded">aria-invalid</code>.
+            </p>
+        </div>
+        <EditForm Model="formModel" OnValidSubmit="HandleValidSubmit" class="max-w-md space-y-4">
+            <DataAnnotationsValidator />
+
+            <div class="space-y-2">
+                <label class="text-sm font-medium">Name</label>
+                <Input Type="InputType.Text" @bind-Value="formModel.Name" Placeholder="Enter your name" />
+                <ValidationMessage For="@(() => formModel.Name)" class="text-sm text-destructive" />
+            </div>
+
+            <div class="space-y-2">
+                <label class="text-sm font-medium">Email</label>
+                <Input Type="InputType.Email" @bind-Value="formModel.Email" Placeholder="Enter your email" />
+                <ValidationMessage For="@(() => formModel.Email)" class="text-sm text-destructive" />
+            </div>
+
+            <div class="flex gap-4">
+                <Button Type="ButtonType.Submit" Variant="ButtonVariant.Default">Submit</Button>
+                <Button Type="ButtonType.Button" Variant="ButtonVariant.Outline" OnClick="ResetForm">Reset</Button>
+            </div>
+
+            @if (!string.IsNullOrEmpty(formMessage))
+            {
+                <div class="p-4 bg-card rounded-lg border">
+                    <p class="text-sm">@formMessage</p>
+                </div>
+            }
+        </EditForm>
+    </div>
+
     <!-- API Reference -->
     <div class="space-y-4">
         <div class="space-y-2">
@@ -319,4 +362,28 @@
 
 @code {
     private string? boundValue;
+    private InputFormModel formModel = new();
+    private string? formMessage;
+
+    private void HandleValidSubmit()
+    {
+        formMessage = $"Form submitted! Name: {formModel.Name}, Email: {formModel.Email}";
+    }
+
+    private void ResetForm()
+    {
+        formModel = new();
+        formMessage = null;
+    }
+
+    private class InputFormModel
+    {
+        [Required(ErrorMessage = "Name is required.")]
+        [StringLength(50, MinimumLength = 2, ErrorMessage = "Name must be between 2 and 50 characters.")]
+        public string? Name { get; set; }
+
+        [Required(ErrorMessage = "Email is required.")]
+        [EmailAddress(ErrorMessage = "Please enter a valid email address.")]
+        public string? Email { get; set; }
+    }
 }

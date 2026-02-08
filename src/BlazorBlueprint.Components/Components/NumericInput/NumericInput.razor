@@ -14,7 +14,7 @@
         required="@Required"
         aria-label="@AriaLabel"
         aria-describedby="@AriaDescribedBy"
-        aria-invalid="@(AriaInvalid?.ToString().ToLower())"
+        aria-invalid="@EffectiveAriaInvalid"
         aria-valuemin="@(Min?.ToString())"
         aria-valuemax="@(Max?.ToString())"
         aria-valuenow="@Value.ToString()"

@@ -4,6 +4,8 @@
 @using BlazorBlueprint.Components.Popover
 @using BlazorBlueprint.Components.Input
 @using BlazorBlueprint.Primitives.Services
+@using Microsoft.AspNetCore.Components.Forms
+@using System.Linq.Expressions
 
 <Popover @bind-Open="_isOpen">
     <PopoverTrigger AsChild="true">
@@ -145,6 +147,11 @@
     private long? _activeAreaPointerId;
     private long? _activeHuePointerId;
     private long? _activeAlphaPointerId;
+    private FieldIdentifier _fieldIdentifier;
+    private EditContext? _editContext;
+
+    [CascadingParameter]
+    private EditContext? CascadedEditContext { get; set; }
 
     private static readonly string[] DefaultPresets = {
         "#000000", "#FFFFFF", "#FF0000", "#00FF00", "#0000FF",
@@ -206,6 +213,12 @@
     [Parameter]
     public string? Class { get; set; }
 
+    /// <summary>
+    /// Gets or sets an expression that identifies the bound value.
+    /// </summary>
+    [Parameter]
+    public Expression<Func<string>>? ValueExpression { get; set; }
+
     private string[] EffectivePresets => PresetColors ?? DefaultPresets;
 
     private string CurrentColorWithoutAlpha => ColorUtils.ToHex(_r, _g, _b);
@@ -232,6 +245,12 @@
         {
             ParseValue(Value);
             _previousValue = Value;
+        }
+
+        if (CascadedEditContext != null && ValueExpression != null)
+        {
+            _editContext = CascadedEditContext;
+            _fieldIdentifier = FieldIdentifier.Create(ValueExpression);
         }
     }
 
@@ -274,6 +293,12 @@
         _previousValue = newValue;
         Value = newValue;
         await ValueChanged.InvokeAsync(newValue);
+
+        if (_editContext != null && ValueExpression != null && _fieldIdentifier.FieldName != null)
+        {
+            _editContext.NotifyFieldChanged(_fieldIdentifier);
+        }
+
         StateHasChanged();
     }
 

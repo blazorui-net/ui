@@ -10,6 +10,6 @@
     maxlength="@MaxLength"
     aria-label="@AriaLabel"
     aria-describedby="@AriaDescribedBy"
-    aria-invalid="@(AriaInvalid?.ToString().ToLower())"
+    aria-invalid="@EffectiveAriaInvalid"
     data-slot="textarea-control"
     @oninput="HandleInput"></textarea>

@@ -5,6 +5,8 @@
 @using BlazorBlueprint.Components.Calendar
 @using BlazorBlueprint.Primitives.Services
 @using BlazorBlueprint.Icons.Lucide.Components
+@using Microsoft.AspNetCore.Components.Forms
+@using System.Linq.Expressions
 
 @*
     Date Picker component - combines a button trigger with a calendar popover.
@@ -37,6 +39,11 @@
 
 @code {
     private bool _isOpen;
+    private FieldIdentifier _fieldIdentifier;
+    private EditContext? _editContext;
+
+    [CascadingParameter]
+    private EditContext? CascadedEditContext { get; set; }
 
     /// <summary>
     /// The selected date value.
@@ -49,6 +56,12 @@
     /// </summary>
     [Parameter]
     public EventCallback<DateTime?> ValueChanged { get; set; }
+
+    /// <summary>
+    /// Gets or sets an expression that identifies the bound value.
+    /// </summary>
+    [Parameter]
+    public Expression<Func<DateTime?>>? ValueExpression { get; set; }
 
     /// <summary>
     /// The date format to display.
@@ -105,10 +118,27 @@
     [Parameter(CaptureUnmatchedValues = true)]
     public Dictionary<string, object>? AdditionalAttributes { get; set; }
 
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+
+        if (CascadedEditContext != null && ValueExpression != null)
+        {
+            _editContext = CascadedEditContext;
+            _fieldIdentifier = FieldIdentifier.Create(ValueExpression);
+        }
+    }
+
     private async Task HandleDateSelected(DateTime? date)
     {
         Value = date;
         await ValueChanged.InvokeAsync(date);
+
+        if (_editContext != null && ValueExpression != null && _fieldIdentifier.FieldName != null)
+        {
+            _editContext.NotifyFieldChanged(_fieldIdentifier);
+        }
+
         _isOpen = false;
     }
 

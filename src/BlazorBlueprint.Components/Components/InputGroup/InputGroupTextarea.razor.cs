@@ -1,6 +1,8 @@
 using BlazorBlueprint.Components.Utilities;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components.Web;
+using System.Linq.Expressions;
 
 namespace BlazorBlueprint.Components.InputGroup;
 
@@ -34,6 +36,15 @@ namespace BlazorBlueprint.Components.InputGroup;
 /// </example>
 public partial class InputGroupTextarea : ComponentBase
 {
+    private FieldIdentifier _fieldIdentifier;
+    private EditContext? _editContext;
+
+    /// <summary>
+    /// Gets or sets the cascaded EditContext from a parent EditForm.
+    /// </summary>
+    [CascadingParameter]
+    private EditContext? CascadedEditContext { get; set; }
+
     /// <summary>
     /// Gets or sets the current value of the textarea.
     /// </summary>
@@ -104,6 +115,36 @@ public partial class InputGroupTextarea : ComponentBase
     public bool? AriaInvalid { get; set; }
 
     /// <summary>
+    /// Gets or sets an expression that identifies the bound value.
+    /// </summary>
+    [Parameter]
+    public Expression<Func<string?>>? ValueExpression { get; set; }
+
+    private bool IsInvalid
+    {
+        get
+        {
+            if (_editContext != null && ValueExpression != null && _fieldIdentifier.FieldName != null)
+            {
+                return _editContext.GetValidationMessages(_fieldIdentifier).Any();
+            }
+            return false;
+        }
+    }
+
+    private string? EffectiveAriaInvalid
+    {
+        get
+        {
+            if (AriaInvalid == true || IsInvalid)
+            {
+                return "true";
+            }
+            return AriaInvalid?.ToString().ToLowerInvariant();
+        }
+    }
+
+    /// <summary>
     /// Gets or sets additional attributes.
     /// </summary>
     [Parameter(CaptureUnmatchedValues = true)]
@@ -130,6 +171,18 @@ public partial class InputGroupTextarea : ComponentBase
         Class
     );
 
+    /// <inheritdoc />
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+
+        if (CascadedEditContext != null && ValueExpression != null)
+        {
+            _editContext = CascadedEditContext;
+            _fieldIdentifier = FieldIdentifier.Create(ValueExpression);
+        }
+    }
+
     /// <summary>
     /// Handles the input event (fired on every keystroke).
     /// </summary>
@@ -146,6 +199,11 @@ public partial class InputGroupTextarea : ComponentBase
         if (ValueChanged.HasDelegate)
         {
             await ValueChanged.InvokeAsync(newValue);
+        }
+
+        if (_editContext != null && ValueExpression != null && _fieldIdentifier.FieldName != null)
+        {
+            _editContext.NotifyFieldChanged(_fieldIdentifier);
         }
     }
 

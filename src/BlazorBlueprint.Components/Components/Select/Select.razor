@@ -1,12 +1,14 @@
 @typeparam TValue
 @namespace BlazorBlueprint.Components.Select
 @using BlazorBlueprint.Primitives.Select
+@using Microsoft.AspNetCore.Components.Forms
+@using System.Linq.Expressions
 @attribute [CascadingTypeParameter(nameof(TValue))]
 
 @* Styled Select wrapper around Select *@
 <BlazorBlueprint.Primitives.Select.Select TValue="TValue"
                  Value="@Value"
-                 ValueChanged="@ValueChanged"
+                 ValueChanged="@HandleValueChanged"
                  @bind-Open="IsOpen"
                  Disabled="Disabled"
                  DisplayTextSelector="@DisplayTextSelector"
@@ -15,6 +17,14 @@
 </BlazorBlueprint.Primitives.Select.Select>
 
 @code {
+    private FieldIdentifier _fieldIdentifier;
+    private EditContext? _editContext;
+
+    /// <summary>
+    /// Gets or sets the cascaded EditContext from a parent EditForm.
+    /// </summary>
+    [CascadingParameter]
+    private EditContext? CascadedEditContext { get; set; }
     /// <summary>
     /// Gets or sets the currently selected value.
     /// </summary>
@@ -26,6 +36,12 @@
     /// </summary>
     [Parameter]
     public EventCallback<TValue?> ValueChanged { get; set; }
+
+    /// <summary>
+    /// Gets or sets an expression that identifies the bound value.
+    /// </summary>
+    [Parameter]
+    public Expression<Func<TValue?>>? ValueExpression { get; set; }
 
     /// <summary>
     /// Gets or sets whether the select is disabled.
@@ -68,6 +84,28 @@
     public RenderFragment? ChildContent { get; set; }
 
     private bool IsOpen { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+
+        if (CascadedEditContext != null && ValueExpression != null)
+        {
+            _editContext = CascadedEditContext;
+            _fieldIdentifier = FieldIdentifier.Create(ValueExpression);
+        }
+    }
+
+    private async Task HandleValueChanged(TValue? value)
+    {
+        Value = value;
+        await ValueChanged.InvokeAsync(value);
+
+        if (_editContext != null && ValueExpression != null && _fieldIdentifier.FieldName != null)
+        {
+            _editContext.NotifyFieldChanged(_fieldIdentifier);
+        }
+    }
 
     /// <summary>
     /// Gets the computed CSS classes for the select container.
