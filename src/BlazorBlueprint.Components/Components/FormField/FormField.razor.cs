@@ -244,25 +244,36 @@ public partial class FormField<TValue> : ComponentBase, IDisposable
         var underlying = Nullable.GetUnderlyingType(type) ?? type;
 
         if (underlying == typeof(string))
+        {
             return "text value";
+        }
         if (underlying == typeof(int) || underlying == typeof(long))
+        {
             return "whole number";
+        }
         if (underlying == typeof(float) || underlying == typeof(double) || underlying == typeof(decimal))
+        {
             return "number";
+        }
         if (underlying == typeof(DateTime) || underlying == typeof(DateTimeOffset) || underlying == typeof(DateOnly))
+        {
             return "date";
+        }
         if (underlying == typeof(TimeOnly))
+        {
             return "time";
+        }
         if (underlying == typeof(Guid))
+        {
             return "GUID";
+        }
         if (underlying == typeof(bool))
+        {
             return "true/false value";
+        }
 
         return underlying.Name.ToLowerInvariant();
     }
 
-    public void Dispose()
-    {
-        GC.SuppressFinalize(this);
-    }
+    public void Dispose() => GC.SuppressFinalize(this);
 }

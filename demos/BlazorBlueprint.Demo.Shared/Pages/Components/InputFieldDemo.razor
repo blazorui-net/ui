@@ -313,6 +313,44 @@
         </div>
     </div>
 
+    <!-- Async Validation -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Async Validation</h2>
+            <p class="text-sm text-muted-foreground">
+                Simulate checking username availability against a backend API. The input uses debounced
+                update timing so the check only fires after the user stops typing. Try
+                <code class="text-xs bg-muted px-1 py-0.5 rounded">admin</code>,
+                <code class="text-xs bg-muted px-1 py-0.5 rounded">test</code>, or
+                <code class="text-xs bg-muted px-1 py-0.5 rounded">user</code>, or
+                <code class="text-xs bg-muted px-1 py-0.5 rounded">mathew</code> (taken) versus anything else (available).
+            </p>
+        </div>
+        <div class="max-w-md">
+            <InputField TValue="string"
+                        @bind-Value="_asyncUsername"
+                        @bind-Value:after="CheckUsernameAvailability"
+                        UpdateTiming="UpdateTiming.Debounced"
+                        DebounceInterval="300"
+                        Placeholder="Choose a username" />
+            @if (_asyncChecking)
+            {
+                <p class="text-sm text-muted-foreground mt-2">Checking availability...</p>
+            }
+            else if (_asyncUsername is { Length: > 0 } && _asyncResult is not null)
+            {
+                @if (_asyncResult.Value)
+                {
+                    <p class="text-sm text-green-600 mt-2">Username "@_asyncUsername" is available!</p>
+                }
+                else
+                {
+                    <p class="text-sm text-destructive mt-2">Username "@_asyncUsername" is already taken.</p>
+                }
+            }
+        </div>
+    </div>
+
     <!-- API Reference -->
     <div class="space-y-4">
         <div class="space-y-2">
@@ -425,5 +463,57 @@
     private void HandleErrorKindCleared()
     {
         _errorKindMessage = "";
+    }
+
+    // Async validation
+    private string? _asyncUsername;
+    private bool _asyncChecking;
+    private bool? _asyncResult;
+    private CancellationTokenSource? _asyncCts;
+
+    private static readonly HashSet<string> TakenUsernames = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "admin", "test", "user", "mathew"
+    };
+
+    private async Task CheckUsernameAvailability()
+    {
+        _asyncCts?.Cancel();
+        _asyncCts?.Dispose();
+
+        if (string.IsNullOrWhiteSpace(_asyncUsername))
+        {
+            _asyncResult = null;
+            _asyncChecking = false;
+            _asyncCts = null;
+            return;
+        }
+
+        _asyncChecking = true;
+        _asyncResult = null;
+
+        var cts = new CancellationTokenSource();
+        _asyncCts = cts;
+
+        try
+        {
+            // Simulate a backend API call
+            await Task.Delay(2000, cts.Token);
+
+            _asyncResult = !TakenUsernames.Contains(_asyncUsername);
+        }
+        catch (TaskCanceledException)
+        {
+            // A newer check superseded this one
+        }
+        finally
+        {
+            _asyncChecking = false;
+            cts.Dispose();
+            if (_asyncCts == cts)
+            {
+                _asyncCts = null;
+            }
+        }
     }
 }
