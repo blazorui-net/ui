@@ -152,7 +152,7 @@
                     }
                     else if (_selectionStart.HasValue && _selectionEnd.HasValue)
                     {
-                        var days = Math.Abs((_selectionEnd.Value - _selectionStart.Value).Days) + 1;
+                        var days = CountSelectedDays(_selectionStart.Value, _selectionEnd.Value);
                         <span>@days day(s) selected</span>
                     }
                 </div>
@@ -198,9 +198,9 @@
                             {
                                 var dateValue = day.Value;
                                 var isDisabled = IsDateDisabled(dateValue) || dateValue.Month != monthDate.Month;
-                                var isInRange = IsInRange(dateValue);
-                                var isRangeStart = IsRangeStart(dateValue);
-                                var isRangeEnd = IsRangeEnd(dateValue);
+                                var isInRange = !isDisabled && IsInRange(dateValue);
+                                var isRangeStart = !isDisabled && IsRangeStart(dateValue);
+                                var isRangeEnd = !isDisabled && IsRangeEnd(dateValue);
                                 var isToday = dateValue.Date == DateTime.Today;
 
                                 <td class="@GetCellClass(day, isInRange, isRangeStart, isRangeEnd)">

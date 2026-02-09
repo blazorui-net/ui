@@ -99,7 +99,21 @@ public partial class DateRangePicker : ComponentBase
     [Parameter]
     public string? Class { get; set; }
 
-    private static readonly string[] DayNames = { "Su", "Mo", "Tu", "We", "Th", "Fr", "Sa" };
+    private static readonly string[] BaseDayNames = { "Su", "Mo", "Tu", "We", "Th", "Fr", "Sa" };
+
+    private string[] DayNames
+    {
+        get
+        {
+            var start = (int)FirstDayOfWeek;
+            var result = new string[7];
+            for (var i = 0; i < 7; i++)
+            {
+                result[i] = BaseDayNames[(start + i) % 7];
+            }
+            return result;
+        }
+    }
     private static readonly string[] MonthNames = { "January", "February", "March", "April", "May", "June",
                                                      "July", "August", "September", "October", "November", "December" };
 
@@ -222,7 +236,7 @@ public partial class DateRangePicker : ComponentBase
     private void ApplyPreset(DateRangePreset preset)
     {
         var range = GetPresetRange(preset);
-        if (range != null)
+        if (range != null && CountSelectedDays(range.Start, range.End) > 0)
         {
             _selectionStart = range.Start;
             _selectionEnd = range.End;
@@ -291,6 +305,22 @@ public partial class DateRangePicker : ComponentBase
         }
 
         return false;
+    }
+
+    private int CountSelectedDays(DateTime start, DateTime end)
+    {
+        var count = 0;
+        var current = start.Date <= end.Date ? start.Date : end.Date;
+        var last = start.Date > end.Date ? start.Date : end.Date;
+        while (current <= last)
+        {
+            if (!IsDateDisabled(current))
+            {
+                count++;
+            }
+            current = current.AddDays(1);
+        }
+        return count;
     }
 
     private bool IsInRange(DateTime date)
