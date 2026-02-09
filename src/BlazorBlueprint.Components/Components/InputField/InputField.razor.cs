@@ -1,8 +1,10 @@
+using System.Linq.Expressions;
 using System.Text.RegularExpressions;
 using BlazorBlueprint.Components.Converters;
 using BlazorBlueprint.Components.Input;
 using BlazorBlueprint.Components.Utilities;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components.Web;
 
 namespace BlazorBlueprint.Components.InputField;
@@ -23,6 +25,9 @@ namespace BlazorBlueprint.Components.InputField;
 /// - Display format support via <see cref="Format"/> parameter
 /// - Editing/display toggle pattern (raw value while focused, formatted while blurred)
 /// - Parse error reporting via <see cref="OnParseError"/> and <see cref="HasParseError"/>
+/// - Error kind discrimination via <see cref="CurrentErrorKind"/> and <see cref="InputFieldErrorKind"/>
+/// - Error cleared notification via <see cref="OnErrorCleared"/>
+/// - Invalid text preservation on blur (user sees what they typed wrong)
 /// - Pre-parse regex validation via <see cref="ValidationPattern"/>
 /// - Post-parse value validation via <see cref="Validation"/>
 /// - Full ARIA attribute support with automatic aria-invalid on parse errors
@@ -44,7 +49,11 @@ public partial class InputField<TValue> : ComponentBase, IDisposable
     private string _editingValue = string.Empty;
     private bool _isEditing;
     private bool _hasParseError;
+    private InputFieldErrorKind? _currentErrorKind;
     private CancellationTokenSource? _debounceCts;
+    private FieldIdentifier _fieldIdentifier;
+    private EditContext? _editContext;
+    private EditContext? _subscribedEditContext;
 
     /// <summary>
     /// Gets or sets the current typed value.
@@ -84,23 +93,46 @@ public partial class InputField<TValue> : ComponentBase, IDisposable
     public string? Format { get; set; }
 
     /// <summary>
-    /// Gets or sets the callback invoked when a parse error occurs on blur.
+    /// Gets or sets the callback invoked when a parse or validation error occurs on blur.
     /// </summary>
     /// <remarks>
     /// Fires when the user leaves the input with a value that cannot be converted to
-    /// <typeparamref name="TValue"/>. During typing, parse errors are silently ignored.
+    /// <typeparamref name="TValue"/> or fails validation. During typing, errors are silently ignored.
+    /// The <see cref="InputParseException.ErrorKind"/> property indicates the specific failure type.
     /// </remarks>
     [Parameter]
     public EventCallback<InputParseException> OnParseError { get; set; }
 
     /// <summary>
-    /// Gets whether the input currently has a parse error.
+    /// Gets or sets the callback invoked when the error state clears.
     /// </summary>
     /// <remarks>
-    /// Set to <c>true</c> on blur when parsing fails. Auto-clears when a valid value is entered.
-    /// Can be used by consumers to conditionally display error messages.
+    /// Fires when the input transitions from an error state back to a valid state,
+    /// either because the user entered a valid value during typing or cleared the input.
+    /// Use this to clear error messages in the parent component.
+    /// </remarks>
+    [Parameter]
+    public EventCallback OnErrorCleared { get; set; }
+
+    /// <summary>
+    /// Gets whether the input currently has a parse or validation error.
+    /// </summary>
+    /// <remarks>
+    /// Set to <c>true</c> on blur when parsing or validation fails. Auto-clears when a valid
+    /// value is entered. Can be used by consumers to conditionally display error messages.
     /// </remarks>
     public bool HasParseError => _hasParseError;
+
+    /// <summary>
+    /// Gets the kind of error currently active, or <c>null</c> if no error.
+    /// </summary>
+    /// <remarks>
+    /// Provides finer-grained error information than <see cref="HasParseError"/>.
+    /// Returns <see cref="InputFieldErrorKind.Parse"/> for conversion failures,
+    /// <see cref="InputFieldErrorKind.PatternValidation"/> for regex failures,
+    /// and <see cref="InputFieldErrorKind.ValueValidation"/> for post-parse validation failures.
+    /// </remarks>
+    public InputFieldErrorKind? CurrentErrorKind => _currentErrorKind;
 
     /// <summary>
     /// Gets or sets a post-parse validation function.
@@ -202,15 +234,54 @@ public partial class InputField<TValue> : ComponentBase, IDisposable
     [Parameter]
     public int DebounceInterval { get; set; } = 500;
 
+    /// <summary>
+    /// Gets or sets the expression identifying the bound value for EditForm integration.
+    /// Automatically provided by <c>@bind-Value</c>.
+    /// </summary>
+    [Parameter]
+    public Expression<Func<TValue?>>? ValueExpression { get; set; }
+
+    /// <summary>
+    /// Gets or sets the HTML name attribute. Auto-derived from <see cref="ValueExpression"/>
+    /// when inside an EditForm if not explicitly set.
+    /// </summary>
+    [Parameter]
+    public string? Name { get; set; }
+
+    [CascadingParameter]
+    private EditContext? CascadedEditContext { get; set; }
+
     private InputConverter<TValue> ResolvedConverter => Converter ?? new InputConverter<TValue>();
 
-    private bool? ComputedAriaInvalid => (AriaInvalid == true || _hasParseError) ? true : AriaInvalid;
+    private string? EffectiveName => Name ?? (_editContext is not null && _fieldIdentifier.FieldName is not null
+        ? _fieldIdentifier.FieldName : null);
+
+    private bool IsEditContextInvalid
+    {
+        get
+        {
+            if (_editContext is not null && ValueExpression is not null && _fieldIdentifier.FieldName is not null)
+            {
+                return _editContext.GetValidationMessages(_fieldIdentifier).Any();
+            }
+
+            return false;
+        }
+    }
+
+    private bool? ComputedAriaInvalid => (AriaInvalid == true || _hasParseError || IsEditContextInvalid) ? true : AriaInvalid;
 
     private string DisplayValue
     {
         get
         {
             if (_isEditing)
+            {
+                return _editingValue;
+            }
+
+            // Preserve the invalid text so the user can see what they typed wrong
+            if (_hasParseError)
             {
                 return _editingValue;
             }
@@ -257,6 +328,43 @@ public partial class InputField<TValue> : ComponentBase, IDisposable
         _ => "text"
     };
 
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+
+        if (CascadedEditContext != _subscribedEditContext)
+        {
+            if (_subscribedEditContext is not null)
+            {
+                _subscribedEditContext.OnValidationStateChanged -= OnValidationStateChanged;
+            }
+
+            _subscribedEditContext = CascadedEditContext;
+
+            if (_subscribedEditContext is not null)
+            {
+                _subscribedEditContext.OnValidationStateChanged += OnValidationStateChanged;
+            }
+        }
+
+        if (CascadedEditContext is not null && ValueExpression is not null)
+        {
+            _editContext = CascadedEditContext;
+            _fieldIdentifier = FieldIdentifier.Create(ValueExpression);
+        }
+    }
+
+    private void NotifyFieldChanged()
+    {
+        if (_editContext is not null && ValueExpression is not null && _fieldIdentifier.FieldName is not null)
+        {
+            _editContext.NotifyFieldChanged(_fieldIdentifier);
+        }
+    }
+
+    private void OnValidationStateChanged(object? sender, ValidationStateChangedEventArgs e) =>
+        StateHasChanged();
+
     private void HandleInput(ChangeEventArgs args)
     {
         var inputValue = args.Value?.ToString() ?? string.Empty;
@@ -289,7 +397,7 @@ public partial class InputField<TValue> : ComponentBase, IDisposable
                     }
                 }
 
-                _hasParseError = false;
+                ClearErrorState();
                 return;
             }
 
@@ -319,16 +427,25 @@ public partial class InputField<TValue> : ComponentBase, IDisposable
                 }
             }
 
-            _hasParseError = false;
+            ClearErrorState();
         }
         catch
         {
             // Silently ignore parse errors during typing
         }
+
+        NotifyFieldChanged();
     }
 
     private void HandleFocus(FocusEventArgs args)
     {
+        if (_hasParseError)
+        {
+            // Preserve the invalid text so the user can correct it
+            _isEditing = true;
+            return;
+        }
+
         if (Value is null)
         {
             _editingValue = string.Empty;
@@ -360,7 +477,8 @@ public partial class InputField<TValue> : ComponentBase, IDisposable
                 await ValueChanged.InvokeAsync(defaultValue);
             }
 
-            _hasParseError = false;
+            ClearErrorState();
+            NotifyFieldChanged();
             return;
         }
 
@@ -368,14 +486,16 @@ public partial class InputField<TValue> : ComponentBase, IDisposable
         {
             if (ValidationPattern is not null && !Regex.IsMatch(_editingValue, ValidationPattern))
             {
-                throw new FormatException($"Input '{_editingValue}' does not match validation pattern.");
+                throw new InputFieldValidationException(InputFieldErrorKind.PatternValidation,
+                    $"Input '{_editingValue}' does not match validation pattern.");
             }
 
             var parsed = ResolvedConverter.Get(_editingValue);
 
             if (Validation is not null && !Validation(parsed))
             {
-                throw new FormatException($"Value failed validation.");
+                throw new InputFieldValidationException(InputFieldErrorKind.ValueValidation,
+                    $"Value failed validation.");
             }
 
             if (!EqualityComparer<TValue?>.Default.Equals(Value, parsed))
@@ -384,17 +504,49 @@ public partial class InputField<TValue> : ComponentBase, IDisposable
                 await ValueChanged.InvokeAsync(parsed);
             }
 
-            _hasParseError = false;
+            ClearErrorState();
+        }
+        catch (InputFieldValidationException ex)
+        {
+            await SetErrorState(ex.ErrorKind, ex);
         }
         catch (Exception ex)
         {
-            _hasParseError = true;
+            await SetErrorState(InputFieldErrorKind.Parse, ex);
+        }
 
-            if (OnParseError.HasDelegate)
+        NotifyFieldChanged();
+    }
+
+    /// <summary>
+    /// Clears the error state and fires <see cref="OnErrorCleared"/> if transitioning from error to valid.
+    /// </summary>
+    private void ClearErrorState()
+    {
+        if (_hasParseError)
+        {
+            _hasParseError = false;
+            _currentErrorKind = null;
+
+            if (OnErrorCleared.HasDelegate)
             {
-                var parseException = new InputParseException(_editingValue, typeof(TValue), ex);
-                await OnParseError.InvokeAsync(parseException);
+                OnErrorCleared.InvokeAsync();
             }
+        }
+    }
+
+    /// <summary>
+    /// Sets the error state and fires <see cref="OnParseError"/>.
+    /// </summary>
+    private async Task SetErrorState(InputFieldErrorKind errorKind, Exception ex)
+    {
+        _hasParseError = true;
+        _currentErrorKind = errorKind;
+
+        if (OnParseError.HasDelegate)
+        {
+            var parseException = new InputParseException(_editingValue, typeof(TValue), errorKind, ex);
+            await OnParseError.InvokeAsync(parseException);
         }
     }
 
@@ -424,8 +576,27 @@ public partial class InputField<TValue> : ComponentBase, IDisposable
 
     public void Dispose()
     {
+        if (_subscribedEditContext is not null)
+        {
+            _subscribedEditContext.OnValidationStateChanged -= OnValidationStateChanged;
+        }
+
         _debounceCts?.Cancel();
         _debounceCts?.Dispose();
         GC.SuppressFinalize(this);
+    }
+
+    /// <summary>
+    /// Internal exception used to distinguish validation failures from parse failures in the catch block.
+    /// </summary>
+    private sealed class InputFieldValidationException : Exception
+    {
+        public InputFieldErrorKind ErrorKind { get; }
+
+        public InputFieldValidationException(InputFieldErrorKind errorKind, string message)
+            : base(message)
+        {
+            ErrorKind = errorKind;
+        }
     }
 }
