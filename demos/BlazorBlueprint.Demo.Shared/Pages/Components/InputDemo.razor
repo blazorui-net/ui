@@ -24,16 +24,31 @@
             Use <code class="text-xs bg-muted px-1 py-0.5 rounded">Input</code> when you need a
             straightforward string-based text field. The bound value is always <code class="text-xs bg-muted px-1 py-0.5 rounded">string?</code>
             &mdash; what the user types is exactly what you get back. No parsing, no formatting, no conversion.
+            Input also integrates with Blazor's <code class="text-xs bg-muted px-1 py-0.5 rounded">EditForm</code>
+            and <code class="text-xs bg-muted px-1 py-0.5 rounded">DataAnnotations</code> validation.
         </p>
+        <div class="rounded-md border border-dashed p-4 space-y-1.5">
+            <p class="text-sm font-medium">Example scenario</p>
+            <p class="text-sm text-muted-foreground">
+                You're building a login form with email and password fields. The values are plain strings
+                &mdash; no numeric parsing or date formatting needed. You just want a styled text input
+                that hands you back exactly what the user typed.
+            </p>
+        </div>
         <div class="bg-muted rounded-md p-4">
             <pre class="text-sm font-mono whitespace-pre-wrap">&lt;Input Type="InputType.Email" @("@")bind-Value="email" Placeholder="you@example.com" /&gt;</pre>
         </div>
-        <p class="text-sm text-muted-foreground">
-            If you need to bind to a typed value like <code class="text-xs bg-muted px-1 py-0.5 rounded">int</code>,
-            <code class="text-xs bg-muted px-1 py-0.5 rounded">decimal</code>, or
-            <code class="text-xs bg-muted px-1 py-0.5 rounded">DateTime</code> with automatic parsing and
-            display formatting, use <a href="/components/input-field" class="text-primary underline underline-offset-4 hover:text-primary/80">InputField&lt;TValue&gt;</a> instead.
-        </p>
+    </div>
+
+    <!-- Which input component? -->
+    <div class="rounded-lg border border-dashed bg-muted/30 p-6 space-y-3">
+        <h2 class="text-lg font-semibold">Which input component?</h2>
+        <div class="space-y-2 text-sm text-muted-foreground">
+            <p><strong>Non-text control</strong> (checkbox, radio, switch, select)? &rarr; <a href="/components/field" class="text-primary underline underline-offset-4 hover:text-primary/80">Field</a></p>
+            <p><strong>Simple string input</strong> with EditForm? &rarr; <strong>Input</strong> (this page)</p>
+            <p><strong>Typed value</strong> with custom error UI or EditForm? &rarr; <a href="/components/input-field" class="text-primary underline underline-offset-4 hover:text-primary/80">InputField&lt;T&gt;</a></p>
+            <p><strong>Typed value</strong> and you want it to work out of the box? &rarr; <a href="/components/form-field" class="text-primary underline underline-offset-4 hover:text-primary/80">FormField&lt;T&gt;</a> (also supports EditForm)</p>
+        </div>
     </div>
 
     <!-- Default Input -->

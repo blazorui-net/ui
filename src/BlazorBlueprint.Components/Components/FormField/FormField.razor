@@ -4,7 +4,7 @@
 @typeparam TValue
 @implements IDisposable
 
-<Field Orientation="@Orientation" IsInvalid="@_hasError" Class="@Class">
+<Field Orientation="@Orientation" IsInvalid="@IsInvalid" Class="@Class">
     @if (Label is not null)
     {
         <FieldLabel For="@_inputId">@Label</FieldLabel>
@@ -14,6 +14,8 @@
                     TValue="TValue"
                     Value="@Value"
                     ValueChanged="HandleValueChanged"
+                    ValueExpression="@ValueExpression"
+                    Name="@Name"
                     Converter="@Converter"
                     Format="@Format"
                     Type="@Type"
@@ -30,13 +32,17 @@
                     OnParseError="HandleParseError"
                     OnErrorCleared="HandleErrorCleared"
                     Class="@InputClass" />
-        @if (!string.IsNullOrEmpty(HelperText) && !_hasError)
+        @if (!string.IsNullOrEmpty(HelperText) && !IsInvalid)
         {
             <FieldDescription Id="@_descriptionId">@HelperText</FieldDescription>
         }
         @if (_hasError)
         {
             <FieldError Id="@_errorId">@_errorMessage</FieldError>
+        }
+        else if (HasEditContextErrors)
+        {
+            <FieldError Id="@_errorId" Errors="@EditContextErrors" />
         }
     </FieldContent>
 </Field>

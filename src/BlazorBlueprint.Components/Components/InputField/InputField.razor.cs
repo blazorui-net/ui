@@ -1,8 +1,10 @@
+using System.Linq.Expressions;
 using System.Text.RegularExpressions;
 using BlazorBlueprint.Components.Converters;
 using BlazorBlueprint.Components.Input;
 using BlazorBlueprint.Components.Utilities;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components.Web;
 
 namespace BlazorBlueprint.Components.InputField;
@@ -49,6 +51,9 @@ public partial class InputField<TValue> : ComponentBase, IDisposable
     private bool _hasParseError;
     private InputFieldErrorKind? _currentErrorKind;
     private CancellationTokenSource? _debounceCts;
+    private FieldIdentifier _fieldIdentifier;
+    private EditContext? _editContext;
+    private EditContext? _subscribedEditContext;
 
     /// <summary>
     /// Gets or sets the current typed value.
@@ -229,9 +234,42 @@ public partial class InputField<TValue> : ComponentBase, IDisposable
     [Parameter]
     public int DebounceInterval { get; set; } = 500;
 
+    /// <summary>
+    /// Gets or sets the expression identifying the bound value for EditForm integration.
+    /// Automatically provided by <c>@bind-Value</c>.
+    /// </summary>
+    [Parameter]
+    public Expression<Func<TValue?>>? ValueExpression { get; set; }
+
+    /// <summary>
+    /// Gets or sets the HTML name attribute. Auto-derived from <see cref="ValueExpression"/>
+    /// when inside an EditForm if not explicitly set.
+    /// </summary>
+    [Parameter]
+    public string? Name { get; set; }
+
+    [CascadingParameter]
+    private EditContext? CascadedEditContext { get; set; }
+
     private InputConverter<TValue> ResolvedConverter => Converter ?? new InputConverter<TValue>();
 
-    private bool? ComputedAriaInvalid => (AriaInvalid == true || _hasParseError) ? true : AriaInvalid;
+    private string? EffectiveName => Name ?? (_editContext is not null && _fieldIdentifier.FieldName is not null
+        ? _fieldIdentifier.FieldName : null);
+
+    private bool IsEditContextInvalid
+    {
+        get
+        {
+            if (_editContext is not null && ValueExpression is not null && _fieldIdentifier.FieldName is not null)
+            {
+                return _editContext.GetValidationMessages(_fieldIdentifier).Any();
+            }
+
+            return false;
+        }
+    }
+
+    private bool? ComputedAriaInvalid => (AriaInvalid == true || _hasParseError || IsEditContextInvalid) ? true : AriaInvalid;
 
     private string DisplayValue
     {
@@ -289,6 +327,43 @@ public partial class InputField<TValue> : ComponentBase, IDisposable
         InputType.File => "file",
         _ => "text"
     };
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+
+        if (CascadedEditContext != _subscribedEditContext)
+        {
+            if (_subscribedEditContext is not null)
+            {
+                _subscribedEditContext.OnValidationStateChanged -= OnValidationStateChanged;
+            }
+
+            _subscribedEditContext = CascadedEditContext;
+
+            if (_subscribedEditContext is not null)
+            {
+                _subscribedEditContext.OnValidationStateChanged += OnValidationStateChanged;
+            }
+        }
+
+        if (CascadedEditContext is not null && ValueExpression is not null)
+        {
+            _editContext = CascadedEditContext;
+            _fieldIdentifier = FieldIdentifier.Create(ValueExpression);
+        }
+    }
+
+    private void NotifyFieldChanged()
+    {
+        if (_editContext is not null && ValueExpression is not null && _fieldIdentifier.FieldName is not null)
+        {
+            _editContext.NotifyFieldChanged(_fieldIdentifier);
+        }
+    }
+
+    private void OnValidationStateChanged(object? sender, ValidationStateChangedEventArgs e) =>
+        StateHasChanged();
 
     private void HandleInput(ChangeEventArgs args)
     {
@@ -358,6 +433,8 @@ public partial class InputField<TValue> : ComponentBase, IDisposable
         {
             // Silently ignore parse errors during typing
         }
+
+        NotifyFieldChanged();
     }
 
     private void HandleFocus(FocusEventArgs args)
@@ -401,6 +478,7 @@ public partial class InputField<TValue> : ComponentBase, IDisposable
             }
 
             ClearErrorState();
+            NotifyFieldChanged();
             return;
         }
 
@@ -436,6 +514,8 @@ public partial class InputField<TValue> : ComponentBase, IDisposable
         {
             await SetErrorState(InputFieldErrorKind.Parse, ex);
         }
+
+        NotifyFieldChanged();
     }
 
     /// <summary>
@@ -496,6 +576,11 @@ public partial class InputField<TValue> : ComponentBase, IDisposable
 
     public void Dispose()
     {
+        if (_subscribedEditContext is not null)
+        {
+            _subscribedEditContext.OnValidationStateChanged -= OnValidationStateChanged;
+        }
+
         _debounceCts?.Cancel();
         _debounceCts?.Dispose();
         GC.SuppressFinalize(this);

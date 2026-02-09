@@ -18,6 +18,45 @@
         </p>
     </div>
 
+    <!-- When to use -->
+    <div class="rounded-lg border bg-card p-6 space-y-4">
+        <h2 class="text-lg font-semibold">When to use Field</h2>
+        <p class="text-sm text-muted-foreground">
+            Use <code class="text-xs bg-muted px-1 py-0.5 rounded">Field</code> when you need full control over
+            form layout, or when wrapping non-text controls like checkboxes, radios, switches, or selects.
+            Field is a layout primitive &mdash; it handles label, description, and error placement but has no
+            value binding or validation of its own.
+        </p>
+        <div class="rounded-md border border-dashed p-4 space-y-1.5">
+            <p class="text-sm font-medium">Example scenario</p>
+            <p class="text-sm text-muted-foreground">
+                You're building a settings page with a "Receive notifications" switch, a "Theme" radio group,
+                and a "Terms &amp; Conditions" checkbox. Each control needs a label, description, and consistent
+                spacing. Field gives you that layout structure while letting you use any control inside it.
+            </p>
+        </div>
+        <div class="bg-muted rounded-md p-4">
+            <pre class="text-sm font-mono whitespace-pre-wrap">&lt;Field&gt;
+    &lt;FieldLabel For="terms"&gt;Accept Terms&lt;/FieldLabel&gt;
+    &lt;FieldContent&gt;
+        &lt;Checkbox Id="terms" @("@")bind-Checked="accepted" /&gt;
+        &lt;FieldDescription&gt;You must accept to continue.&lt;/FieldDescription&gt;
+    &lt;/FieldContent&gt;
+&lt;/Field&gt;</pre>
+        </div>
+    </div>
+
+    <!-- Which input component? -->
+    <div class="rounded-lg border border-dashed bg-muted/30 p-6 space-y-3">
+        <h2 class="text-lg font-semibold">Which input component?</h2>
+        <div class="space-y-2 text-sm text-muted-foreground">
+            <p><strong>Non-text control</strong> (checkbox, radio, switch, select)? &rarr; <strong>Field</strong> (this page)</p>
+            <p><strong>Simple string input</strong> with EditForm? &rarr; <a href="/components/input" class="text-primary underline underline-offset-4 hover:text-primary/80">Input</a></p>
+            <p><strong>Typed value</strong> with custom error UI or EditForm? &rarr; <a href="/components/input-field" class="text-primary underline underline-offset-4 hover:text-primary/80">InputField&lt;T&gt;</a></p>
+            <p><strong>Typed value</strong> and you want it to work out of the box? &rarr; <a href="/components/form-field" class="text-primary underline underline-offset-4 hover:text-primary/80">FormField&lt;T&gt;</a> (also supports EditForm)</p>
+        </div>
+    </div>
+
     <!-- Basic Forms -->
     <section class="space-y-6">
         <div class="space-y-2">

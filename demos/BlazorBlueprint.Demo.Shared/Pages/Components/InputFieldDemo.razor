@@ -2,6 +2,8 @@
 @using BlazorBlueprint.Components.InputField
 @using BlazorBlueprint.Components.Input
 @using BlazorBlueprint.Components.Converters
+@using BlazorBlueprint.Components.Button
+@using System.ComponentModel.DataAnnotations
 
 <PageTitle>InputField Component - Blazor Blueprint</PageTitle>
 
@@ -20,20 +22,42 @@
         <h2 class="text-lg font-semibold">When to use InputField</h2>
         <p class="text-sm text-muted-foreground">
             Use <code class="text-xs bg-muted px-1 py-0.5 rounded">InputField&lt;TValue&gt;</code> when you need
-            two-way binding to a typed value. It automatically converts between the string in the HTML input
-            and your C# type, handles display formatting on blur, and reports parse errors.
+            two-way binding to a typed value with full control over layout and error rendering.
+            It automatically converts between the string in the HTML input and your C# type,
+            handles display formatting on blur, and reports parse errors. Works inside
+            <code class="text-xs bg-muted px-1 py-0.5 rounded">EditForm</code> with DataAnnotations validation.
+            Pair it with the
+            <a href="/components/field" class="text-primary underline underline-offset-4 hover:text-primary/80">Field</a>
+            component system for labels, descriptions, and error display.
         </p>
+        <div class="rounded-md border border-dashed p-4 space-y-1.5">
+            <p class="text-sm font-medium">Example scenario</p>
+            <p class="text-sm text-muted-foreground">
+                You're building a product editor where the user enters a price as
+                <code class="text-xs bg-muted px-1 py-0.5 rounded">decimal</code>, a stock quantity as
+                <code class="text-xs bg-muted px-1 py-0.5 rounded">int</code>, and a release date as
+                <code class="text-xs bg-muted px-1 py-0.5 rounded">DateTime</code>. You need the price
+                to display as "1,234.56" when blurred but allow raw editing when focused, and you want
+                to show a custom error layout when parsing fails. InputField handles the type conversion
+                and formatting while you control exactly how errors are rendered.
+            </p>
+        </div>
         <div class="bg-muted rounded-md p-4 space-y-2">
             <pre class="text-sm font-mono whitespace-pre-wrap">&lt;InputField TValue="int" @("@")bind-Value="age" Placeholder="Enter age" /&gt;
 &lt;InputField TValue="decimal" @("@")bind-Value="price" Format="N2" /&gt;
 &lt;InputField TValue="DateTime?" @("@")bind-Value="date" Format="yyyy-MM-dd" Type="InputType.Date" /&gt;</pre>
         </div>
-        <p class="text-sm text-muted-foreground">
-            If you only need a plain string value with no type conversion, use the simpler
-            <a href="/components/input" class="text-primary underline underline-offset-4 hover:text-primary/80">Input</a> component instead.
-            For a complete form field with label, helper text, and automatic error messages, see
-            <a href="/components/form-field" class="text-primary underline underline-offset-4 hover:text-primary/80">FormField</a>.
-        </p>
+    </div>
+
+    <!-- Which input component? -->
+    <div class="rounded-lg border border-dashed bg-muted/30 p-6 space-y-3">
+        <h2 class="text-lg font-semibold">Which input component?</h2>
+        <div class="space-y-2 text-sm text-muted-foreground">
+            <p><strong>Non-text control</strong> (checkbox, radio, switch, select)? &rarr; <a href="/components/field" class="text-primary underline underline-offset-4 hover:text-primary/80">Field</a></p>
+            <p><strong>Simple string input</strong> with EditForm? &rarr; <a href="/components/input" class="text-primary underline underline-offset-4 hover:text-primary/80">Input</a></p>
+            <p><strong>Typed value</strong> with custom error UI or EditForm? &rarr; <strong>InputField&lt;T&gt;</strong> (this page)</p>
+            <p><strong>Typed value</strong> and you want it to work out of the box? &rarr; <a href="/components/form-field" class="text-primary underline underline-offset-4 hover:text-primary/80">FormField&lt;T&gt;</a> (also supports EditForm)</p>
+        </div>
     </div>
 
     <!-- Basic Integer -->
@@ -351,6 +375,55 @@
         </div>
     </div>
 
+    <!-- EditForm Integration -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">EditForm Integration</h2>
+            <p class="text-sm text-muted-foreground">
+                InputField works inside Blazor's <code class="text-xs bg-muted px-1 py-0.5 rounded">EditForm</code>
+                with <code class="text-xs bg-muted px-1 py-0.5 rounded">DataAnnotationsValidator</code>. It notifies
+                the EditContext of field changes and reflects validation state via
+                <code class="text-xs bg-muted px-1 py-0.5 rounded">aria-invalid</code>. Both InputField's own
+                parse validation and DataAnnotations validation work together.
+            </p>
+        </div>
+        <div class="max-w-md">
+            <EditForm Model="_editFormModel" OnValidSubmit="HandleEditFormSubmit" class="space-y-4">
+                <DataAnnotationsValidator />
+                <div class="space-y-2">
+                    <label class="text-sm font-medium">Name (required)</label>
+                    <InputField TValue="string" @bind-Value="_editFormModel.Name" Placeholder="Jane Smith" />
+                    <ValidationMessage For="@(() => _editFormModel.Name)" />
+                </div>
+                <div class="space-y-2">
+                    <label class="text-sm font-medium">Age (1-120)</label>
+                    <InputField TValue="int" @bind-Value="_editFormModel.Age" Placeholder="25" />
+                    <ValidationMessage For="@(() => _editFormModel.Age)" />
+                </div>
+                <div class="space-y-2">
+                    <label class="text-sm font-medium">Score (0.0-100.0)</label>
+                    <InputField TValue="decimal" @bind-Value="_editFormModel.Score" Format="N1" Placeholder="0.0" />
+                    <ValidationMessage For="@(() => _editFormModel.Score)" />
+                </div>
+                <div class="flex gap-2">
+                    <Button Type="ButtonType.Submit">Submit</Button>
+                    <Button Type="ButtonType.Button" Variant="ButtonVariant.Outline" OnClick="ResetEditForm">Reset</Button>
+                </div>
+            </EditForm>
+        </div>
+        @if (_editFormSubmitted)
+        {
+            <div class="rounded-lg border p-4 bg-muted/50">
+                <p class="text-sm font-medium mb-1">Submitted values:</p>
+                <div class="space-y-1 text-sm font-mono">
+                    <p>Name: @_editFormModel.Name</p>
+                    <p>Age: @_editFormModel.Age</p>
+                    <p>Score: @_editFormModel.Score</p>
+                </div>
+            </div>
+        }
+    </div>
+
     <!-- API Reference -->
     <div class="space-y-4">
         <div class="space-y-2">
@@ -370,6 +443,8 @@
                     <p><strong>Required:</strong> <code class="bg-muted px-1 py-0.5 rounded">bool</code> - Whether the input is required.</p>
                     <p><strong>Validation:</strong> <code class="bg-muted px-1 py-0.5 rounded">Func&lt;TValue, bool&gt;?</code> - Post-parse value validation.</p>
                     <p><strong>ValidationPattern:</strong> <code class="bg-muted px-1 py-0.5 rounded">string?</code> - Pre-parse regex validation on raw string.</p>
+                    <p><strong>ValueExpression:</strong> <code class="bg-muted px-1 py-0.5 rounded">Expression&lt;Func&lt;TValue?&gt;&gt;?</code> - Binding expression for EditForm integration. Auto-provided by @("@")bind-Value.</p>
+                    <p><strong>Name:</strong> <code class="bg-muted px-1 py-0.5 rounded">string?</code> - HTML name attribute. Auto-derived from ValueExpression inside EditForm.</p>
                 </div>
             </div>
             <Separator />
@@ -463,6 +538,34 @@
     private void HandleErrorKindCleared()
     {
         _errorKindMessage = "";
+    }
+
+    // EditForm integration
+    private EditFormModel _editFormModel = new();
+    private bool _editFormSubmitted;
+
+    private void HandleEditFormSubmit()
+    {
+        _editFormSubmitted = true;
+    }
+
+    private void ResetEditForm()
+    {
+        _editFormModel = new();
+        _editFormSubmitted = false;
+    }
+
+    private sealed class EditFormModel
+    {
+        [Required(ErrorMessage = "Name is required.")]
+        [StringLength(50, ErrorMessage = "Name must be 50 characters or fewer.")]
+        public string? Name { get; set; }
+
+        [Range(1, 120, ErrorMessage = "Age must be between 1 and 120.")]
+        public int Age { get; set; }
+
+        [Range(0, 100, ErrorMessage = "Score must be between 0 and 100.")]
+        public decimal Score { get; set; }
     }
 
     // Async validation

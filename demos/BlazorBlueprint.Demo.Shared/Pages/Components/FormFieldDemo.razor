@@ -2,7 +2,9 @@
 @using BlazorBlueprint.Components.FormField
 @using BlazorBlueprint.Components.InputField
 @using BlazorBlueprint.Components.Input
+@using BlazorBlueprint.Components.Button
 @using BlazorBlueprint.Components.Converters
+@using System.ComponentModel.DataAnnotations
 
 <PageTitle>FormField Component - Blazor Blueprint</PageTitle>
 
@@ -22,17 +24,35 @@
         <p class="text-sm text-muted-foreground">
             Use <code class="text-xs bg-muted px-1 py-0.5 rounded">FormField&lt;TValue&gt;</code> when you want a complete,
             ready-to-use form field with label, helper text, and automatic error display. It composes
-            <code class="text-xs bg-muted px-1 py-0.5 rounded">InputField&lt;TValue&gt;</code> with the Field component system
+            <a href="/components/input-field" class="text-primary underline underline-offset-4 hover:text-primary/80">InputField&lt;TValue&gt;</a>
+            with the <a href="/components/field" class="text-primary underline underline-offset-4 hover:text-primary/80">Field</a> component system
             so you don't have to wire them up manually.
         </p>
+        <div class="rounded-md border border-dashed p-4 space-y-1.5">
+            <p class="text-sm font-medium">Example scenario</p>
+            <p class="text-sm text-muted-foreground">
+                You're building a user registration form with Name, Age, and Email fields.
+                Each field needs a label, helper text, and user-friendly error messages when
+                validation fails. Instead of wiring up Field + FieldLabel + InputField + FieldDescription +
+                FieldError for each one, you drop in a single
+                <code class="text-xs bg-muted px-1 py-0.5 rounded">FormField</code> tag per field and
+                get all of that automatically.
+            </p>
+        </div>
         <div class="bg-muted rounded-md p-4 space-y-2">
             <pre class="text-sm font-mono whitespace-pre-wrap">&lt;FormField TValue="int" @("@")bind-Value="age" Label="Age" HelperText="Must be 18 or older" /&gt;</pre>
         </div>
-        <p class="text-sm text-muted-foreground">
-            For full control over layout and error rendering, use the primitive
-            <a href="/components/input-field" class="text-primary underline underline-offset-4 hover:text-primary/80">InputField</a>
-            with the <a href="/components/field" class="text-primary underline underline-offset-4 hover:text-primary/80">Field</a> component system directly.
-        </p>
+    </div>
+
+    <!-- Which input component? -->
+    <div class="rounded-lg border border-dashed bg-muted/30 p-6 space-y-3">
+        <h2 class="text-lg font-semibold">Which input component?</h2>
+        <div class="space-y-2 text-sm text-muted-foreground">
+            <p><strong>Non-text control</strong> (checkbox, radio, switch, select)? &rarr; <a href="/components/field" class="text-primary underline underline-offset-4 hover:text-primary/80">Field</a></p>
+            <p><strong>Simple string input</strong> with EditForm? &rarr; <a href="/components/input" class="text-primary underline underline-offset-4 hover:text-primary/80">Input</a></p>
+            <p><strong>Typed value</strong> with custom error UI or EditForm? &rarr; <a href="/components/input-field" class="text-primary underline underline-offset-4 hover:text-primary/80">InputField&lt;T&gt;</a></p>
+            <p><strong>Typed value</strong> and you want it to work out of the box? &rarr; <strong>FormField&lt;T&gt;</strong> (this page, also supports EditForm)</p>
+        </div>
     </div>
 
     <!-- Basic Example -->
@@ -228,6 +248,56 @@
         </div>
     </div>
 
+    <!-- EditForm Integration -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">EditForm Integration</h2>
+            <p class="text-sm text-muted-foreground">
+                FormField works inside Blazor's <code class="text-xs bg-muted px-1 py-0.5 rounded">EditForm</code>
+                with <code class="text-xs bg-muted px-1 py-0.5 rounded">DataAnnotationsValidator</code>.
+                DataAnnotations validation messages are displayed automatically &mdash; no
+                <code class="text-xs bg-muted px-1 py-0.5 rounded">ValidationMessage</code> component needed.
+                Parse errors from InputField take visual priority over DataAnnotations errors.
+            </p>
+        </div>
+        <div class="max-w-md">
+            <EditForm Model="_editFormModel" OnValidSubmit="HandleEditFormSubmit" class="space-y-4">
+                <DataAnnotationsValidator />
+                <FormField TValue="string"
+                           @bind-Value="_editFormModel.FullName"
+                           Label="Full Name"
+                           HelperText="Required. Enter your first and last name."
+                           Placeholder="Jane Smith" />
+                <FormField TValue="int"
+                           @bind-Value="_editFormModel.Age"
+                           Label="Age"
+                           HelperText="Must be between 1 and 120."
+                           Placeholder="25" />
+                <FormField TValue="string"
+                           @bind-Value="_editFormModel.Email"
+                           Label="Email"
+                           HelperText="We'll use this to contact you."
+                           Type="InputType.Email"
+                           Placeholder="jane@example.com" />
+                <div class="flex gap-2">
+                    <Button Type="ButtonType.Submit">Submit</Button>
+                    <Button Type="ButtonType.Button" Variant="ButtonVariant.Outline" OnClick="ResetEditForm">Reset</Button>
+                </div>
+            </EditForm>
+        </div>
+        @if (_editFormSubmitted)
+        {
+            <div class="rounded-lg border p-4 bg-muted/50">
+                <p class="text-sm font-medium mb-1">Submitted values:</p>
+                <div class="space-y-1 text-sm font-mono">
+                    <p>Name: @_editFormModel.FullName</p>
+                    <p>Age: @_editFormModel.Age</p>
+                    <p>Email: @_editFormModel.Email</p>
+                </div>
+            </div>
+        }
+    </div>
+
     <!-- API Reference -->
     <div class="space-y-4">
         <div class="space-y-2">
@@ -249,7 +319,8 @@
             <div>
                 <h3 class="font-mono text-sm font-semibold mb-2">Pass-Through Parameters</h3>
                 <div class="space-y-2 text-sm text-muted-foreground">
-                    <p>All <code class="bg-muted px-1 py-0.5 rounded">InputField&lt;TValue&gt;</code> parameters are available: Value, Converter, Format, Type, Placeholder, Disabled, Required, Validation, ValidationPattern, UpdateTiming, DebounceInterval, AriaLabel, OnParseError, OnErrorCleared.</p>
+                    <p>All <code class="bg-muted px-1 py-0.5 rounded">InputField&lt;TValue&gt;</code> parameters are available: Value, Converter, Format, Type, Placeholder, Disabled, Required, Validation, ValidationPattern, UpdateTiming, DebounceInterval, AriaLabel, OnParseError, OnErrorCleared, ValueExpression, Name.</p>
+                    <p>Inside an <code class="bg-muted px-1 py-0.5 rounded">EditForm</code>, DataAnnotations validation messages are displayed automatically. Parse errors take priority over DataAnnotations errors.</p>
                 </div>
             </div>
             <Separator />
@@ -276,4 +347,33 @@
     private string? _formName;
     private string? _formEmail;
     private int _formAge;
+
+    // EditForm integration
+    private EditFormModel _editFormModel = new();
+    private bool _editFormSubmitted;
+
+    private void HandleEditFormSubmit()
+    {
+        _editFormSubmitted = true;
+    }
+
+    private void ResetEditForm()
+    {
+        _editFormModel = new();
+        _editFormSubmitted = false;
+    }
+
+    private sealed class EditFormModel
+    {
+        [Required(ErrorMessage = "Name is required.")]
+        [StringLength(100, ErrorMessage = "Name must be 100 characters or fewer.")]
+        public string? FullName { get; set; }
+
+        [Range(1, 120, ErrorMessage = "Age must be between 1 and 120.")]
+        public int Age { get; set; }
+
+        [Required(ErrorMessage = "Email is required.")]
+        [EmailAddress(ErrorMessage = "Please enter a valid email address.")]
+        public string? Email { get; set; }
+    }
 }

@@ -1,8 +1,10 @@
+using System.Linq.Expressions;
 using BlazorBlueprint.Components.Converters;
 using BlazorBlueprint.Components.Field;
 using BlazorBlueprint.Components.Input;
 using BlazorBlueprint.Components.InputField;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Forms;
 
 namespace BlazorBlueprint.Components.FormField;
 
@@ -47,6 +49,8 @@ public partial class FormField<TValue> : ComponentBase, IDisposable
     private bool _hasError;
     private string? _errorMessage;
     private readonly string _inputId = $"formfield-{Guid.NewGuid():N}";
+    private FieldIdentifier? _fieldIdentifier;
+    private EditContext? _subscribedEditContext;
 
     // --- Form Field Parameters ---
 
@@ -187,6 +191,22 @@ public partial class FormField<TValue> : ComponentBase, IDisposable
     public EventCallback OnErrorCleared { get; set; }
 
     /// <summary>
+    /// Gets or sets the expression identifying the bound value for EditForm integration.
+    /// Automatically provided by <c>@bind-Value</c>. Passed through to the inner InputField.
+    /// </summary>
+    [Parameter]
+    public Expression<Func<TValue?>>? ValueExpression { get; set; }
+
+    /// <summary>
+    /// Gets or sets the HTML name attribute. Passed through to the inner InputField.
+    /// </summary>
+    [Parameter]
+    public string? Name { get; set; }
+
+    [CascadingParameter]
+    private EditContext? CascadedEditContext { get; set; }
+
+    /// <summary>
     /// Gets whether the form field currently has an error.
     /// </summary>
     public bool HasError => _hasError;
@@ -199,9 +219,58 @@ public partial class FormField<TValue> : ComponentBase, IDisposable
     private string _descriptionId => $"{_inputId}-description";
     private string _errorId => $"{_inputId}-error";
 
-    private string? _describedById => _hasError
+    private bool HasEditContextErrors => EditContextErrors.Any();
+
+    private IEnumerable<string> EditContextErrors
+    {
+        get
+        {
+            if (CascadedEditContext is not null && _fieldIdentifier.HasValue)
+            {
+                return CascadedEditContext.GetValidationMessages(_fieldIdentifier.Value);
+            }
+
+            return Enumerable.Empty<string>();
+        }
+    }
+
+    private bool IsInvalid => _hasError || HasEditContextErrors;
+
+    private string? _describedById => _hasError || HasEditContextErrors
         ? _errorId
         : !string.IsNullOrEmpty(HelperText) ? _descriptionId : null;
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+
+        if (CascadedEditContext != _subscribedEditContext)
+        {
+            if (_subscribedEditContext is not null)
+            {
+                _subscribedEditContext.OnValidationStateChanged -= OnValidationStateChanged;
+            }
+
+            _subscribedEditContext = CascadedEditContext;
+
+            if (_subscribedEditContext is not null)
+            {
+                _subscribedEditContext.OnValidationStateChanged += OnValidationStateChanged;
+            }
+        }
+
+        if (CascadedEditContext is not null && ValueExpression is not null)
+        {
+            _fieldIdentifier = FieldIdentifier.Create(ValueExpression);
+        }
+        else
+        {
+            _fieldIdentifier = null;
+        }
+    }
+
+    private void OnValidationStateChanged(object? sender, ValidationStateChangedEventArgs e) =>
+        StateHasChanged();
 
     private async Task HandleValueChanged(TValue? value)
     {
@@ -275,5 +344,13 @@ public partial class FormField<TValue> : ComponentBase, IDisposable
         return underlying.Name.ToLowerInvariant();
     }
 
-    public void Dispose() => GC.SuppressFinalize(this);
+    public void Dispose()
+    {
+        if (_subscribedEditContext is not null)
+        {
+            _subscribedEditContext.OnValidationStateChanged -= OnValidationStateChanged;
+        }
+
+        GC.SuppressFinalize(this);
+    }
 }
