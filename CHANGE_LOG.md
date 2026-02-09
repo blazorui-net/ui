@@ -6,6 +6,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## 2026-02-09
+
+### Fixed
+- DateRangePicker popover layout responsive on mobile devices (single-month view with horizontal preset scrolling)
+- DateRangePicker day name headers now rotate correctly based on `FirstDayOfWeek` parameter
+- DateRangePicker no longer highlights disabled dates within a selected range
+- DateRangePicker selected day count excludes disabled dates
+- DateRangePicker presets are ignored when all dates in the range are disabled
+
+---
+
 ## 2026-02-08
 
 ### Added
