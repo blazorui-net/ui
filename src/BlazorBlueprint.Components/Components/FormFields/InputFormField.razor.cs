@@ -1,21 +1,19 @@
 using System.Linq.Expressions;
 using BlazorBlueprint.Components.Converters;
-using BlazorBlueprint.Components.Field;
 using BlazorBlueprint.Components.Input;
 using BlazorBlueprint.Components.InputField;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Forms;
 
-namespace BlazorBlueprint.Components.FormField;
+namespace BlazorBlueprint.Components.FormFields;
 
 /// <summary>
 /// An opinionated form field that composes <see cref="InputField{TValue}"/> with
-/// <see cref="Field.Field"/>, <see cref="FieldLabel"/>, <see cref="FieldDescription"/>,
-/// and <see cref="FieldError"/> for a complete, ready-to-use form field experience.
+/// <see cref="Field.Field"/>, <see cref="Field.FieldLabel"/>, <see cref="Field.FieldDescription"/>,
+/// and <see cref="Field.FieldError"/> for a complete, ready-to-use form field experience.
 /// </summary>
 /// <remarks>
 /// <para>
-/// FormField provides a higher-level abstraction over the primitive <see cref="InputField{TValue}"/>.
+/// InputFormField provides a higher-level abstraction over the primitive <see cref="InputField{TValue}"/>.
 /// It automatically handles label association, helper text display, and error message rendering
 /// based on the error kind from the underlying InputField.
 /// </para>
@@ -28,7 +26,7 @@ namespace BlazorBlueprint.Components.FormField;
 /// - Automatic label with proper for/id association
 /// - Helper text that hides during error state
 /// - Auto-generated contextual error messages based on error kind
-/// - Manual error text override via <see cref="ErrorText"/>
+/// - Manual error text override via <see cref="FormFieldBase.ErrorText"/>
 /// - All <see cref="InputField{TValue}"/> parameters passed through
 /// - Automatic ARIA attribute wiring (describedby, invalid)
 /// </para>
@@ -36,67 +34,18 @@ namespace BlazorBlueprint.Components.FormField;
 /// <typeparam name="TValue">The value type to bind to.</typeparam>
 /// <example>
 /// <code>
-/// &lt;FormField TValue="int"
+/// &lt;InputFormField TValue="int"
 ///            @bind-Value="age"
 ///            Label="Age"
 ///            HelperText="Must be 18 or older"
 ///            Validation="v =&gt; v &gt;= 18" /&gt;
 /// </code>
 /// </example>
-public partial class FormField<TValue> : ComponentBase, IDisposable
+public partial class InputFormField<TValue> : FormFieldBase
 {
     private InputField<TValue>? _inputRef;
     private bool _hasError;
     private string? _errorMessage;
-    private readonly string _inputId = $"formfield-{Guid.NewGuid():N}";
-    private FieldIdentifier? _fieldIdentifier;
-    private EditContext? _subscribedEditContext;
-
-    // --- Form Field Parameters ---
-
-    /// <summary>
-    /// Gets or sets the label text displayed above the input.
-    /// </summary>
-    [Parameter]
-    public string? Label { get; set; }
-
-    /// <summary>
-    /// Gets or sets the helper text displayed below the input.
-    /// </summary>
-    /// <remarks>
-    /// Hidden when the field is in an error state; the error message takes its place.
-    /// </remarks>
-    [Parameter]
-    public string? HelperText { get; set; }
-
-    /// <summary>
-    /// Gets or sets a manual error text override.
-    /// </summary>
-    /// <remarks>
-    /// When set, this text is displayed instead of the auto-generated error message
-    /// whenever the field enters an error state. Useful when you need domain-specific
-    /// error messages rather than generic ones.
-    /// </remarks>
-    [Parameter]
-    public string? ErrorText { get; set; }
-
-    /// <summary>
-    /// Gets or sets the orientation of the field layout.
-    /// </summary>
-    [Parameter]
-    public FieldOrientation Orientation { get; set; } = FieldOrientation.Vertical;
-
-    /// <summary>
-    /// Gets or sets additional CSS classes applied to the outer Field container.
-    /// </summary>
-    [Parameter]
-    public string? Class { get; set; }
-
-    /// <summary>
-    /// Gets or sets additional CSS classes applied to the inner InputField element.
-    /// </summary>
-    [Parameter]
-    public string? InputClass { get; set; }
 
     // --- InputField Pass-Through Parameters ---
 
@@ -161,10 +110,10 @@ public partial class FormField<TValue> : ComponentBase, IDisposable
     public string? ValidationPattern { get; set; }
 
     /// <summary>
-    /// Gets or sets the ARIA label for the input.
+    /// Gets or sets additional CSS classes applied to the inner InputField element.
     /// </summary>
     [Parameter]
-    public string? AriaLabel { get; set; }
+    public string? InputClass { get; set; }
 
     /// <summary>
     /// Gets or sets when ValueChanged fires.
@@ -203,9 +152,6 @@ public partial class FormField<TValue> : ComponentBase, IDisposable
     [Parameter]
     public string? Name { get; set; }
 
-    [CascadingParameter]
-    private EditContext? CascadedEditContext { get; set; }
-
     /// <summary>
     /// Gets whether the form field currently has an error.
     /// </summary>
@@ -216,61 +162,16 @@ public partial class FormField<TValue> : ComponentBase, IDisposable
     /// </summary>
     public InputField<TValue>? InputFieldRef => _inputRef;
 
-    private string _descriptionId => $"{_inputId}-description";
-    private string _errorId => $"{_inputId}-error";
+    /// <inheritdoc />
+    protected override bool IsInvalid => _hasError || HasEditContextErrors;
 
-    private bool HasEditContextErrors => EditContextErrors.Any();
+    /// <inheritdoc />
+    protected override string? DescribedById => _hasError || HasEditContextErrors
+        ? ErrorId
+        : !string.IsNullOrEmpty(HelperText) ? DescriptionId : null;
 
-    private IEnumerable<string> EditContextErrors
-    {
-        get
-        {
-            if (CascadedEditContext is not null && _fieldIdentifier.HasValue)
-            {
-                return CascadedEditContext.GetValidationMessages(_fieldIdentifier.Value);
-            }
-
-            return Enumerable.Empty<string>();
-        }
-    }
-
-    private bool IsInvalid => _hasError || HasEditContextErrors;
-
-    private string? _describedById => _hasError || HasEditContextErrors
-        ? _errorId
-        : !string.IsNullOrEmpty(HelperText) ? _descriptionId : null;
-
-    protected override void OnParametersSet()
-    {
-        base.OnParametersSet();
-
-        if (CascadedEditContext != _subscribedEditContext)
-        {
-            if (_subscribedEditContext is not null)
-            {
-                _subscribedEditContext.OnValidationStateChanged -= OnValidationStateChanged;
-            }
-
-            _subscribedEditContext = CascadedEditContext;
-
-            if (_subscribedEditContext is not null)
-            {
-                _subscribedEditContext.OnValidationStateChanged += OnValidationStateChanged;
-            }
-        }
-
-        if (CascadedEditContext is not null && ValueExpression is not null)
-        {
-            _fieldIdentifier = FieldIdentifier.Create(ValueExpression);
-        }
-        else
-        {
-            _fieldIdentifier = null;
-        }
-    }
-
-    private void OnValidationStateChanged(object? sender, ValidationStateChangedEventArgs e) =>
-        StateHasChanged();
+    /// <inheritdoc />
+    protected override LambdaExpression? GetFieldExpression() => ValueExpression;
 
     private async Task HandleValueChanged(TValue? value)
     {
@@ -342,15 +243,5 @@ public partial class FormField<TValue> : ComponentBase, IDisposable
         }
 
         return underlying.Name.ToLowerInvariant();
-    }
-
-    public void Dispose()
-    {
-        if (_subscribedEditContext is not null)
-        {
-            _subscribedEditContext.OnValidationStateChanged -= OnValidationStateChanged;
-        }
-
-        GC.SuppressFinalize(this);
     }
 }

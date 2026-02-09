@@ -1,0 +1,133 @@
+@page "/components/checkbox-form-field"
+@using BlazorBlueprint.Components.FormFields
+@using BlazorBlueprint.Components.Button
+@using BlazorBlueprint.Components.Field
+@using System.ComponentModel.DataAnnotations
+
+<PageTitle>CheckboxFormField Component - Blazor Blueprint</PageTitle>
+
+<div class="space-y-8 max-w-4xl">
+    <div>
+        <div class="space-y-3">
+            <h1 class="text-4xl font-bold tracking-tight">CheckboxFormField</h1>
+            <p class="text-xl text-muted-foreground">
+                A form field wrapper for Checkbox with built-in label, helper text, and error messages.
+            </p>
+        </div>
+    </div>
+
+    <!-- Basic Example -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Basic Usage</h2>
+            <p class="text-sm text-muted-foreground">
+                A checkbox with an auto-associated label and helper text.
+            </p>
+        </div>
+        <div class="max-w-md">
+            <CheckboxFormField @bind-Checked="_acceptTerms"
+                               Label="Accept terms and conditions"
+                               HelperText="You must accept before continuing." />
+        </div>
+        <div class="rounded-lg border p-4 bg-muted/50">
+            <p class="text-sm font-medium mb-1">Checked:</p>
+            <p class="text-sm font-mono">@_acceptTerms</p>
+        </div>
+    </div>
+
+    <!-- Horizontal Layout -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Horizontal Layout</h2>
+            <p class="text-sm text-muted-foreground">
+                Use <code class="text-xs bg-muted px-1 py-0.5 rounded">Orientation="FieldOrientation.Horizontal"</code> to place the label beside the checkbox.
+            </p>
+        </div>
+        <div class="max-w-md">
+            <CheckboxFormField @bind-Checked="_newsletter"
+                               Label="Subscribe to newsletter"
+                               HelperText="Get weekly updates."
+                               Orientation="FieldOrientation.Horizontal" />
+        </div>
+    </div>
+
+    <!-- Error Text -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Error Text Override</h2>
+            <p class="text-sm text-muted-foreground">
+                Provide a static error message via <code class="text-xs bg-muted px-1 py-0.5 rounded">ErrorText</code>.
+                When used inside an EditForm, validation errors display automatically.
+            </p>
+        </div>
+        <div class="max-w-md">
+            <CheckboxFormField @bind-Checked="_errorDemo"
+                               Label="Required checkbox"
+                               ErrorText="@(_errorDemoError)" />
+        </div>
+    </div>
+
+    <!-- Disabled -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Disabled</h2>
+            <p class="text-sm text-muted-foreground">
+                A disabled checkbox form field.
+            </p>
+        </div>
+        <div class="max-w-md">
+            <CheckboxFormField Checked="true"
+                               Label="Locked preference"
+                               HelperText="Contact support to change."
+                               Disabled="true" />
+        </div>
+    </div>
+
+    <!-- EditForm Integration -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">EditForm Integration</h2>
+            <p class="text-sm text-muted-foreground">
+                Inside an <code class="text-xs bg-muted px-1 py-0.5 rounded">EditForm</code>,
+                validation errors are displayed automatically. Try submitting without checking the box.
+            </p>
+        </div>
+        <div class="max-w-md">
+            <EditForm Model="_formModel" OnValidSubmit="HandleFormSubmit">
+                <DataAnnotationsValidator />
+                <div class="space-y-4">
+                    <CheckboxFormField @bind-Checked="_formModel.AgreeToTerms"
+                                       Label="I agree to the terms of service" />
+                    <Button Type="ButtonType.Submit">Submit</Button>
+                </div>
+            </EditForm>
+            @if (_formSubmitted)
+            {
+                <div class="mt-4 rounded-lg border border-green-200 bg-green-50 dark:bg-green-950 dark:border-green-800 p-4">
+                    <p class="text-sm font-medium text-green-800 dark:text-green-200">Form submitted successfully!</p>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    private bool _acceptTerms;
+    private bool _newsletter;
+    private bool _errorDemo;
+    private bool _formSubmitted;
+    private CheckboxFormModel _formModel = new();
+
+    private string? _errorDemoError => !_errorDemo ? "This field is required." : null;
+
+    private void HandleFormSubmit()
+    {
+        _formSubmitted = true;
+    }
+
+    private class CheckboxFormModel
+    {
+        [Range(typeof(bool), "true", "true", ErrorMessage = "You must agree to the terms.")]
+        public bool AgreeToTerms { get; set; }
+    }
+}

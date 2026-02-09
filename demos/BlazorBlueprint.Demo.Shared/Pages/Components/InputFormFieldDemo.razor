@@ -1,17 +1,17 @@
-@page "/components/form-field"
-@using BlazorBlueprint.Components.FormField
+@page "/components/input-form-field"
+@using BlazorBlueprint.Components.FormFields
 @using BlazorBlueprint.Components.InputField
 @using BlazorBlueprint.Components.Input
 @using BlazorBlueprint.Components.Button
 @using BlazorBlueprint.Components.Converters
 @using System.ComponentModel.DataAnnotations
 
-<PageTitle>FormField Component - Blazor Blueprint</PageTitle>
+<PageTitle>InputFormField Component - Blazor Blueprint</PageTitle>
 
 <div class="space-y-8 max-w-4xl">
     <div>
         <div class="space-y-3">
-            <h1 class="text-4xl font-bold tracking-tight">FormField Component</h1>
+            <h1 class="text-4xl font-bold tracking-tight">InputFormField Component</h1>
             <p class="text-xl text-muted-foreground">
                 An opinionated form field with built-in label, helper text, and automatic error messages.
             </p>
@@ -20,9 +20,9 @@
 
     <!-- When to use -->
     <div class="rounded-lg border bg-card p-6 space-y-4">
-        <h2 class="text-lg font-semibold">When to use FormField</h2>
+        <h2 class="text-lg font-semibold">When to use InputFormField</h2>
         <p class="text-sm text-muted-foreground">
-            Use <code class="text-xs bg-muted px-1 py-0.5 rounded">FormField&lt;TValue&gt;</code> when you want a complete,
+            Use <code class="text-xs bg-muted px-1 py-0.5 rounded">InputFormField&lt;TValue&gt;</code> when you want a complete,
             ready-to-use form field with label, helper text, and automatic error display. It composes
             <a href="/components/input-field" class="text-primary underline underline-offset-4 hover:text-primary/80">InputField&lt;TValue&gt;</a>
             with the <a href="/components/field" class="text-primary underline underline-offset-4 hover:text-primary/80">Field</a> component system
@@ -35,12 +35,12 @@
                 Each field needs a label, helper text, and user-friendly error messages when
                 validation fails. Instead of wiring up Field + FieldLabel + InputField + FieldDescription +
                 FieldError for each one, you drop in a single
-                <code class="text-xs bg-muted px-1 py-0.5 rounded">FormField</code> tag per field and
+                <code class="text-xs bg-muted px-1 py-0.5 rounded">InputFormField</code> tag per field and
                 get all of that automatically.
             </p>
         </div>
         <div class="bg-muted rounded-md p-4 space-y-2">
-            <pre class="text-sm font-mono whitespace-pre-wrap">&lt;FormField TValue="int" @("@")bind-Value="age" Label="Age" HelperText="Must be 18 or older" /&gt;</pre>
+            <pre class="text-sm font-mono whitespace-pre-wrap">&lt;InputFormField TValue="int" @("@")bind-Value="age" Label="Age" HelperText="Must be 18 or older" /&gt;</pre>
         </div>
     </div>
 
@@ -51,7 +51,7 @@
             <p><strong>Non-text control</strong> (checkbox, radio, switch, select)? &rarr; <a href="/components/field" class="text-primary underline underline-offset-4 hover:text-primary/80">Field</a></p>
             <p><strong>Simple string input</strong> with EditForm? &rarr; <a href="/components/input" class="text-primary underline underline-offset-4 hover:text-primary/80">Input</a></p>
             <p><strong>Typed value</strong> with custom error UI or EditForm? &rarr; <a href="/components/input-field" class="text-primary underline underline-offset-4 hover:text-primary/80">InputField&lt;T&gt;</a></p>
-            <p><strong>Typed value</strong> and you want it to work out of the box? &rarr; <strong>FormField&lt;T&gt;</strong> (this page, also supports EditForm)</p>
+            <p><strong>Typed value</strong> and you want it to work out of the box? &rarr; <strong>InputFormField&lt;T&gt;</strong> (this page, also supports EditForm)</p>
         </div>
     </div>
 
@@ -65,7 +65,7 @@
             </p>
         </div>
         <div class="max-w-md">
-            <FormField TValue="string"
+            <InputFormField TValue="string"
                        @bind-Value="_name"
                        Label="Full Name"
                        HelperText="Enter your first and last name."
@@ -82,13 +82,13 @@
         <div class="space-y-2">
             <h2 class="text-2xl font-semibold">Automatic Error Messages</h2>
             <p class="text-sm text-muted-foreground">
-                FormField automatically generates contextual error messages based on the error kind.
+                InputFormField automatically generates contextual error messages based on the error kind.
                 Try entering a non-numeric value to see a parse error, or a number outside 1-100 to see a validation error.
                 The helper text is replaced by the error message during the error state.
             </p>
         </div>
         <div class="max-w-md">
-            <FormField TValue="int"
+            <InputFormField TValue="int"
                        @bind-Value="_age"
                        Label="Age"
                        HelperText="Must be between 1 and 100."
@@ -111,7 +111,7 @@
             </p>
         </div>
         <div class="max-w-md">
-            <FormField TValue="decimal"
+            <InputFormField TValue="decimal"
                        @bind-Value="_price"
                        Label="Price"
                        HelperText="Enter the product price in USD."
@@ -130,12 +130,12 @@
         <div class="space-y-2">
             <h2 class="text-2xl font-semibold">Pattern Validation</h2>
             <p class="text-sm text-muted-foreground">
-                Combine <code class="text-xs bg-muted px-1 py-0.5 rounded">ValidationPattern</code> with FormField
+                Combine <code class="text-xs bg-muted px-1 py-0.5 rounded">ValidationPattern</code> with InputFormField
                 for regex-based validation with automatic error display.
             </p>
         </div>
         <div class="max-w-md">
-            <FormField TValue="string"
+            <InputFormField TValue="string"
                        @bind-Value="_email"
                        Label="Email Address"
                        HelperText="We'll never share your email with anyone else."
@@ -154,11 +154,11 @@
         <div class="space-y-2">
             <h2 class="text-2xl font-semibold">Nullable DateTime</h2>
             <p class="text-sm text-muted-foreground">
-                All InputField features work through FormField, including nullable types and format strings.
+                All InputField features work through InputFormField, including nullable types and format strings.
             </p>
         </div>
         <div class="max-w-md">
-            <FormField TValue="DateTime?"
+            <InputFormField TValue="DateTime?"
                        @bind-Value="_birthDate"
                        Label="Date of Birth"
                        HelperText="Optional. Used for age verification."
@@ -181,7 +181,7 @@
             </p>
         </div>
         <div class="max-w-md">
-            <FormField TValue="string"
+            <InputFormField TValue="string"
                        @bind-Value="_username"
                        Label="Username"
                        HelperText="Required. Choose a unique username."
@@ -199,11 +199,11 @@
         <div class="space-y-2">
             <h2 class="text-2xl font-semibold">Disabled</h2>
             <p class="text-sm text-muted-foreground">
-                A disabled FormField. The label and helper text remain visible.
+                A disabled InputFormField. The label and helper text remain visible.
             </p>
         </div>
         <div class="max-w-md">
-            <FormField TValue="string"
+            <InputFormField TValue="string"
                        Value="@("readonly@example.com")"
                        Label="Email (locked)"
                        HelperText="Contact support to change your email."
@@ -216,22 +216,22 @@
         <div class="space-y-2">
             <h2 class="text-2xl font-semibold">Form Example</h2>
             <p class="text-sm text-muted-foreground">
-                Multiple FormFields composed together as a simple form.
+                Multiple InputFormFields composed together as a simple form.
             </p>
         </div>
         <div class="max-w-md space-y-4">
-            <FormField TValue="string"
+            <InputFormField TValue="string"
                        @bind-Value="_formName"
                        Label="Name"
                        Required="true"
                        Placeholder="Jane Smith" />
-            <FormField TValue="string"
+            <InputFormField TValue="string"
                        @bind-Value="_formEmail"
                        Label="Email"
                        Type="InputType.Email"
                        Required="true"
                        Placeholder="jane@example.com" />
-            <FormField TValue="int"
+            <InputFormField TValue="int"
                        @bind-Value="_formAge"
                        Label="Age"
                        HelperText="Must be 18 or older."
@@ -253,7 +253,7 @@
         <div class="space-y-2">
             <h2 class="text-2xl font-semibold">EditForm Integration</h2>
             <p class="text-sm text-muted-foreground">
-                FormField works inside Blazor's <code class="text-xs bg-muted px-1 py-0.5 rounded">EditForm</code>
+                InputFormField works inside Blazor's <code class="text-xs bg-muted px-1 py-0.5 rounded">EditForm</code>
                 with <code class="text-xs bg-muted px-1 py-0.5 rounded">DataAnnotationsValidator</code>.
                 DataAnnotations validation messages are displayed automatically &mdash; no
                 <code class="text-xs bg-muted px-1 py-0.5 rounded">ValidationMessage</code> component needed.
@@ -263,17 +263,17 @@
         <div class="max-w-md">
             <EditForm Model="_editFormModel" OnValidSubmit="HandleEditFormSubmit" class="space-y-4">
                 <DataAnnotationsValidator />
-                <FormField TValue="string"
+                <InputFormField TValue="string"
                            @bind-Value="_editFormModel.FullName"
                            Label="Full Name"
                            HelperText="Required. Enter your first and last name."
                            Placeholder="Jane Smith" />
-                <FormField TValue="int"
+                <InputFormField TValue="int"
                            @bind-Value="_editFormModel.Age"
                            Label="Age"
                            HelperText="Must be between 1 and 120."
                            Placeholder="25" />
-                <FormField TValue="string"
+                <InputFormField TValue="string"
                            @bind-Value="_editFormModel.Email"
                            Label="Email"
                            HelperText="We'll use this to contact you."
@@ -305,7 +305,7 @@
         </div>
         <div class="border rounded-lg p-6 space-y-4">
             <div>
-                <h3 class="font-mono text-sm font-semibold mb-2">FormField&lt;TValue&gt; Parameters</h3>
+                <h3 class="font-mono text-sm font-semibold mb-2">InputFormField&lt;TValue&gt; Parameters</h3>
                 <div class="space-y-2 text-sm">
                     <p><strong>Label:</strong> <code class="bg-muted px-1 py-0.5 rounded">string?</code> - Label text displayed above the input.</p>
                     <p><strong>HelperText:</strong> <code class="bg-muted px-1 py-0.5 rounded">string?</code> - Helper text below the input. Hidden during error state.</p>

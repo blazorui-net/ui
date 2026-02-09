@@ -1,0 +1,136 @@
+@page "/components/switch-form-field"
+@using BlazorBlueprint.Components.FormFields
+@using BlazorBlueprint.Components.Switch
+@using BlazorBlueprint.Components.Button
+@using BlazorBlueprint.Components.Field
+@using System.ComponentModel.DataAnnotations
+
+<PageTitle>SwitchFormField Component - Blazor Blueprint</PageTitle>
+
+<div class="space-y-8 max-w-4xl">
+    <div>
+        <div class="space-y-3">
+            <h1 class="text-4xl font-bold tracking-tight">SwitchFormField</h1>
+            <p class="text-xl text-muted-foreground">
+                A form field wrapper for Switch with built-in label, helper text, and error messages.
+            </p>
+        </div>
+    </div>
+
+    <!-- Basic Example -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Basic Usage</h2>
+            <p class="text-sm text-muted-foreground">
+                A switch with an auto-associated label and helper text.
+            </p>
+        </div>
+        <div class="max-w-md">
+            <SwitchFormField @bind-Checked="_darkMode"
+                             Label="Dark mode"
+                             HelperText="Toggle the application theme." />
+        </div>
+        <div class="rounded-lg border p-4 bg-muted/50">
+            <p class="text-sm font-medium mb-1">Checked:</p>
+            <p class="text-sm font-mono">@_darkMode</p>
+        </div>
+    </div>
+
+    <!-- Horizontal Layout -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Horizontal Layout</h2>
+            <p class="text-sm text-muted-foreground">
+                The label sits beside the switch in horizontal orientation.
+            </p>
+        </div>
+        <div class="max-w-md">
+            <SwitchFormField @bind-Checked="_notifications"
+                             Label="Enable notifications"
+                             HelperText="Receive push notifications."
+                             Orientation="FieldOrientation.Horizontal" />
+        </div>
+    </div>
+
+    <!-- Size Variants -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Size Variants</h2>
+            <p class="text-sm text-muted-foreground">
+                Pass the <code class="text-xs bg-muted px-1 py-0.5 rounded">Size</code> parameter to control the switch size.
+            </p>
+        </div>
+        <div class="max-w-md space-y-4">
+            <SwitchFormField @bind-Checked="_small" Label="Small" Size="SwitchSize.Small" />
+            <SwitchFormField @bind-Checked="_medium" Label="Medium (default)" Size="SwitchSize.Medium" />
+            <SwitchFormField @bind-Checked="_large" Label="Large" Size="SwitchSize.Large" />
+        </div>
+    </div>
+
+    <!-- Disabled -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Disabled</h2>
+            <p class="text-sm text-muted-foreground">
+                A disabled switch form field.
+            </p>
+        </div>
+        <div class="max-w-md">
+            <SwitchFormField Checked="true"
+                             Label="Airplane mode"
+                             HelperText="Managed by your administrator."
+                             Disabled="true" />
+        </div>
+    </div>
+
+    <!-- EditForm Integration -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">EditForm Integration</h2>
+            <p class="text-sm text-muted-foreground">
+                Validation errors display automatically inside an EditForm.
+            </p>
+        </div>
+        <div class="max-w-md">
+            <EditForm Model="_formModel" OnValidSubmit="HandleFormSubmit">
+                <DataAnnotationsValidator />
+                <div class="space-y-4">
+                    <SwitchFormField @bind-Checked="_formModel.AcceptMarketing"
+                                     Label="Accept marketing emails" />
+                    <SwitchFormField @bind-Checked="_formModel.AcceptPrivacy"
+                                     Label="Accept privacy policy" />
+                    <Button Type="ButtonType.Submit">Submit</Button>
+                </div>
+            </EditForm>
+            @if (_formSubmitted)
+            {
+                <div class="mt-4 rounded-lg border border-green-200 bg-green-50 dark:bg-green-950 dark:border-green-800 p-4">
+                    <p class="text-sm font-medium text-green-800 dark:text-green-200">Form submitted successfully!</p>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    private bool _darkMode;
+    private bool _notifications;
+    private bool _small;
+    private bool _medium;
+    private bool _large;
+    private bool _formSubmitted;
+    private SwitchFormModel _formModel = new();
+
+    private void HandleFormSubmit()
+    {
+        _formSubmitted = true;
+    }
+
+    private class SwitchFormModel
+    {
+        public bool AcceptMarketing { get; set; }
+
+        [Range(typeof(bool), "true", "true", ErrorMessage = "You must accept the privacy policy.")]
+        public bool AcceptPrivacy { get; set; }
+    }
+}

@@ -126,6 +126,12 @@ public partial class Checkbox : ComponentBase
     public string? Id { get; set; }
 
     /// <summary>
+    /// Gets or sets the IDs of elements that describe the checkbox, for accessibility.
+    /// </summary>
+    [Parameter]
+    public string? AriaDescribedBy { get; set; }
+
+    /// <summary>
     /// Gets or sets an expression that identifies the bound value.
     /// </summary>
     /// <remarks>

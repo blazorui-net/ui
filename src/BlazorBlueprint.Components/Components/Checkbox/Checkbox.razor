@@ -11,7 +11,8 @@
     AriaLabel="@AriaLabel"
     class="@CssClass"
     aria-required="@(CheckedExpression != null ? "true" : null)"
-    aria-invalid="@(IsInvalid ? "true" : null)">
+    aria-invalid="@(IsInvalid ? "true" : null)"
+    aria-describedby="@AriaDescribedBy">
     @if (Checked)
     {
         <svg xmlns="http://www.w3.org/2000/svg"

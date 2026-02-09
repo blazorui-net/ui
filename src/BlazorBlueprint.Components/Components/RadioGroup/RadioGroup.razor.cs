@@ -97,6 +97,12 @@ public partial class RadioGroup<TValue> : ComponentBase
     public string? AriaLabel { get; set; }
 
     /// <summary>
+    /// Gets or sets the IDs of elements that describe the radio group, for accessibility.
+    /// </summary>
+    [Parameter]
+    public string? AriaDescribedBy { get; set; }
+
+    /// <summary>
     /// Gets or sets the content to be rendered inside the radio group.
     /// </summary>
     /// <remarks>

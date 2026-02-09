@@ -1,0 +1,35 @@
+@namespace BlazorBlueprint.Components.FormFields
+@using BlazorBlueprint.Components.Checkbox
+@using BlazorBlueprint.Components.Field
+@inherits FormFieldBase
+
+<Field Orientation="@Orientation" IsInvalid="@IsInvalid" Class="@Class">
+    @if (Label is not null)
+    {
+        <FieldLabel For="@ControlId">@Label</FieldLabel>
+    }
+    <FieldContent>
+        <Checkbox Id="@ControlId"
+                  Checked="@Checked"
+                  CheckedChanged="HandleCheckedChanged"
+                  CheckedExpression="@CheckedExpression"
+                  Indeterminate="@Indeterminate"
+                  IndeterminateChanged="@IndeterminateChanged"
+                  Disabled="@Disabled"
+                  AriaLabel="@AriaLabel"
+                  AriaDescribedBy="@DescribedById"
+                  Class="@InputClass" />
+        @if (!string.IsNullOrEmpty(HelperText) && !IsInvalid)
+        {
+            <FieldDescription Id="@DescriptionId">@HelperText</FieldDescription>
+        }
+        @if (IsInvalid && !string.IsNullOrEmpty(ErrorText))
+        {
+            <FieldError Id="@ErrorId">@ErrorText</FieldError>
+        }
+        else if (HasEditContextErrors)
+        {
+            <FieldError Id="@ErrorId" Errors="@EditContextErrors" />
+        }
+    </FieldContent>
+</Field>

@@ -8,6 +8,7 @@
                  aria-label="@AriaLabel"
                  aria-required="@(CheckedExpression != null ? "true" : null)"
                  aria-invalid="@(IsInvalid ? "true" : null)"
+                 aria-describedby="@AriaDescribedBy"
                  class="@CssClass">
     <span data-state="@(Checked ? "checked" : "unchecked")" class="@ThumbCssClass">
     </span>

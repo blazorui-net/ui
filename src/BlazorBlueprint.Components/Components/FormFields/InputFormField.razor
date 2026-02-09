@@ -1,13 +1,13 @@
-@namespace BlazorBlueprint.Components.FormField
+@namespace BlazorBlueprint.Components.FormFields
 @using BlazorBlueprint.Components.Field
 @using BlazorBlueprint.Components.InputField
 @typeparam TValue
-@implements IDisposable
+@inherits FormFieldBase
 
 <Field Orientation="@Orientation" IsInvalid="@IsInvalid" Class="@Class">
     @if (Label is not null)
     {
-        <FieldLabel For="@_inputId">@Label</FieldLabel>
+        <FieldLabel For="@ControlId">@Label</FieldLabel>
     }
     <FieldContent>
         <InputField @ref="_inputRef"
@@ -26,23 +26,23 @@
                     ValidationPattern="@ValidationPattern"
                     UpdateTiming="@UpdateTiming"
                     DebounceInterval="@DebounceInterval"
-                    Id="@_inputId"
+                    Id="@ControlId"
                     AriaLabel="@AriaLabel"
-                    AriaDescribedBy="@_describedById"
+                    AriaDescribedBy="@DescribedById"
                     OnParseError="HandleParseError"
                     OnErrorCleared="HandleErrorCleared"
                     Class="@InputClass" />
         @if (!string.IsNullOrEmpty(HelperText) && !IsInvalid)
         {
-            <FieldDescription Id="@_descriptionId">@HelperText</FieldDescription>
+            <FieldDescription Id="@DescriptionId">@HelperText</FieldDescription>
         }
         @if (_hasError)
         {
-            <FieldError Id="@_errorId">@_errorMessage</FieldError>
+            <FieldError Id="@ErrorId">@_errorMessage</FieldError>
         }
         else if (HasEditContextErrors)
         {
-            <FieldError Id="@_errorId" Errors="@EditContextErrors" />
+            <FieldError Id="@ErrorId" Errors="@EditContextErrors" />
         }
     </FieldContent>
 </Field>

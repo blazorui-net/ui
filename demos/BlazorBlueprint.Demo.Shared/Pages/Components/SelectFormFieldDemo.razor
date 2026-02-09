@@ -1,0 +1,163 @@
+@page "/components/select-form-field"
+@using BlazorBlueprint.Components.FormFields
+@using BlazorBlueprint.Components.Button
+@using BlazorBlueprint.Components.Field
+@using System.ComponentModel.DataAnnotations
+
+<PageTitle>SelectFormField Component - Blazor Blueprint</PageTitle>
+
+<div class="space-y-8 max-w-4xl">
+    <div>
+        <div class="space-y-3">
+            <h1 class="text-4xl font-bold tracking-tight">SelectFormField</h1>
+            <p class="text-xl text-muted-foreground">
+                A form field wrapper for Select with built-in label, helper text, error messages, and a simplified API.
+            </p>
+        </div>
+    </div>
+
+    <!-- Basic Example -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Basic Usage</h2>
+            <p class="text-sm text-muted-foreground">
+                A select with a label and placeholder. Just provide SelectItem children &mdash;
+                the trigger, value display, and content wrapper are generated automatically.
+            </p>
+        </div>
+        <div class="max-w-md">
+            <SelectFormField TValue="string"
+                             @bind-Value="_fruit"
+                             Label="Favorite fruit"
+                             Placeholder="Select a fruit..."
+                             HelperText="Pick one from the list.">
+                <SelectItem Value="@("apple")" Text="Apple">Apple</SelectItem>
+                <SelectItem Value="@("banana")" Text="Banana">Banana</SelectItem>
+                <SelectItem Value="@("cherry")" Text="Cherry">Cherry</SelectItem>
+                <SelectItem Value="@("grape")" Text="Grape">Grape</SelectItem>
+            </SelectFormField>
+        </div>
+        <div class="rounded-lg border p-4 bg-muted/50">
+            <p class="text-sm font-medium mb-1">Selected:</p>
+            <p class="text-sm font-mono">@(string.IsNullOrEmpty(_fruit) ? "(none)" : _fruit)</p>
+        </div>
+    </div>
+
+    <!-- DisplayTextSelector -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">DisplayTextSelector</h2>
+            <p class="text-sm text-muted-foreground">
+                Use <code class="text-xs bg-muted px-1 py-0.5 rounded">DisplayTextSelector</code> to
+                control the display text when using non-string value types.
+            </p>
+        </div>
+        <div class="max-w-md">
+            <SelectFormField TValue="int"
+                             @bind-Value="_priorityLevel"
+                             Label="Priority"
+                             Placeholder="Select priority..."
+                             DisplayTextSelector="GetPriorityText">
+                <SelectItem Value="1" Text="Low">Low</SelectItem>
+                <SelectItem Value="2" Text="Medium">Medium</SelectItem>
+                <SelectItem Value="3" Text="High">High</SelectItem>
+            </SelectFormField>
+        </div>
+        <div class="rounded-lg border p-4 bg-muted/50">
+            <p class="text-sm font-medium mb-1">Selected value:</p>
+            <p class="text-sm font-mono">@_priorityLevel</p>
+        </div>
+    </div>
+
+    <!-- Disabled -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Disabled</h2>
+            <p class="text-sm text-muted-foreground">
+                A disabled select form field.
+            </p>
+        </div>
+        <div class="max-w-md">
+            <SelectFormField TValue="string"
+                             Value="@("usd")"
+                             Label="Currency"
+                             Placeholder="Select..."
+                             HelperText="Locked to your region."
+                             DisplayTextSelector="GetCurrencyText"
+                             Disabled="true">
+                <SelectItem Value="@("usd")" Text="USD ($)">USD ($)</SelectItem>
+                <SelectItem Value="@("eur")" Text="EUR">EUR</SelectItem>
+            </SelectFormField>
+        </div>
+    </div>
+
+    <!-- EditForm Integration -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">EditForm Integration</h2>
+            <p class="text-sm text-muted-foreground">
+                Validation errors display automatically inside an EditForm.
+                Try submitting without selecting a country.
+            </p>
+        </div>
+        <div class="max-w-md">
+            <EditForm Model="_formModel" OnValidSubmit="HandleFormSubmit">
+                <DataAnnotationsValidator />
+                <div class="space-y-4">
+                    <SelectFormField TValue="string"
+                                     @bind-Value="_formModel.Country"
+                                     Label="Country"
+                                     Placeholder="Select a country...">
+                        <SelectItem Value="@("us")" Text="United States">United States</SelectItem>
+                        <SelectItem Value="@("ca")" Text="Canada">Canada</SelectItem>
+                        <SelectItem Value="@("gb")" Text="United Kingdom">United Kingdom</SelectItem>
+                        <SelectItem Value="@("de")" Text="Germany">Germany</SelectItem>
+                        <SelectItem Value="@("fr")" Text="France">France</SelectItem>
+                    </SelectFormField>
+                    <Button Type="ButtonType.Submit">Submit</Button>
+                </div>
+            </EditForm>
+            @if (_formSubmitted)
+            {
+                <div class="mt-4 rounded-lg border border-green-200 bg-green-50 dark:bg-green-950 dark:border-green-800 p-4">
+                    <p class="text-sm font-medium text-green-800 dark:text-green-200">
+                        Submitted: @_formModel.Country
+                    </p>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    private string? _fruit;
+    private int _priorityLevel;
+    private bool _formSubmitted;
+    private SelectFormModel _formModel = new();
+
+    private static string GetPriorityText(int value) => value switch
+    {
+        1 => "Low",
+        2 => "Medium",
+        3 => "High",
+        _ => value.ToString()
+    };
+
+    private static string GetCurrencyText(string value) => value switch
+    {
+        "usd" => "USD ($)",
+        "eur" => "EUR",
+        _ => value
+    };
+
+    private void HandleFormSubmit()
+    {
+        _formSubmitted = true;
+    }
+
+    private class SelectFormModel
+    {
+        [Required(ErrorMessage = "Please select a country.")]
+        public string? Country { get; set; }
+    }
+}
