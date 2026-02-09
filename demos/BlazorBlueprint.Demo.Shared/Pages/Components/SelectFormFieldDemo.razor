@@ -1,5 +1,6 @@
 @page "/components/select-form-field"
 @using BlazorBlueprint.Components.FormFields
+@using BlazorBlueprint.Components.Avatar
 @using BlazorBlueprint.Components.Button
 @using BlazorBlueprint.Components.Field
 @using System.ComponentModel.DataAnnotations
@@ -40,6 +41,123 @@
         <div class="rounded-lg border p-4 bg-muted/50">
             <p class="text-sm font-medium mb-1">Selected:</p>
             <p class="text-sm font-mono">@(string.IsNullOrEmpty(_fruit) ? "(none)" : _fruit)</p>
+        </div>
+    </div>
+
+    <!-- With Flag Icons -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">With Flag Icons</h2>
+            <p class="text-sm text-muted-foreground">
+                Use rich content inside SelectItem to display flag emojis alongside country names.
+                The <code class="text-xs bg-muted px-1 py-0.5 rounded">Text</code> parameter controls what shows in the trigger after selection.
+            </p>
+        </div>
+        <div class="max-w-md">
+            <SelectFormField TValue="string"
+                             @bind-Value="_country"
+                             Label="Country"
+                             Placeholder="Select a country...">
+                <SelectItem Value="@("us")" Text="United States">
+                    <div class="flex items-center gap-2">
+                        <span class="text-base">&#x1F1FA;&#x1F1F8;</span>
+                        <span>United States</span>
+                    </div>
+                </SelectItem>
+                <SelectItem Value="@("ca")" Text="Canada">
+                    <div class="flex items-center gap-2">
+                        <span class="text-base">&#x1F1E8;&#x1F1E6;</span>
+                        <span>Canada</span>
+                    </div>
+                </SelectItem>
+                <SelectItem Value="@("gb")" Text="United Kingdom">
+                    <div class="flex items-center gap-2">
+                        <span class="text-base">&#x1F1EC;&#x1F1E7;</span>
+                        <span>United Kingdom</span>
+                    </div>
+                </SelectItem>
+                <SelectItem Value="@("de")" Text="Germany">
+                    <div class="flex items-center gap-2">
+                        <span class="text-base">&#x1F1E9;&#x1F1EA;</span>
+                        <span>Germany</span>
+                    </div>
+                </SelectItem>
+                <SelectItem Value="@("fr")" Text="France">
+                    <div class="flex items-center gap-2">
+                        <span class="text-base">&#x1F1EB;&#x1F1F7;</span>
+                        <span>France</span>
+                    </div>
+                </SelectItem>
+            </SelectFormField>
+        </div>
+        <div class="rounded-lg border p-4 bg-muted/50">
+            <p class="text-sm font-medium mb-1">Selected:</p>
+            <p class="text-sm font-mono">@(string.IsNullOrEmpty(_country) ? "(none)" : _country)</p>
+        </div>
+    </div>
+
+    <!-- With Avatars -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">With Avatars</h2>
+            <p class="text-sm text-muted-foreground">
+                Combine Avatar components with SelectItem to create a user or team member picker.
+            </p>
+        </div>
+        <div class="max-w-md">
+            <SelectFormField TValue="string"
+                             @bind-Value="_assignee"
+                             Label="Assign to"
+                             Placeholder="Select a team member...">
+                <SelectItem Value="@("alice")" Text="Alice Martin">
+                    <div class="flex items-center gap-2">
+                        <Avatar Size="AvatarSize.Small" Class="h-6 w-6 text-[10px]">
+                            <AvatarFallback>AM</AvatarFallback>
+                        </Avatar>
+                        <div class="flex flex-col">
+                            <span class="text-sm">Alice Martin</span>
+                            <span class="text-xs text-muted-foreground">Engineering</span>
+                        </div>
+                    </div>
+                </SelectItem>
+                <SelectItem Value="@("bob")" Text="Bob Chen">
+                    <div class="flex items-center gap-2">
+                        <Avatar Size="AvatarSize.Small" Class="h-6 w-6 text-[10px]">
+                            <AvatarFallback>BC</AvatarFallback>
+                        </Avatar>
+                        <div class="flex flex-col">
+                            <span class="text-sm">Bob Chen</span>
+                            <span class="text-xs text-muted-foreground">Design</span>
+                        </div>
+                    </div>
+                </SelectItem>
+                <SelectItem Value="@("carol")" Text="Carol Davis">
+                    <div class="flex items-center gap-2">
+                        <Avatar Size="AvatarSize.Small" Class="h-6 w-6 text-[10px]">
+                            <AvatarFallback>CD</AvatarFallback>
+                        </Avatar>
+                        <div class="flex flex-col">
+                            <span class="text-sm">Carol Davis</span>
+                            <span class="text-xs text-muted-foreground">Product</span>
+                        </div>
+                    </div>
+                </SelectItem>
+                <SelectItem Value="@("dan")" Text="Dan Wilson">
+                    <div class="flex items-center gap-2">
+                        <Avatar Size="AvatarSize.Small" Class="h-6 w-6 text-[10px]">
+                            <AvatarFallback>DW</AvatarFallback>
+                        </Avatar>
+                        <div class="flex flex-col">
+                            <span class="text-sm">Dan Wilson</span>
+                            <span class="text-xs text-muted-foreground">Engineering</span>
+                        </div>
+                    </div>
+                </SelectItem>
+            </SelectFormField>
+        </div>
+        <div class="rounded-lg border p-4 bg-muted/50">
+            <p class="text-sm font-medium mb-1">Assigned to:</p>
+            <p class="text-sm font-mono">@(string.IsNullOrEmpty(_assignee) ? "(none)" : _assignee)</p>
         </div>
     </div>
 
@@ -131,6 +249,8 @@
 
 @code {
     private string? _fruit;
+    private string? _country;
+    private string? _assignee;
     private int _priorityLevel;
     private bool _formSubmitted;
     private SelectFormModel _formModel = new();
