@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Reflection;
 using System.Text;
 using Microsoft.AspNetCore.Components;
@@ -21,7 +22,7 @@ public static class ApiSurfaceGenerator
         var sb = new StringBuilder();
         var assemblyName = assembly.GetName().Name;
 
-        sb.AppendLine($"# {assemblyName} - API Surface");
+        sb.AppendLine(CultureInfo.InvariantCulture, $"# {assemblyName} - API Surface");
         sb.AppendLine();
 
         var exportedTypes = assembly.GetExportedTypes()
@@ -42,14 +43,16 @@ public static class ApiSurfaceGenerator
             .ToList();
 
         if (componentTypes.Count == 0)
+        {
             return;
+        }
 
         sb.AppendLine("## Components");
         sb.AppendLine();
 
         foreach (var type in componentTypes)
         {
-            sb.AppendLine($"### {type.Name} ({type.Namespace})");
+            sb.AppendLine(CultureInfo.InvariantCulture, $"### {type.Name} ({type.Namespace})");
 
             var parameters = type.GetProperties(BindingFlags.Public | BindingFlags.Instance)
                 .Where(p => p.GetCustomAttribute<ParameterAttribute>() != null)
@@ -64,7 +67,7 @@ public static class ApiSurfaceGenerator
                     var suffix = paramAttr.CaptureUnmatchedValues
                         ? " [CaptureUnmatchedValues]"
                         : "";
-                    sb.AppendLine($"  - {prop.Name} : {FormatTypeName(prop.PropertyType)}{suffix}");
+                    sb.AppendLine(CultureInfo.InvariantCulture, $"  - {prop.Name} : {FormatTypeName(prop.PropertyType)}{suffix}");
                 }
             }
 
@@ -79,19 +82,21 @@ public static class ApiSurfaceGenerator
             .ToList();
 
         if (enumTypes.Count == 0)
+        {
             return;
+        }
 
         sb.AppendLine("## Enums");
         sb.AppendLine();
 
         foreach (var type in enumTypes)
         {
-            sb.AppendLine($"### {type.Name} ({type.Namespace})");
+            sb.AppendLine(CultureInfo.InvariantCulture, $"### {type.Name} ({type.Namespace})");
 
             foreach (var name in Enum.GetNames(type))
             {
-                var value = Convert.ToInt32(Enum.Parse(type, name));
-                sb.AppendLine($"  - {name} = {value}");
+                var value = Convert.ToInt32(Enum.Parse(type, name), CultureInfo.InvariantCulture);
+                sb.AppendLine(CultureInfo.InvariantCulture, $"  - {name} = {value}");
             }
 
             sb.AppendLine();
@@ -105,7 +110,9 @@ public static class ApiSurfaceGenerator
             .ToList();
 
         if (interfaces.Count == 0)
+        {
             return;
+        }
 
         sb.AppendLine("## Interfaces");
         sb.AppendLine();
@@ -116,7 +123,7 @@ public static class ApiSurfaceGenerator
                 ? FormatTypeName(type)
                 : type.Name;
 
-            sb.AppendLine($"### {displayName} ({type.Namespace})");
+            sb.AppendLine(CultureInfo.InvariantCulture, $"### {displayName} ({type.Namespace})");
 
             var properties = type.GetProperties(BindingFlags.Public | BindingFlags.Instance)
                 .OrderBy(p => p.Name, StringComparer.Ordinal)
@@ -125,10 +132,18 @@ public static class ApiSurfaceGenerator
             foreach (var prop in properties)
             {
                 var accessors = new List<string>();
-                if (prop.GetMethod != null) accessors.Add("get");
-                if (prop.SetMethod != null) accessors.Add("set");
+                if (prop.GetMethod != null)
+                {
+                    accessors.Add("get");
+                }
+
+                if (prop.SetMethod != null)
+                {
+                    accessors.Add("set");
+                }
+
                 var accessorStr = accessors.Count > 0 ? $" {{ {string.Join("; ", accessors)}; }}" : "";
-                sb.AppendLine($"  - {prop.Name} : {FormatTypeName(prop.PropertyType)}{accessorStr}");
+                sb.AppendLine(CultureInfo.InvariantCulture, $"  - {prop.Name} : {FormatTypeName(prop.PropertyType)}{accessorStr}");
             }
 
             var methods = type.GetMethods(BindingFlags.Public | BindingFlags.Instance)
@@ -141,7 +156,7 @@ public static class ApiSurfaceGenerator
             {
                 var paramList = string.Join(", ", method.GetParameters()
                     .Select(p => $"{FormatTypeName(p.ParameterType)} {p.Name}"));
-                sb.AppendLine($"  - {method.Name}({paramList}) : {FormatTypeName(method.ReturnType)}");
+                sb.AppendLine(CultureInfo.InvariantCulture, $"  - {method.Name}({paramList}) : {FormatTypeName(method.ReturnType)}");
             }
 
             sb.AppendLine();
@@ -157,7 +172,9 @@ public static class ApiSurfaceGenerator
         // Handle nullable value types: Nullable<bool> -> Boolean?
         var underlying = Nullable.GetUnderlyingType(type);
         if (underlying != null)
+        {
             return FormatTypeName(underlying) + "?";
+        }
 
         // Handle generic types: EventCallback<MouseEventArgs>, Dictionary<String, Object>, etc.
         if (type.IsGenericType)
