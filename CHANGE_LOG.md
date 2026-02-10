@@ -8,8 +8,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## 2026-02-10
 
+### Added
+- `Strategy` and `ZIndex` parameters on `PopoverContent` — allows dropdowns to use `fixed` positioning and custom z-index to escape stacking contexts (e.g., inside Dialogs)
+- Dialog demo expanded with Select, Combobox, and MultiSelect controls to demonstrate nested portal behavior
+- DataTable demo added "Dialog with Combobox in Cell Template" section as a nested portal regression test
+
 ### Fixed
 - Portal render timeout warnings when floating content is nested inside other portals (e.g., Combobox inside Dialog) — `NotifyPortalRendered` now fires before processing deferred rerenders in `PortalHost`
+- Combobox and MultiSelect dropdowns now render correctly above Dialog overlays using `fixed` positioning with elevated z-index
 
 ---
 

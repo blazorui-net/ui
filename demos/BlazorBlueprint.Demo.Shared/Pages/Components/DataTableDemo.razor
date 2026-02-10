@@ -2,6 +2,8 @@
 @using BlazorBlueprint.Components.DataTable
 @using BlazorBlueprint.Components.Badge
 @using BlazorBlueprint.Components.Button
+@using BlazorBlueprint.Components.Dialog
+@using BlazorBlueprint.Components.Combobox
 @using BlazorBlueprint.Demo.Services
 @inject MockDataService MockDataService
 
@@ -112,6 +114,72 @@
                                 Edit
                             </Button>
                         </div>
+                    </CellTemplate>
+                </DataTableColumn>
+            </Columns>
+        </DataTable>
+    </div>
+
+    <!-- Dialog with Combobox in CellTemplate (Issue #119 regression test) -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Dialog with Combobox in Cell Template</h2>
+            <p class="text-sm text-muted-foreground">
+                Each row has an "Edit" button that opens a Dialog containing a Combobox.
+                This tests nested portals (DataTable row &rarr; Dialog portal &rarr; Combobox FloatingPortal).
+            </p>
+        </div>
+        <DataTable TData="Person" Data="@people" ShowPagination="true" InitialPageSize="5" ShowToolbar="false">
+            <Columns>
+                <DataTableColumn TData="Person" TValue="string" Property="@(p => p.Name)" Header="Name" Sortable />
+                <DataTableColumn TData="Person" TValue="string" Property="@(p => p.Role)" Header="Role" />
+                <DataTableColumn TData="Person" TValue="string" Property="@(p => p.Status)" Header="Status">
+                    <CellTemplate Context="person">
+                        <Badge Variant="@(person.Status == "Active" ? BadgeVariant.Default : BadgeVariant.Outline)">
+                            @person.Status
+                        </Badge>
+                    </CellTemplate>
+                </DataTableColumn>
+                <DataTableColumn TData="Person" TValue="string" Property="@(p => p.Email)" Header="Actions">
+                    <CellTemplate Context="person">
+                        <Dialog>
+                            <DialogTrigger AsChild>
+                                <Button Variant="ButtonVariant.Outline" Size="ButtonSize.Small">
+                                    Edit Role
+                                </Button>
+                            </DialogTrigger>
+                            <DialogContent>
+                                <DialogHeader>
+                                    <DialogTitle>Edit @person.Name</DialogTitle>
+                                    <DialogDescription>
+                                        Change the role for this person using the combobox below.
+                                    </DialogDescription>
+                                </DialogHeader>
+                                <div class="py-4">
+                                    <Combobox TItem="RoleOption"
+                                              Items="roleOptions"
+                                              @bind-Value="selectedCellRole"
+                                              ValueSelector="@(r => r.Value)"
+                                              DisplaySelector="@(r => r.Label)"
+                                              Placeholder="Select role..."
+                                              SearchPlaceholder="Search roles..."
+                                              EmptyMessage="No roles found."
+                                              MatchTriggerWidth="true" />
+                                    @if (!string.IsNullOrEmpty(selectedCellRole))
+                                    {
+                                        <p class="text-sm mt-2">Selected: <strong>@selectedCellRole</strong></p>
+                                    }
+                                </div>
+                                <DialogFooter>
+                                    <BlazorBlueprint.Primitives.Dialog.DialogClose class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2">
+                                        Cancel
+                                    </BlazorBlueprint.Primitives.Dialog.DialogClose>
+                                    <button class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2">
+                                        Save
+                                    </button>
+                                </DialogFooter>
+                            </DialogContent>
+                        </Dialog>
                     </CellTemplate>
                 </DataTableColumn>
             </Columns>
@@ -389,6 +457,23 @@
     private IReadOnlyCollection<Person> selectedPeople = Array.Empty<Person>();
     private bool isLoading = false;
     private bool enableKeyboardNavigation = true;
+    private string? selectedCellRole;
+
+    private readonly List<RoleOption> roleOptions = new()
+    {
+        new RoleOption { Value = "Developer", Label = "Developer" },
+        new RoleOption { Value = "Designer", Label = "Designer" },
+        new RoleOption { Value = "Manager", Label = "Manager" },
+        new RoleOption { Value = "QA Engineer", Label = "QA Engineer" },
+        new RoleOption { Value = "DevOps", Label = "DevOps" },
+        new RoleOption { Value = "Product Owner", Label = "Product Owner" }
+    };
+
+    public class RoleOption
+    {
+        public required string Value { get; set; }
+        public required string Label { get; set; }
+    }
 
     protected override void OnInitialized()
     {

@@ -30,7 +30,7 @@
                     <path d="m6 9 6 6 6-6" />
                 </svg>
             </PopoverTrigger>
-            <PopoverContent Side="@PopoverSide.Bottom" Align="@PopoverAlign.Start" MatchTriggerWidth="@MatchTriggerWidth" OnContentReady="@HandleContentReady" Class="@(MatchTriggerWidth ? "!p-0" : $"{PopoverWidth} !p-0")">
+            <PopoverContent Side="@PopoverSide.Bottom" Align="@PopoverAlign.Start" MatchTriggerWidth="@MatchTriggerWidth" Strategy="fixed" ZIndex="9999" OnContentReady="@HandleContentReady" Class="@(MatchTriggerWidth ? "!p-0" : $"{PopoverWidth} !p-0")">
                 <Command>
                     <CommandInput @ref="_commandInputRef" Placeholder="@SearchPlaceholder" />
                     <CommandList>
