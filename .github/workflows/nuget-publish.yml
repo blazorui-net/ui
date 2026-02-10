@@ -108,7 +108,6 @@ jobs:
           echo "🏷️  Version: $VERSION"
 
       - name: Download Tailwind CSS standalone CLI
-        if: steps.package-info.outputs.package == 'components'
         run: |
           curl -sLO https://github.com/tailwindlabs/tailwindcss/releases/download/v4.1.16/tailwindcss-linux-x64
           chmod +x tailwindcss-linux-x64
@@ -117,7 +116,6 @@ jobs:
           ./tools/tailwindcss-linux --help | head -1
 
       - name: Pre-generate Tailwind CSS
-        if: steps.package-info.outputs.package == 'components'
         run: |
           echo "Pre-generating Tailwind CSS so it exists before dotnet build evaluates the project..."
           ./tools/tailwindcss-linux -i src/BlazorBlueprint.Components/wwwroot/css/blazorblueprint-input.css -o src/BlazorBlueprint.Components/wwwroot/blazorblueprint.css --minify
@@ -142,6 +140,9 @@ jobs:
           fi
           echo "Checking MinVer calculated version..."
           dotnet msbuild ${{ steps.package-info.outputs.project_path }} -getProperty:Version -p:Configuration=Release
+
+      - name: Run API surface tests
+        run: dotnet test tests/BlazorBlueprint.Tests/BlazorBlueprint.Tests.csproj --configuration Release --verbosity normal
 
       - name: Pack
         run: |
