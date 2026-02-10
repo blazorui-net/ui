@@ -62,15 +62,6 @@
         // or non-nested content updates) should trigger a re-render.
         _isRendering = false;
 
-        // If a portal change was deferred during rendering (e.g., one portal closing while
-        // another opens), process it now by scheduling a new render cycle.
-        if (_pendingRerender)
-        {
-            _pendingRerender = false;
-            await InvokeAsync(StateHasChanged);
-            return;
-        }
-
         if (firstRender)
         {
             // Load portal.js to initialize the auto-focus observer
@@ -90,11 +81,23 @@
             }
         }
 
-        // Notify all portals that were rendered this cycle
-        // This signals to content components that their ElementRef is now valid
+        // Notify all portals that were rendered this cycle BEFORE processing pending rerenders.
+        // This signals to content components that their ElementRef is now valid.
+        // Must happen before the _pendingRerender check because nested portals (e.g., Combobox
+        // inside Dialog) trigger RefreshPortal during PortalHost's render, setting _pendingRerender.
+        // Without notifying first, the early return would skip NotifyPortalRendered, causing
+        // FloatingPortal's 500ms timeout to fire unnecessarily.
         foreach (var portalId in _renderedThisCycle)
         {
             PortalService.NotifyPortalRendered(portalId);
+        }
+
+        // If a portal change was deferred during rendering (e.g., one portal closing while
+        // another opens), process it now by scheduling a new render cycle.
+        if (_pendingRerender)
+        {
+            _pendingRerender = false;
+            await InvokeAsync(StateHasChanged);
         }
     }
 
