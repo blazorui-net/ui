@@ -70,11 +70,34 @@
 
     protected override void OnParametersSet()
     {
-        // Update controlled value if it changed
         if (_state.IsControlled && Open.HasValue)
         {
-            _state.ControlledValue = Open.Value;
-            _context.State.IsOpen = Open.Value;
+            var previousIsOpen = _context.State.IsOpen;
+
+            if (previousIsOpen != Open.Value)
+            {
+                // State actually changed via parameter binding. Use Context API
+                // BEFORE updating _state.ControlledValue so that
+                // HandleContextStateChanged sees the old _state.Value, passes
+                // its guard, and fires OpenChanged → consumer cleanup (e.g.,
+                // Combobox resets _focusDone) and PopoverContent cleanup
+                // (e.g., click-outside listener disposal).
+                if (Open.Value)
+                {
+                    _context.Open();
+                }
+                else
+                {
+                    _context.Close();
+                }
+
+                _state.ControlledValue = Open.Value;
+            }
+            else
+            {
+                _state.ControlledValue = Open.Value;
+                _context.State.IsOpen = Open.Value;
+            }
         }
     }
 
