@@ -2,6 +2,7 @@
 @using BlazorBlueprint.Components.Dialog
 @using BlazorBlueprint.Components.Combobox
 @using BlazorBlueprint.Components.MultiSelect
+@using BlazorBlueprint.Components.DatePicker
 
 <PageTitle>Dialog Component - Blazor Blueprint</PageTitle>
 
@@ -352,6 +353,45 @@
     </div>
 
     <div class="space-y-4">
+        <h2 class="text-2xl font-semibold">DatePicker in Dialog</h2>
+        <p class="text-sm text-muted-foreground">
+            DatePicker inside a Dialog. The calendar popover renders above the dialog overlay
+            using fixed positioning and elevated z-index.
+        </p>
+
+        <Dialog>
+            <DialogTrigger class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2">
+                Open Dialog with DatePicker
+            </DialogTrigger>
+
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>Schedule Event</DialogTitle>
+                    <DialogDescription>
+                        Pick a date for the event using the DatePicker below.
+                    </DialogDescription>
+                </DialogHeader>
+
+                <div class="grid gap-4 py-4">
+                    <div class="space-y-2">
+                        <label class="text-sm font-medium">Event Date</label>
+                        <DatePicker @bind-Value="dialogDatePickerValue" Class="w-full" />
+                    </div>
+                </div>
+
+                <DialogFooter>
+                    <BlazorBlueprint.Primitives.Dialog.DialogClose class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2">
+                        Cancel
+                    </BlazorBlueprint.Primitives.Dialog.DialogClose>
+                    <button class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2">
+                        Confirm
+                    </button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+    </div>
+
+    <div class="space-y-4">
         <h2 class="text-2xl font-semibold">Features</h2>
         <ul class="list-disc list-inside space-y-2 text-sm">
             <li>Full keyboard navigation support</li>
@@ -395,6 +435,7 @@
 
 @code {
     private bool isDialogOpen = false;
+    private DateTime? dialogDatePickerValue;
     private string? selectedComboboxFramework;
     private string? selectedDialogFruit;
     private IEnumerable<string>? selectedTechnologies = new List<string>();
