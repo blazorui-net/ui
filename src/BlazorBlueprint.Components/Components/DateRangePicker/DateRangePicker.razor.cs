@@ -99,7 +99,21 @@ public partial class DateRangePicker : ComponentBase
     [Parameter]
     public string? Class { get; set; }
 
-    private static readonly string[] DayNames = { "Su", "Mo", "Tu", "We", "Th", "Fr", "Sa" };
+    private static readonly string[] BaseDayNames = { "Su", "Mo", "Tu", "We", "Th", "Fr", "Sa" };
+
+    private string[] DayNames
+    {
+        get
+        {
+            var start = (int)FirstDayOfWeek;
+            var result = new string[7];
+            for (var i = 0; i < 7; i++)
+            {
+                result[i] = BaseDayNames[(start + i) % 7];
+            }
+            return result;
+        }
+    }
     private static readonly string[] MonthNames = { "January", "February", "March", "April", "May", "June",
                                                      "July", "August", "September", "October", "November", "December" };
 
@@ -222,7 +236,7 @@ public partial class DateRangePicker : ComponentBase
     private void ApplyPreset(DateRangePreset preset)
     {
         var range = GetPresetRange(preset);
-        if (range != null)
+        if (range != null && CountSelectedDays(range.Start, range.End) > 0)
         {
             _selectionStart = range.Start;
             _selectionEnd = range.End;
@@ -291,6 +305,22 @@ public partial class DateRangePicker : ComponentBase
         }
 
         return false;
+    }
+
+    private int CountSelectedDays(DateTime start, DateTime end)
+    {
+        var count = 0;
+        var current = start.Date <= end.Date ? start.Date : end.Date;
+        var last = start.Date > end.Date ? start.Date : end.Date;
+        while (current <= last)
+        {
+            if (!IsDateDisabled(current))
+            {
+                count++;
+            }
+            current = current.AddDays(1);
+        }
+        return count;
     }
 
     private bool IsInRange(DateTime date)
@@ -393,7 +423,7 @@ public partial class DateRangePicker : ComponentBase
                          range.Start == _selectionStart.Value && range.End == _selectionEnd.Value;
 
         return ClassNames.cn(
-            "text-left px-2 py-1.5 text-sm rounded-md transition-colors",
+            "text-left px-2 py-1.5 text-sm rounded-md transition-colors whitespace-nowrap shrink-0 sm:shrink sm:whitespace-normal",
             isSelected ? "bg-primary text-primary-foreground" : "hover:bg-accent hover:text-accent-foreground"
         );
     }
@@ -402,11 +432,11 @@ public partial class DateRangePicker : ComponentBase
     {
         if (!day.HasValue)
         {
-            return "h-9 w-9 text-center text-sm p-0";
+            return "h-9 w-9 flex-1 sm:flex-none text-center text-sm p-0";
         }
 
         return ClassNames.cn(
-            "h-9 w-9 text-center text-sm p-0 relative",
+            "h-9 w-9 flex-1 sm:flex-none text-center text-sm p-0 relative",
             isInRange && !isRangeStart && !isRangeEnd ? "bg-accent" : null,
             isRangeStart ? "rounded-l-md bg-accent" : null,
             isRangeEnd ? "rounded-r-md bg-accent" : null
@@ -416,7 +446,7 @@ public partial class DateRangePicker : ComponentBase
     private static string GetDayClass(DateTime date, bool isDisabled, bool isInRange, bool isRangeStart, bool isRangeEnd, bool isToday)
     {
         return ClassNames.cn(
-            "inline-flex h-9 w-9 items-center justify-center rounded-md text-sm font-normal",
+            "inline-flex h-9 w-full sm:w-9 items-center justify-center rounded-md text-sm font-normal",
             "ring-offset-background transition-colors",
             "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
             "disabled:pointer-events-none disabled:opacity-50",
