@@ -1,6 +1,7 @@
 @page "/components/dialog"
 @using BlazorBlueprint.Components.Dialog
 @using BlazorBlueprint.Components.Combobox
+@using BlazorBlueprint.Components.MultiSelect
 
 <PageTitle>Dialog Component - Blazor Blueprint</PageTitle>
 
@@ -275,38 +276,67 @@
     </div>
 
     <div class="space-y-4">
-        <h2 class="text-2xl font-semibold">Combobox in Dialog</h2>
+        <h2 class="text-2xl font-semibold">Dropdown Controls in Dialog</h2>
         <p class="text-sm text-muted-foreground">
-            Dialog containing a Combobox for selecting items. Tests nested portal behavior.
+            Dialog containing Select, Combobox, and MultiSelect controls. Tests nested portal behavior
+            where each dropdown renders its floating content above the dialog overlay.
         </p>
 
         <Dialog>
             <DialogTrigger class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2">
-                Open Dialog with Combobox
+                Open Dialog with Dropdowns
             </DialogTrigger>
 
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle>Select a Framework</DialogTitle>
+                    <DialogTitle>Nested Dropdown Controls</DialogTitle>
                     <DialogDescription>
-                        Use the combobox below to search and select a framework.
+                        Select, Combobox, and MultiSelect all use nested portals to render above the dialog.
                     </DialogDescription>
                 </DialogHeader>
 
-                <div class="py-4">
-                    <Combobox TItem="ComboboxFramework"
-                             Items="comboboxFrameworks"
-                             @bind-Value="selectedComboboxFramework"
-                             ValueSelector="@(f => f.Value)"
-                             DisplaySelector="@(f => f.Label)"
-                             Placeholder="Select framework..."
-                             SearchPlaceholder="Search framework..."
-                             EmptyMessage="No framework found."
-                             PopoverWidth="w-[300px]" />
-                    @if (!string.IsNullOrEmpty(selectedComboboxFramework))
-                    {
-                        <p class="text-sm mt-2">Selected: <strong>@GetComboboxFrameworkLabel(selectedComboboxFramework)</strong></p>
-                    }
+                <div class="grid gap-4 py-4">
+                    <div class="space-y-2">
+                        <label class="text-sm font-medium">Select</label>
+                        <Select @bind-Value="selectedDialogFruit" TValue="string" Class="w-full">
+                            <SelectTrigger>
+                                <SelectValue Placeholder="Select a fruit..." />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem Value="@("apple")" Text="Apple" TValue="string">Apple</SelectItem>
+                                <SelectItem Value="@("banana")" Text="Banana" TValue="string">Banana</SelectItem>
+                                <SelectItem Value="@("blueberry")" Text="Blueberry" TValue="string">Blueberry</SelectItem>
+                                <SelectItem Value="@("grapes")" Text="Grapes" TValue="string">Grapes</SelectItem>
+                                <SelectItem Value="@("pineapple")" Text="Pineapple" TValue="string">Pineapple</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+
+                    <div class="space-y-2">
+                        <label class="text-sm font-medium">Combobox</label>
+                        <Combobox TItem="ComboboxFramework"
+                                  Items="comboboxFrameworks"
+                                  @bind-Value="selectedComboboxFramework"
+                                  ValueSelector="@(f => f.Value)"
+                                  DisplaySelector="@(f => f.Label)"
+                                  Placeholder="Select framework..."
+                                  SearchPlaceholder="Search framework..."
+                                  EmptyMessage="No framework found."
+                                  MatchTriggerWidth="true" />
+                    </div>
+
+                    <div class="space-y-2">
+                        <label class="text-sm font-medium">MultiSelect</label>
+                        <MultiSelect TItem="string"
+                                     Items="multiSelectTechnologies"
+                                     @bind-Values="selectedTechnologies"
+                                     ValueSelector="@(t => t)"
+                                     DisplaySelector="@(t => t)"
+                                     Placeholder="Select technologies..."
+                                     SearchPlaceholder="Search technologies..."
+                                     EmptyMessage="No technologies found."
+                                     MatchTriggerWidth="true" />
+                    </div>
                 </div>
 
                 <DialogFooter>
@@ -314,7 +344,7 @@
                         Cancel
                     </BlazorBlueprint.Primitives.Dialog.DialogClose>
                     <button class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2">
-                        Confirm Selection
+                        Confirm
                     </button>
                 </DialogFooter>
             </DialogContent>
@@ -366,6 +396,13 @@
 @code {
     private bool isDialogOpen = false;
     private string? selectedComboboxFramework;
+    private string? selectedDialogFruit;
+    private IEnumerable<string>? selectedTechnologies = new List<string>();
+
+    private readonly List<string> multiSelectTechnologies = new()
+    {
+        "Blazor", "React", "Vue", "Angular", "Svelte", "Next.js", "Nuxt", "SolidJS", "Astro", "Remix"
+    };
 
     private readonly List<ComboboxFramework> comboboxFrameworks = new()
     {

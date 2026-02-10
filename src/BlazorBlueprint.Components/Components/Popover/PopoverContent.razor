@@ -10,6 +10,8 @@
                                                    Align="@Align"
                                                    Offset="@Offset"
                                                    MatchTriggerWidth="@MatchTriggerWidth"
+                                                   Strategy="@Strategy"
+                                                   ZIndex="@ZIndex"
                                                    OnEscapeKeyDown="@OnEscapeKeyDown"
                                                    OnClickOutside="@OnClickOutside"
                                                    OnContentReady="@OnContentReady"
@@ -39,6 +41,21 @@
 
     [Parameter]
     public bool MatchTriggerWidth { get; set; } = false;
+
+    /// <summary>
+    /// CSS positioning strategy: "absolute" or "fixed".
+    /// Use "fixed" for dropdowns that need to escape stacking contexts (e.g., inside Dialogs).
+    /// Default is "absolute".
+    /// </summary>
+    [Parameter]
+    public string Strategy { get; set; } = "absolute";
+
+    /// <summary>
+    /// CSS z-index value for the popover content.
+    /// Default is 50.
+    /// </summary>
+    [Parameter]
+    public int ZIndex { get; set; } = 50;
 
     [Parameter]
     public EventCallback<KeyboardEventArgs> OnEscapeKeyDown { get; set; }
