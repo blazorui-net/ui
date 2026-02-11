@@ -1,0 +1,66 @@
+@page "/issues/132"
+@using BlazorBlueprint.Components.Input
+
+<PageTitle>Issue #132 - File Input Cannot Resolve Attribute Type</PageTitle>
+
+<div class="max-w-3xl space-y-6">
+    <div class="space-y-2">
+        <h1 class="text-3xl font-bold tracking-tight">Issue #132</h1>
+        <p class="text-muted-foreground">
+            <strong>Bug:</strong> File Input - Cannot resolve attribute type.
+            Using the Input component with <code class="rounded bg-muted px-1.5 py-0.5 text-sm">InputType.File</code>
+            causes a runtime crash when a file is selected. The Blazor render tree attempts to
+            set the value on the file input element, which is prohibited by browser security restrictions.
+        </p>
+    </div>
+
+    <div class="rounded-lg border border-border p-6 space-y-6">
+        <h2 class="text-xl font-semibold">Reproduction</h2>
+
+        <div class="space-y-4">
+            <h3 class="text-sm font-medium text-muted-foreground">1. Input with Type="InputType.File" (triggers crash on file select)</h3>
+            <Input Type="InputType.File" />
+        </div>
+
+        <div class="space-y-4">
+            <h3 class="text-sm font-medium text-muted-foreground">2. Input with Type="InputType.File" and two-way binding</h3>
+            <Input Type="InputType.File" @bind-Value="fileValue" />
+            <p class="text-xs text-muted-foreground">Bound value: @(fileValue ?? "(empty)")</p>
+        </div>
+
+        <div class="space-y-4">
+            <h3 class="text-sm font-medium text-muted-foreground">3. Working comparison: plain HTML file input</h3>
+            <input type="file" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm" />
+        </div>
+
+        <div class="space-y-4">
+            <h3 class="text-sm font-medium text-muted-foreground">4. Working comparison: Input with Type="InputType.Text"</h3>
+            <Input Type="InputType.Text" Placeholder="This one works fine" @bind-Value="textValue" />
+        </div>
+    </div>
+
+    <div class="rounded-lg border border-border p-6 space-y-4">
+        <h2 class="text-xl font-semibold">Expected Behavior</h2>
+        <p class="text-sm text-muted-foreground">
+            The file input should allow selecting a file without crashing. The component
+            should not attempt to set the <code class="rounded bg-muted px-1.5 py-0.5 text-sm">value</code>
+            attribute on file inputs, as this is restricted by browser security.
+        </p>
+    </div>
+
+    <div class="rounded-lg border border-border p-6 space-y-4">
+        <h2 class="text-xl font-semibold">Actual Behavior</h2>
+        <p class="text-sm text-muted-foreground">
+            Selecting a file triggers an AggregateException because the Blazor render tree
+            attempts to programmatically set the file input's value to an empty string.
+            The <code class="rounded bg-muted px-1.5 py-0.5 text-sm">Input.razor</code> template
+            unconditionally renders <code class="rounded bg-muted px-1.5 py-0.5 text-sm">value="@@Value"</code>
+            for all input types, including <code class="rounded bg-muted px-1.5 py-0.5 text-sm">type="file"</code>.
+        </p>
+    </div>
+</div>
+
+@code {
+    private string? fileValue;
+    private string? textValue;
+}
