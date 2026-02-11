@@ -70,7 +70,7 @@ public partial class CollapsibleTrigger : ComponentBase
     /// Use this when you want a custom component (like Button) to act as the trigger.
     /// </summary>
     [Parameter]
-    public bool AsChild { get; set; } = false;
+    public bool AsChild { get; set; } = true;
 
     /// <summary>
     /// Gets or sets the content to be rendered inside the trigger.

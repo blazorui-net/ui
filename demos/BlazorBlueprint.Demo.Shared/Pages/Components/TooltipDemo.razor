@@ -35,7 +35,7 @@
                         TooltipTrigger renders its own span element.
                     </p>
                     <Tooltip>
-                        <TooltipTrigger Class="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground cursor-pointer">
+                        <TooltipTrigger AsChild="false" Class="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground cursor-pointer">
                             Hover me
                         </TooltipTrigger>
                         <TooltipContent>
@@ -51,7 +51,7 @@
                         Button receives hover/focus behavior via TriggerContext.
                     </p>
                     <Tooltip>
-                        <TooltipTrigger AsChild>
+                        <TooltipTrigger>
                             <Button Variant="ButtonVariant.Outline" Size="ButtonSize.Icon">
                                 <LucideIcon Name="info" Size="16" />
                             </Button>
@@ -74,7 +74,7 @@
             </div>
             <div class="flex gap-4">
                 <Tooltip>
-                    <TooltipTrigger Class="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground cursor-pointer">
+                    <TooltipTrigger AsChild="false" Class="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground cursor-pointer">
                         Hover me
                     </TooltipTrigger>
                     <TooltipContent>
@@ -94,7 +94,7 @@
             </div>
             <div class="flex flex-wrap gap-4">
                 <Tooltip Placement="@PopoverPlacement.Top">
-                    <TooltipTrigger Class="inline-flex h-9 items-center justify-center rounded-md bg-primary px-3 text-sm font-medium text-primary-foreground hover:bg-primary/90 cursor-pointer">
+                    <TooltipTrigger AsChild="false" Class="inline-flex h-9 items-center justify-center rounded-md bg-primary px-3 text-sm font-medium text-primary-foreground hover:bg-primary/90 cursor-pointer">
                         Top
                     </TooltipTrigger>
                     <TooltipContent>
@@ -103,7 +103,7 @@
                 </Tooltip>
 
                 <Tooltip Placement="@PopoverPlacement.Bottom">
-                    <TooltipTrigger Class="inline-flex h-9 items-center justify-center rounded-md bg-primary px-3 text-sm font-medium text-primary-foreground hover:bg-primary/90 cursor-pointer">
+                    <TooltipTrigger AsChild="false" Class="inline-flex h-9 items-center justify-center rounded-md bg-primary px-3 text-sm font-medium text-primary-foreground hover:bg-primary/90 cursor-pointer">
                         Bottom
                     </TooltipTrigger>
                     <TooltipContent>
@@ -112,7 +112,7 @@
                 </Tooltip>
 
                 <Tooltip Placement="@PopoverPlacement.Left">
-                    <TooltipTrigger Class="inline-flex h-9 items-center justify-center rounded-md bg-primary px-3 text-sm font-medium text-primary-foreground hover:bg-primary/90 cursor-pointer">
+                    <TooltipTrigger AsChild="false" Class="inline-flex h-9 items-center justify-center rounded-md bg-primary px-3 text-sm font-medium text-primary-foreground hover:bg-primary/90 cursor-pointer">
                         Left
                     </TooltipTrigger>
                     <TooltipContent>
@@ -121,7 +121,7 @@
                 </Tooltip>
 
                 <Tooltip Placement="@PopoverPlacement.Right">
-                    <TooltipTrigger Class="inline-flex h-9 items-center justify-center rounded-md bg-primary px-3 text-sm font-medium text-primary-foreground hover:bg-primary/90 cursor-pointer">
+                    <TooltipTrigger AsChild="false" Class="inline-flex h-9 items-center justify-center rounded-md bg-primary px-3 text-sm font-medium text-primary-foreground hover:bg-primary/90 cursor-pointer">
                         Right
                     </TooltipTrigger>
                     <TooltipContent>
@@ -143,7 +143,7 @@
                 <div class="flex items-center gap-2">
                     <span>Username</span>
                     <Tooltip>
-                        <TooltipTrigger>
+                        <TooltipTrigger AsChild="false">
                             <LucideIcon Name="info" Size="16" Class="cursor-help text-muted-foreground" />
                         </TooltipTrigger>
                         <TooltipContent>
@@ -155,7 +155,7 @@
                 <div class="flex items-center gap-2">
                     <span>Email</span>
                     <Tooltip>
-                        <TooltipTrigger>
+                        <TooltipTrigger AsChild="false">
                             <LucideIcon Name="info" Size="16" Class="cursor-help text-muted-foreground" />
                         </TooltipTrigger>
                         <TooltipContent>
@@ -176,7 +176,7 @@
             </div>
             <div class="border rounded-lg p-2 inline-flex gap-1">
                 <Tooltip>
-                    <TooltipTrigger Class="inline-flex h-8 w-8 items-center justify-center rounded-md text-sm font-medium hover:bg-accent hover:text-accent-foreground cursor-pointer">
+                    <TooltipTrigger AsChild="false" Class="inline-flex h-8 w-8 items-center justify-center rounded-md text-sm font-medium hover:bg-accent hover:text-accent-foreground cursor-pointer">
                         <LucideIcon Name="bold" Size="16" />
                     </TooltipTrigger>
                     <TooltipContent>
@@ -185,7 +185,7 @@
                 </Tooltip>
 
                 <Tooltip>
-                    <TooltipTrigger Class="inline-flex h-8 w-8 items-center justify-center rounded-md text-sm font-medium hover:bg-accent hover:text-accent-foreground cursor-pointer">
+                    <TooltipTrigger AsChild="false" Class="inline-flex h-8 w-8 items-center justify-center rounded-md text-sm font-medium hover:bg-accent hover:text-accent-foreground cursor-pointer">
                         <LucideIcon Name="italic" Size="16" />
                     </TooltipTrigger>
                     <TooltipContent>
@@ -194,7 +194,7 @@
                 </Tooltip>
 
                 <Tooltip>
-                    <TooltipTrigger Class="inline-flex h-8 w-8 items-center justify-center rounded-md text-sm font-medium hover:bg-accent hover:text-accent-foreground cursor-pointer">
+                    <TooltipTrigger AsChild="false" Class="inline-flex h-8 w-8 items-center justify-center rounded-md text-sm font-medium hover:bg-accent hover:text-accent-foreground cursor-pointer">
                         <LucideIcon Name="underline" Size="16" />
                     </TooltipTrigger>
                     <TooltipContent>
@@ -205,7 +205,7 @@
                 <Separator Orientation="SeparatorOrientation.Vertical" Class="mx-1 h-8" />
 
                 <Tooltip>
-                    <TooltipTrigger Class="inline-flex h-8 w-8 items-center justify-center rounded-md text-sm font-medium hover:bg-accent hover:text-accent-foreground cursor-pointer">
+                    <TooltipTrigger AsChild="false" Class="inline-flex h-8 w-8 items-center justify-center rounded-md text-sm font-medium hover:bg-accent hover:text-accent-foreground cursor-pointer">
                         <LucideIcon Name="align-left" Size="16" />
                     </TooltipTrigger>
                     <TooltipContent>
@@ -214,7 +214,7 @@
                 </Tooltip>
 
                 <Tooltip>
-                    <TooltipTrigger Class="inline-flex h-8 w-8 items-center justify-center rounded-md text-sm font-medium hover:bg-accent hover:text-accent-foreground cursor-pointer">
+                    <TooltipTrigger AsChild="false" Class="inline-flex h-8 w-8 items-center justify-center rounded-md text-sm font-medium hover:bg-accent hover:text-accent-foreground cursor-pointer">
                         <LucideIcon Name="align-center" Size="16" />
                     </TooltipTrigger>
                     <TooltipContent>
@@ -223,7 +223,7 @@
                 </Tooltip>
 
                 <Tooltip>
-                    <TooltipTrigger Class="inline-flex h-8 w-8 items-center justify-center rounded-md text-sm font-medium hover:bg-accent hover:text-accent-foreground cursor-pointer">
+                    <TooltipTrigger AsChild="false" Class="inline-flex h-8 w-8 items-center justify-center rounded-md text-sm font-medium hover:bg-accent hover:text-accent-foreground cursor-pointer">
                         <LucideIcon Name="align-right" Size="16" />
                     </TooltipTrigger>
                     <TooltipContent>
@@ -243,7 +243,7 @@
             </div>
             <div class="flex gap-4">
                 <Tooltip>
-                    <TooltipTrigger Class="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground cursor-pointer">
+                    <TooltipTrigger AsChild="false" Class="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground cursor-pointer">
                         <LucideIcon Name="package" Size="16" Class="mr-2" />
                         Premium Plan
                     </TooltipTrigger>
@@ -260,7 +260,7 @@
                 </Tooltip>
 
                 <Tooltip>
-                    <TooltipTrigger Class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors cursor-help">
+                    <TooltipTrigger AsChild="false" Class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors cursor-help">
                         <LucideIcon Name="zap" Size="12" Class="mr-1" />
                         Performance
                     </TooltipTrigger>

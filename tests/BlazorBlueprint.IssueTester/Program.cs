@@ -1,5 +1,8 @@
+using BlazorBlueprint.Primitives.Extensions;
+
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddBlazorBlueprintPrimitives();
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 

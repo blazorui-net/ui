@@ -10,6 +10,8 @@
 #   Tests will FAIL because no .verified.txt baselines exist yet.
 #   Review the generated .received.txt files, then run with --accept to promote them.
 
+clear
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 TEST_PROJECT="$PROJECT_ROOT/tests/BlazorBlueprint.Tests/BlazorBlueprint.Tests.csproj"

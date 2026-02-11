@@ -6,6 +6,8 @@
 # Launches the Issue Tester Blazor Server app for reproducing
 # and testing user-reported issues against BlazorBlueprint components.
 
+clear
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 ISSUE_TESTER="$PROJECT_ROOT/tests/BlazorBlueprint.IssueTester/BlazorBlueprint.IssueTester.csproj"

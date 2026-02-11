@@ -31,7 +31,7 @@
                     HoverCardTrigger renders its own div element.
                 </p>
                 <HoverCard>
-                    <HoverCardTrigger Class="underline cursor-pointer">
+                    <HoverCardTrigger AsChild="false" Class="underline cursor-pointer">
                         @@username
                     </HoverCardTrigger>
                     <HoverCardContent>
@@ -47,7 +47,7 @@
                     Button receives hover/focus behavior via TriggerContext.
                 </p>
                 <HoverCard>
-                    <HoverCardTrigger AsChild>
+                    <HoverCardTrigger>
                         <Button Variant="ButtonVariant.Link">@@johndoe</Button>
                     </HoverCardTrigger>
                     <HoverCardContent>
@@ -75,7 +75,7 @@
         <div class="flex items-center gap-2">
             <p class="text-sm">Hover over</p>
             <HoverCard>
-                <HoverCardTrigger Class="underline">@@nextjs</HoverCardTrigger>
+                <HoverCardTrigger AsChild="false" Class="underline">@@nextjs</HoverCardTrigger>
                 <HoverCardContent>
                     <div class="flex justify-between space-x-4">
                         <div class="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-purple-500 to-pink-500 text-white font-bold text-lg">
@@ -109,7 +109,7 @@
         <div class="text-sm">
             Article written by
             <HoverCard>
-                <HoverCardTrigger Class="font-semibold text-primary hover:underline cursor-pointer">
+                <HoverCardTrigger AsChild="false" Class="font-semibold text-primary hover:underline cursor-pointer">
                     @@johndoe
                 </HoverCardTrigger>
                 <HoverCardContent>
@@ -149,7 +149,7 @@
 
         <div class="flex flex-wrap gap-4">
             <HoverCard OpenDelay="300">
-                <HoverCardTrigger Class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2">
+                <HoverCardTrigger AsChild="false" Class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2">
                     View Product
                 </HoverCardTrigger>
                 <HoverCardContent>
@@ -170,7 +170,7 @@
             </HoverCard>
 
             <HoverCard OpenDelay="300">
-                <HoverCardTrigger Class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2">
+                <HoverCardTrigger AsChild="false" Class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2">
                     Another Product
                 </HoverCardTrigger>
                 <HoverCardContent>
@@ -202,7 +202,7 @@
             <p>
                 The component uses
                 <HoverCard OpenDelay="200">
-                    <HoverCardTrigger Class="border-b border-dashed border-primary cursor-help">
+                    <HoverCardTrigger AsChild="false" Class="border-b border-dashed border-primary cursor-help">
                         Floating UI
                     </HoverCardTrigger>
                     <HoverCardContent>
@@ -219,7 +219,7 @@
                 </HoverCard>
                 for intelligent positioning with automatic collision detection and
                 <HoverCard OpenDelay="200">
-                    <HoverCardTrigger Class="border-b border-dashed border-primary cursor-help">
+                    <HoverCardTrigger AsChild="false" Class="border-b border-dashed border-primary cursor-help">
                         ARIA attributes
                     </HoverCardTrigger>
                     <HoverCardContent>

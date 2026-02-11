@@ -69,7 +69,7 @@
         @if (IsCollapsible && DetailContent != null)
         {
             <Collapsible DefaultOpen="@DefaultOpen">
-                <CollapsibleTrigger Class="flex w-full items-center gap-2 cursor-pointer">
+                <CollapsibleTrigger AsChild="false" Class="flex w-full items-center gap-2 cursor-pointer">
                     <div class="flex-1">
                         @ChildContent
                     </div>

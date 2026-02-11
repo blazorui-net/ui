@@ -4,7 +4,7 @@
 @using BlazorBlueprint.Primitives.Services
 
 <DropdownMenu>
-    <DropdownMenuTrigger Class="flex w-full items-center gap-2 px-2 py-2 group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:py-0 group-data-[collapsible=icon]:justify-center cursor-pointer hover:bg-sidebar-accent data-[state=open]:bg-sidebar-accent rounded-md transition-colors">
+    <DropdownMenuTrigger AsChild="false" Class="flex w-full items-center gap-2 px-2 py-2 group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:py-0 group-data-[collapsible=icon]:justify-center cursor-pointer hover:bg-sidebar-accent data-[state=open]:bg-sidebar-accent rounded-md transition-colors">
         <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
             <LucideIcon Name="book-open" Size="16" />
         </div>

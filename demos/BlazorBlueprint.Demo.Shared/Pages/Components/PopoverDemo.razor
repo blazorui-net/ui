@@ -32,7 +32,7 @@
                     PopoverTrigger renders its own button with inline classes.
                 </p>
                 <Popover>
-                    <PopoverTrigger class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2">
+                    <PopoverTrigger AsChild="false" class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2">
                         Open Popover
                     </PopoverTrigger>
                     <PopoverContent>
@@ -48,7 +48,7 @@
                     Button receives trigger behavior via TriggerContext.
                 </p>
                 <Popover>
-                    <PopoverTrigger AsChild>
+                    <PopoverTrigger>
                         <Button Variant="ButtonVariant.Outline">
                             <LucideIcon Name="settings" Size="16" />
                             Settings
@@ -68,7 +68,7 @@
     <section class="space-y-4">
         <h2 class="text-2xl font-semibold mb-4">Basic Popover</h2>
         <Popover>
-            <PopoverTrigger AsChild>
+            <PopoverTrigger>
                 <Button Variant="ButtonVariant.Outline">Open Popover</Button>
             </PopoverTrigger>
             <PopoverContent>
@@ -98,7 +98,7 @@
         <h2 class="text-2xl font-semibold mb-4">Positioning</h2>
         <div class="flex flex-wrap gap-4">
             <Popover>
-                <PopoverTrigger AsChild>
+                <PopoverTrigger>
                     <Button Variant="ButtonVariant.Secondary">Top</Button>
                 </PopoverTrigger>
                 <PopoverContent Side="@PopoverSide.Top">
@@ -107,7 +107,7 @@
             </Popover>
 
             <Popover>
-                <PopoverTrigger AsChild>
+                <PopoverTrigger>
                     <Button Variant="ButtonVariant.Secondary">Bottom</Button>
                 </PopoverTrigger>
                 <PopoverContent Side="@PopoverSide.Bottom">
@@ -116,7 +116,7 @@
             </Popover>
 
             <Popover>
-                <PopoverTrigger AsChild>
+                <PopoverTrigger>
                     <Button Variant="ButtonVariant.Secondary">Left</Button>
                 </PopoverTrigger>
                 <PopoverContent Side="@PopoverSide.Left">
@@ -125,7 +125,7 @@
             </Popover>
 
             <Popover>
-                <PopoverTrigger AsChild>
+                <PopoverTrigger>
                     <Button Variant="ButtonVariant.Secondary">Right</Button>
                 </PopoverTrigger>
                 <PopoverContent Side="@PopoverSide.Right">
@@ -139,7 +139,7 @@
         <h2 class="text-2xl font-semibold mb-4">Controlled Popover</h2>
         <div class="flex items-center gap-4">
             <Popover @bind-Open="_isControlledOpen">
-                <PopoverTrigger AsChild>
+                <PopoverTrigger>
                     <Button>@(_isControlledOpen ? "Close" : "Open") Controlled</Button>
                 </PopoverTrigger>
                 <PopoverContent>

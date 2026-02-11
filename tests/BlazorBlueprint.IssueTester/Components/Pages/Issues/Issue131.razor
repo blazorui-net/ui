@@ -1,6 +1,7 @@
 @page "/issues/131"
 @using BlazorBlueprint.Components.ButtonGroup
 @using BlazorBlueprint.Components.Dialog
+@using BlazorBlueprint.Components.DropdownMenu
 
 <PageTitle>Issue #131 - Nested Button Group Styling Bug</PageTitle>
 
@@ -27,7 +28,7 @@
         </div>
 
         <div class="space-y-4">
-            <h3 class="text-sm font-medium text-muted-foreground">2. Bug: ButtonGroup with a Dialog wrapping one of the buttons</h3>
+            <h3 class="text-sm font-medium text-muted-foreground">2. Fixed: ButtonGroup with a Dialog wrapping one of the buttons (AsChild now defaults to true)</h3>
             <ButtonGroup AriaLabel="Button group with dialog trigger">
                 <Button Variant="ButtonVariant.Outline">Archive</Button>
                 <Dialog>
@@ -50,11 +51,11 @@
         </div>
 
         <div class="space-y-4">
-            <h3 class="text-sm font-medium text-muted-foreground">3. Bug: ButtonGroup with DialogTrigger using AsChild</h3>
+            <h3 class="text-sm font-medium text-muted-foreground">3. Fixed: ButtonGroup with DialogTrigger (AsChild is now the default)</h3>
             <ButtonGroup AriaLabel="Button group with dialog trigger as child">
                 <Button Variant="ButtonVariant.Outline">Archive</Button>
                 <Dialog>
-                    <DialogTrigger AsChild="true">
+                    <DialogTrigger>
                         <Button Variant="ButtonVariant.Outline">More Actions</Button>
                     </DialogTrigger>
                     <DialogContent>
@@ -68,6 +69,25 @@
                         </DialogFooter>
                     </DialogContent>
                 </Dialog>
+                <Button Variant="ButtonVariant.Outline">Delete</Button>
+            </ButtonGroup>
+        </div>
+
+        <div class="space-y-4">
+            <h3 class="text-sm font-medium text-muted-foreground">4. DropdownMenu in ButtonGroup</h3>
+            <ButtonGroup AriaLabel="Button group with dropdown menu">
+                <Button Variant="ButtonVariant.Outline">Archive</Button>
+                <DropdownMenu>
+                    <DropdownMenuTrigger>
+                        <Button Variant="ButtonVariant.Outline">More Actions</Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                        <DropdownMenuItem>Move to folder</DropdownMenuItem>
+                        <DropdownMenuItem>Copy link</DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem>Mark as read</DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
                 <Button Variant="ButtonVariant.Outline">Delete</Button>
             </ButtonGroup>
         </div>

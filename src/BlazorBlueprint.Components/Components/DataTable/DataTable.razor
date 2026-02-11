@@ -67,7 +67,7 @@
                                         @if (ShouldShowSelectAllPrompt())
                                         {
                                             <DropdownMenu @bind-Open="_selectAllDropdownOpen">
-                                                <DropdownMenuTrigger Class="inline-flex items-center justify-center p-0 bg-transparent border-0 hover:bg-transparent focus:outline-none">
+                                                <DropdownMenuTrigger AsChild="false" Class="inline-flex items-center justify-center p-0 bg-transparent border-0 hover:bg-transparent focus:outline-none">
                                                     <Checkbox Checked="@IsAllSelected()"
                                                               Indeterminate="@IsSomeSelected()"
                                                               AriaLabel="Select rows - click to see options"

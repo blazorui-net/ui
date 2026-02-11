@@ -7,7 +7,7 @@
 <CascadingValue Value="this" IsFixed="false">
     <div class="@ContainerClass">
         <Popover Open="_isOpen" OpenChanged="HandleOpenChanged">
-            <PopoverTrigger role="combobox"
+            <PopoverTrigger AsChild="false" role="combobox"
                            aria-expanded="@GetIsOpen().ToString().ToLower()"
                            aria-controls="@($"{Id}-listbox")"
                            aria-haspopup="listbox"
