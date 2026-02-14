@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # BlazorBlueprint Demo Runner
-# Usage: ./run-demo.sh [server|wasm|auto]
+# Usage: ./run-demo.sh [server|wasm|auto|ssr]
 # If no argument provided, shows interactive selection menu
 
 clear
@@ -13,6 +13,7 @@ PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 DEMO_SERVER="$PROJECT_ROOT/demos/BlazorBlueprint.Demo.Server/BlazorBlueprint.Demo.Server.csproj"
 DEMO_WASM="$PROJECT_ROOT/demos/BlazorBlueprint.Demo.Wasm/BlazorBlueprint.Demo.Wasm.csproj"
 DEMO_AUTO="$PROJECT_ROOT/demos/BlazorBlueprint.Demo.Auto/BlazorBlueprint.Demo.Auto.csproj"
+DEMO_SSR="$PROJECT_ROOT/demos/BlazorBlueprint.Demo.SSR/BlazorBlueprint.Demo.SSR.csproj"
 
 run_demo() {
     local demo_type="$1"
@@ -32,9 +33,13 @@ run_demo() {
             project_path="$DEMO_AUTO"
             demo_name="Blazor Auto (Server + WASM hybrid)"
             ;;
+        ssr|4)
+            project_path="$DEMO_SSR"
+            demo_name="Blazor Static SSR (No interactivity by default)"
+            ;;
         *)
             echo "Unknown demo type: $demo_type"
-            echo "Valid options: server, wasm, auto"
+            echo "Valid options: server, wasm, auto, ssr"
             exit 1
             ;;
     esac
@@ -65,10 +70,11 @@ show_menu() {
     echo "  1) Server  - Blazor Server (InteractiveServer mode)"
     echo "  2) WASM    - Blazor WebAssembly (Standalone, runs in browser)"
     echo "  3) Auto    - Blazor Auto (Server first, then WASM)"
+    echo "  4) SSR     - Static SSR (No interactivity, tests SSR compatibility)"
     echo ""
     echo "  q) Quit"
     echo ""
-    read -p "Enter your choice [1-3]: " choice
+    read -p "Enter your choice [1-4]: " choice
 
     case "$choice" in
         1|server)
@@ -80,12 +86,15 @@ show_menu() {
         3|auto)
             run_demo "auto"
             ;;
+        4|ssr)
+            run_demo "ssr"
+            ;;
         q|Q)
             echo "Goodbye!"
             exit 0
             ;;
         *)
-            echo "Invalid choice. Please enter 1, 2, 3, or q."
+            echo "Invalid choice. Please enter 1, 2, 3, 4, or q."
             exit 1
             ;;
     esac

@@ -1,0 +1,20 @@
+@inherits LayoutComponentBase
+
+<div class="min-h-screen bg-background text-foreground">
+    <header class="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div class="container flex h-14 items-center px-4">
+            <h1 class="text-lg font-semibold">BlazorBlueprint SSR Test</h1>
+            <nav class="ml-8 flex gap-4 text-sm">
+                <a href="/" class="text-muted-foreground hover:text-foreground">Home</a>
+                <a href="/static-components" class="text-muted-foreground hover:text-foreground">Static (SSR Safe)</a>
+                <a href="/form-components" class="text-muted-foreground hover:text-foreground">Forms</a>
+                <a href="/interactive-components" class="text-muted-foreground hover:text-foreground">Needs Interactivity</a>
+                <a href="/js-dependent" class="text-muted-foreground hover:text-foreground">JS Dependent</a>
+                <a href="/interactive-island" class="text-muted-foreground hover:text-foreground">Interactive Island</a>
+            </nav>
+        </div>
+    </header>
+    <main class="container px-4 py-8">
+        @Body
+    </main>
+</div>

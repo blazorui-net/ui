@@ -1,0 +1,164 @@
+@page "/js-dependent"
+
+<PageTitle>JS Dependent Components - BlazorBlueprint</PageTitle>
+
+<div class="max-w-4xl space-y-8">
+    <div class="space-y-3">
+        <h1 class="text-4xl font-bold tracking-tight">JS Dependent Components</h1>
+        <p class="text-xl text-muted-foreground">
+            These components are non-functional or render incorrectly without JavaScript interop.
+            They require <code class="bg-muted px-1 py-0.5 rounded text-xs">@@rendermode</code> to work at all.
+        </p>
+        <div class="rounded-md bg-red-500/10 border border-red-500/20 p-3 text-sm text-red-700 dark:text-red-400">
+            Components here will render empty containers, unstyled fallbacks, or throw errors during SSR.
+            Check the server console for any exceptions.
+        </div>
+    </div>
+
+    @* ───── Slider ───── *@
+    <section class="space-y-3">
+        <h2 class="text-2xl font-semibold">Slider</h2>
+        <p class="text-sm text-muted-foreground">
+            Track HTML renders but the thumb position and drag behavior are entirely JS-driven
+            via pointer events in <code class="bg-muted px-1 py-0.5 rounded text-xs">slider.js</code>.
+        </p>
+        <div class="w-[300px]">
+            <Slider Value="50" Min="0" Max="100" />
+        </div>
+    </section>
+
+    <Separator />
+
+    @* ───── RangeSlider ───── *@
+    <section class="space-y-3">
+        <h2 class="text-2xl font-semibold">RangeSlider</h2>
+        <p class="text-sm text-muted-foreground">
+            Same as Slider — dual-thumb drag handling is JS.
+            <code class="bg-muted px-1 py-0.5 rounded text-xs">[JSInvokable] UpdateValueFromPercentage</code> won't be called.
+        </p>
+        <div class="w-[300px]">
+            <RangeSlider MinValue="20" MaxValue="80" Min="0" Max="100" />
+        </div>
+    </section>
+
+    <Separator />
+
+    @* ───── Resizable ───── *@
+    <section class="space-y-3">
+        <h2 class="text-2xl font-semibold">Resizable Panels</h2>
+        <p class="text-sm text-muted-foreground">
+            Panels render at default sizes but the drag handles are non-functional.
+            <code class="bg-muted px-1 py-0.5 rounded text-xs">resizable.js</code> manages all pointer events.
+        </p>
+        <div class="h-[200px] max-w-lg rounded-lg border">
+            <ResizablePanelGroup Direction="ResizableDirection.Horizontal">
+                <ResizablePanel DefaultSize="50">
+                    <div class="flex h-full items-center justify-center p-6">
+                        <span class="font-semibold">Panel A</span>
+                    </div>
+                </ResizablePanel>
+                <ResizableHandle />
+                <ResizablePanel DefaultSize="50">
+                    <div class="flex h-full items-center justify-center p-6">
+                        <span class="font-semibold">Panel B</span>
+                    </div>
+                </ResizablePanel>
+            </ResizablePanelGroup>
+        </div>
+    </section>
+
+    <Separator />
+
+    @* ───── MaskedInput ───── *@
+    <section class="space-y-3">
+        <h2 class="text-2xl font-semibold">MaskedInput</h2>
+        <p class="text-sm text-muted-foreground">
+            Renders a plain input without the mask applied. The mask logic runs in
+            <code class="bg-muted px-1 py-0.5 rounded text-xs">masked-input.js</code>.
+        </p>
+        <div class="w-[300px]">
+            <MaskedInput Mask="(999) 999-9999" Placeholder="(___) ___-____" />
+        </div>
+    </section>
+
+    <Separator />
+
+    @* ───── InputOTP ───── *@
+    <section class="space-y-3">
+        <h2 class="text-2xl font-semibold">InputOTP</h2>
+        <p class="text-sm text-muted-foreground">
+            Renders the input boxes but focus management between boxes requires interactivity.
+        </p>
+        <InputOTP MaxLength="6" />
+    </section>
+
+    <Separator />
+
+    @* ───── FileUpload ───── *@
+    <section class="space-y-3">
+        <h2 class="text-2xl font-semibold">FileUpload</h2>
+        <p class="text-sm text-muted-foreground">
+            The drop zone renders visually, but drag-and-drop requires
+            <code class="bg-muted px-1 py-0.5 rounded text-xs">file-upload.js</code> and Blazor's
+            <code class="bg-muted px-1 py-0.5 rounded text-xs">InputFile</code> requires interactivity.
+        </p>
+        <div class="max-w-lg">
+            <FileUpload />
+        </div>
+    </section>
+
+    <Separator />
+
+    @* ───── Sidebar ───── *@
+    <section class="space-y-3">
+        <h2 class="text-2xl font-semibold">Sidebar</h2>
+        <p class="text-sm text-muted-foreground">
+            <code class="bg-muted px-1 py-0.5 rounded text-xs">SidebarProvider</code> delays
+            <code class="bg-muted px-1 py-0.5 rounded text-xs">Context.Initialize()</code> until
+            <code class="bg-muted px-1 py-0.5 rounded text-xs">OnAfterRenderAsync</code>, which never runs in SSR.
+            Child components receive uninitialized context. Mobile detection, keyboard shortcuts, and cookie
+            persistence are all JS-dependent.
+        </p>
+        <div class="rounded-lg border h-[300px] overflow-hidden">
+            <SidebarProvider DefaultOpen="true">
+                <BlazorBlueprint.Components.Sidebar.Sidebar>
+                    <SidebarContent>
+                        <SidebarGroup>
+                            <SidebarGroupLabel>Menu</SidebarGroupLabel>
+                            <SidebarGroupContent>
+                                <SidebarMenu>
+                                    <SidebarMenuItem>
+                                        <SidebarMenuButton>
+                                            <LucideIcon Name="home" Class="h-4 w-4" />
+                                            <span>Home</span>
+                                        </SidebarMenuButton>
+                                    </SidebarMenuItem>
+                                    <SidebarMenuItem>
+                                        <SidebarMenuButton>
+                                            <LucideIcon Name="settings" Class="h-4 w-4" />
+                                            <span>Settings</span>
+                                        </SidebarMenuButton>
+                                    </SidebarMenuItem>
+                                </SidebarMenu>
+                            </SidebarGroupContent>
+                        </SidebarGroup>
+                    </SidebarContent>
+                </BlazorBlueprint.Components.Sidebar.Sidebar>
+                <main class="flex-1 p-4">
+                    <p class="text-sm text-muted-foreground">Main content area</p>
+                </main>
+            </SidebarProvider>
+        </div>
+    </section>
+
+    <Separator />
+
+    @* ───── ResponsiveNav ───── *@
+    <section class="space-y-3">
+        <h2 class="text-2xl font-semibold">ResponsiveNav</h2>
+        <p class="text-sm text-muted-foreground">
+            Mobile detection requires <code class="bg-muted px-1 py-0.5 rounded text-xs">window.innerWidth</code> check in JS.
+            Without it, the component can't determine if it should render the mobile or desktop layout.
+        </p>
+    </section>
+</div>

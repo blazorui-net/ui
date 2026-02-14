@@ -1,0 +1,31 @@
+@using BlazorBlueprint.Components.Tabs
+@using BlazorBlueprint.Components.Card
+
+<Tabs DefaultValue="account" Class="w-full max-w-lg">
+    <TabsList>
+        <TabsTrigger Value="account">Account</TabsTrigger>
+        <TabsTrigger Value="password">Password</TabsTrigger>
+    </TabsList>
+    <TabsContent Value="account">
+        <Card>
+            <CardHeader>
+                <CardTitle>Account</CardTitle>
+                <CardDescription>Make changes to your account here.</CardDescription>
+            </CardHeader>
+            <CardContent>
+                <p class="text-sm">This tab content is interactive — switch between tabs!</p>
+            </CardContent>
+        </Card>
+    </TabsContent>
+    <TabsContent Value="password">
+        <Card>
+            <CardHeader>
+                <CardTitle>Password</CardTitle>
+                <CardDescription>Change your password here.</CardDescription>
+            </CardHeader>
+            <CardContent>
+                <p class="text-sm">You switched tabs! This is running via SignalR.</p>
+            </CardContent>
+        </Card>
+    </TabsContent>
+</Tabs>

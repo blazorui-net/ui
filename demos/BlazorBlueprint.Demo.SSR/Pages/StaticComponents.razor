@@ -1,0 +1,289 @@
+@page "/static-components"
+
+<PageTitle>Static Components (SSR Safe) - BlazorBlueprint</PageTitle>
+
+<div class="max-w-4xl space-y-8">
+    <div class="space-y-3">
+        <h1 class="text-4xl font-bold tracking-tight">Static Components</h1>
+        <p class="text-xl text-muted-foreground">
+            These components render correctly as pure static HTML with no interactivity required.
+        </p>
+        <div class="rounded-md bg-green-500/10 border border-green-500/20 p-3 text-sm text-green-700 dark:text-green-400">
+            All components on this page should look correct. They are rendered entirely on the server.
+        </div>
+    </div>
+
+    @* ───── Alert ───── *@
+    <section class="space-y-3">
+        <h2 class="text-2xl font-semibold">Alert</h2>
+        <Alert>
+            <ChildContent>
+                <AlertTitle>Default Alert</AlertTitle>
+                <AlertDescription>This is a default alert rendered via SSR.</AlertDescription>
+            </ChildContent>
+        </Alert>
+        <Alert Variant="AlertVariant.Destructive">
+            <ChildContent>
+                <AlertTitle>Destructive Alert</AlertTitle>
+                <AlertDescription>This is a destructive alert rendered via SSR.</AlertDescription>
+            </ChildContent>
+        </Alert>
+    </section>
+
+    <Separator />
+
+    @* ───── Avatar ───── *@
+    <section class="space-y-3">
+        <h2 class="text-2xl font-semibold">Avatar</h2>
+        <div class="flex gap-4 items-center">
+            <Avatar Src="https://github.com/shadcn.png" Alt="shadcn" Fallback="CN" />
+            <Avatar Fallback="JD" />
+            <Avatar Fallback="AB" Size="AvatarSize.Large" />
+        </div>
+    </section>
+
+    <Separator />
+
+    @* ───── Badge ───── *@
+    <section class="space-y-3">
+        <h2 class="text-2xl font-semibold">Badge</h2>
+        <div class="flex gap-2 flex-wrap">
+            <Badge>Default</Badge>
+            <Badge Variant="BadgeVariant.Secondary">Secondary</Badge>
+            <Badge Variant="BadgeVariant.Outline">Outline</Badge>
+            <Badge Variant="BadgeVariant.Destructive">Destructive</Badge>
+        </div>
+    </section>
+
+    <Separator />
+
+    @* ───── Breadcrumb ───── *@
+    <section class="space-y-3">
+        <h2 class="text-2xl font-semibold">Breadcrumb</h2>
+        <Breadcrumb>
+            <BreadcrumbList>
+                <BreadcrumbItem>
+                    <BreadcrumbLink Href="/">Home</BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                    <BreadcrumbLink Href="/static-components">Components</BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                    <BreadcrumbPage>Breadcrumb</BreadcrumbPage>
+                </BreadcrumbItem>
+            </BreadcrumbList>
+        </Breadcrumb>
+    </section>
+
+    <Separator />
+
+    @* ───── Button ───── *@
+    <section class="space-y-3">
+        <h2 class="text-2xl font-semibold">Button</h2>
+        <p class="text-sm text-muted-foreground">Buttons render correctly but click handlers won't fire in static SSR.</p>
+        <div class="flex gap-2 flex-wrap">
+            <Button>Default</Button>
+            <Button Variant="ButtonVariant.Secondary">Secondary</Button>
+            <Button Variant="ButtonVariant.Outline">Outline</Button>
+            <Button Variant="ButtonVariant.Ghost">Ghost</Button>
+            <Button Variant="ButtonVariant.Destructive">Destructive</Button>
+            <Button Variant="ButtonVariant.Link">Link</Button>
+            <Button Disabled="true">Disabled</Button>
+        </div>
+    </section>
+
+    <Separator />
+
+    @* ───── Card ───── *@
+    <section class="space-y-3">
+        <h2 class="text-2xl font-semibold">Card</h2>
+        <Card Class="w-[350px]">
+            <CardHeader>
+                <CardTitle>Card Title</CardTitle>
+                <CardDescription>Card description rendered via SSR.</CardDescription>
+            </CardHeader>
+            <CardContent>
+                <p class="text-sm">This card is pure static HTML. No interactivity needed.</p>
+            </CardContent>
+            <CardFooter>
+                <Button Variant="ButtonVariant.Outline" Class="w-full">Action</Button>
+            </CardFooter>
+        </Card>
+    </section>
+
+    <Separator />
+
+    @* ───── Calendar ───── *@
+    <section class="space-y-3">
+        <h2 class="text-2xl font-semibold">Calendar</h2>
+        <p class="text-sm text-muted-foreground">Renders the current month grid. Navigation buttons won't work without interactivity.</p>
+        <Calendar Value="DateTime.Today" Class="rounded-md border w-fit" />
+    </section>
+
+    <Separator />
+
+    @* ───── Icons ───── *@
+    <section class="space-y-3">
+        <h2 class="text-2xl font-semibold">Icons (Lucide)</h2>
+        <p class="text-sm text-muted-foreground">Icons are inline SVGs — fully SSR safe.</p>
+        <div class="flex gap-4 items-center">
+            <LucideIcon Name="home" Class="h-6 w-6" />
+            <LucideIcon Name="settings" Class="h-6 w-6" />
+            <LucideIcon Name="user" Class="h-6 w-6" />
+            <LucideIcon Name="search" Class="h-6 w-6" />
+            <LucideIcon Name="bell" Class="h-6 w-6" />
+            <LucideIcon Name="mail" Class="h-6 w-6" />
+            <LucideIcon Name="heart" Class="h-6 w-6 text-red-500" />
+            <LucideIcon Name="star" Class="h-6 w-6 text-yellow-500" />
+        </div>
+    </section>
+
+    <Separator />
+
+    @* ───── Kbd ───── *@
+    <section class="space-y-3">
+        <h2 class="text-2xl font-semibold">Kbd</h2>
+        <div class="flex gap-2 items-center">
+            <Kbd>Ctrl</Kbd>
+            <span>+</span>
+            <Kbd>C</Kbd>
+            <span class="ml-4">or</span>
+            <Kbd>⌘</Kbd>
+            <span>+</span>
+            <Kbd>V</Kbd>
+        </div>
+    </section>
+
+    <Separator />
+
+    @* ───── Progress ───── *@
+    <section class="space-y-3">
+        <h2 class="text-2xl font-semibold">Progress</h2>
+        <div class="space-y-4 w-[400px]">
+            <Progress Value="25" />
+            <Progress Value="50" />
+            <Progress Value="75" />
+        </div>
+    </section>
+
+    <Separator />
+
+    @* ───── Separator ───── *@
+    <section class="space-y-3">
+        <h2 class="text-2xl font-semibold">Separator</h2>
+        <div class="space-y-1">
+            <h4 class="text-sm font-medium leading-none">BlazorBlueprint UI</h4>
+            <p class="text-sm text-muted-foreground">An open-source component library.</p>
+        </div>
+        <Separator />
+        <div class="flex h-5 items-center space-x-4 text-sm">
+            <span>Docs</span>
+            <Separator Orientation="SeparatorOrientation.Vertical" />
+            <span>Source</span>
+            <Separator Orientation="SeparatorOrientation.Vertical" />
+            <span>Blog</span>
+        </div>
+    </section>
+
+    <Separator />
+
+    @* ───── Skeleton ───── *@
+    <section class="space-y-3">
+        <h2 class="text-2xl font-semibold">Skeleton</h2>
+        <div class="flex items-center space-x-4">
+            <Skeleton Class="h-12 w-12 rounded-full" />
+            <div class="space-y-2">
+                <Skeleton Class="h-4 w-[250px]" />
+                <Skeleton Class="h-4 w-[200px]" />
+            </div>
+        </div>
+    </section>
+
+    <Separator />
+
+    @* ───── Spinner ───── *@
+    <section class="space-y-3">
+        <h2 class="text-2xl font-semibold">Spinner</h2>
+        <div class="flex gap-4 items-center">
+            <Spinner />
+            <Spinner Size="SpinnerSize.Large" />
+        </div>
+    </section>
+
+    <Separator />
+
+    @* ───── ScrollArea ───── *@
+    <section class="space-y-3">
+        <h2 class="text-2xl font-semibold">ScrollArea</h2>
+        <ScrollArea Height="200px" Class="w-[350px] rounded-md border p-4">
+            <div class="space-y-4">
+                @for (int i = 1; i <= 20; i++)
+                {
+                    <div class="text-sm">Item @i — Scrollable content rendered via SSR</div>
+                }
+            </div>
+        </ScrollArea>
+    </section>
+
+    <Separator />
+
+    @* ───── Timeline ───── *@
+    <section class="space-y-3">
+        <h2 class="text-2xl font-semibold">Timeline</h2>
+        <Timeline>
+            <TimelineItem>
+                <TimelineHeading>Step 1</TimelineHeading>
+                <TimelineDescription>Server renders HTML</TimelineDescription>
+            </TimelineItem>
+            <TimelineItem>
+                <TimelineHeading>Step 2</TimelineHeading>
+                <TimelineDescription>HTML sent to browser</TimelineDescription>
+            </TimelineItem>
+            <TimelineItem>
+                <TimelineHeading>Step 3</TimelineHeading>
+                <TimelineDescription>No JS required</TimelineDescription>
+            </TimelineItem>
+        </Timeline>
+    </section>
+
+    <Separator />
+
+    @* ───── AspectRatio ───── *@
+    <section class="space-y-3">
+        <h2 class="text-2xl font-semibold">AspectRatio</h2>
+        <div class="w-[350px]">
+            <AspectRatio Ratio="16.0/9.0">
+                <div class="flex items-center justify-center h-full bg-muted rounded-md text-sm text-muted-foreground">
+                    16:9 aspect ratio container
+                </div>
+            </AspectRatio>
+        </div>
+    </section>
+
+    <Separator />
+
+    @* ───── Empty ───── *@
+    <section class="space-y-3">
+        <h2 class="text-2xl font-semibold">Empty</h2>
+        <Empty>
+            <Icon>
+                <LucideIcon Name="inbox" Class="h-10 w-10" />
+            </Icon>
+            <ChildContent>
+                <EmptyTitle>No results</EmptyTitle>
+                <EmptyDescription>No items found. Try a different search.</EmptyDescription>
+            </ChildContent>
+        </Empty>
+    </section>
+
+    <Separator />
+
+    @* ───── Pagination ───── *@
+    <section class="space-y-3">
+        <h2 class="text-2xl font-semibold">Pagination</h2>
+        <p class="text-sm text-muted-foreground">Links render but navigation callbacks won't fire without interactivity.</p>
+        <Pagination TotalPages="10" CurrentPage="3" />
+    </section>
+</div>

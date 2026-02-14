@@ -1,0 +1,62 @@
+@page "/"
+
+<PageTitle>SSR Compatibility Test - BlazorBlueprint</PageTitle>
+
+<div class="max-w-4xl space-y-8">
+    <div class="space-y-3">
+        <h1 class="text-4xl font-bold tracking-tight">SSR Compatibility Test</h1>
+        <p class="text-xl text-muted-foreground">
+            This demo runs with <strong>no render mode</strong> on the root Routes component.
+            Every page renders as static HTML on the server — no SignalR, no WebAssembly, no JS interop.
+        </p>
+    </div>
+
+    <div class="rounded-lg border bg-card p-6 space-y-4">
+        <h2 class="text-lg font-semibold">How this works</h2>
+        <ul class="space-y-2 text-sm text-muted-foreground list-disc list-inside">
+            <li>In the other demos, <code class="text-xs bg-muted px-1 py-0.5 rounded">@@rendermode="InteractiveServer"</code> is set on <code class="text-xs bg-muted px-1 py-0.5 rounded">&lt;Routes&gt;</code> in App.razor — making the entire app interactive.</li>
+            <li>In this demo, <code class="text-xs bg-muted px-1 py-0.5 rounded">&lt;Routes&gt;</code> has <strong>no render mode</strong>. Components render as pure static HTML.</li>
+            <li><code class="text-xs bg-muted px-1 py-0.5 rounded">OnAfterRenderAsync</code> never runs. JS interop is unavailable. <code class="text-xs bg-muted px-1 py-0.5 rounded">ElementReference</code> values are empty.</li>
+            <li>Click handlers, two-way binding, and event callbacks don't work — the page is plain HTML.</li>
+            <li>Forms work only via traditional HTTP POST with the <code class="text-xs bg-muted px-1 py-0.5 rounded">Name</code> parameter and <code class="text-xs bg-muted px-1 py-0.5 rounded">&lt;EditForm&gt;</code> with <code class="text-xs bg-muted px-1 py-0.5 rounded">FormName</code>.</li>
+            <li>The <a href="/interactive-island" class="underline text-foreground">Interactive Island</a> page shows how to opt individual components into interactivity.</li>
+        </ul>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <a href="/static-components" class="group rounded-lg border p-6 hover:border-foreground/25 transition-colors">
+            <h3 class="font-semibold group-hover:underline">Static Components</h3>
+            <p class="text-sm text-muted-foreground mt-1">
+                Components that render correctly as pure static HTML.
+            </p>
+        </a>
+
+        <a href="/form-components" class="group rounded-lg border p-6 hover:border-foreground/25 transition-colors">
+            <h3 class="font-semibold group-hover:underline">Form Components</h3>
+            <p class="text-sm text-muted-foreground mt-1">
+                Form inputs tested with SSR form postback.
+            </p>
+        </a>
+
+        <a href="/interactive-components" class="group rounded-lg border p-6 hover:border-foreground/25 transition-colors">
+            <h3 class="font-semibold group-hover:underline">Needs Interactivity</h3>
+            <p class="text-sm text-muted-foreground mt-1">
+                Components that render HTML but lose all interactive behavior.
+            </p>
+        </a>
+
+        <a href="/js-dependent" class="group rounded-lg border p-6 hover:border-foreground/25 transition-colors">
+            <h3 class="font-semibold group-hover:underline">JS Dependent</h3>
+            <p class="text-sm text-muted-foreground mt-1">
+                Components that are non-functional or broken without JS interop.
+            </p>
+        </a>
+
+        <a href="/interactive-island" class="group rounded-lg border p-6 hover:border-foreground/25 transition-colors md:col-span-2">
+            <h3 class="font-semibold group-hover:underline">Interactive Island Demo</h3>
+            <p class="text-sm text-muted-foreground mt-1">
+                Shows how to opt individual components into @@rendermode="InteractiveServer" while the rest of the page stays static.
+            </p>
+        </a>
+    </div>
+</div>

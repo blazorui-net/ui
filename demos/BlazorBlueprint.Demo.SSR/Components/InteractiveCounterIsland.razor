@@ -1,0 +1,26 @@
+@using BlazorBlueprint.Components.Button
+@using BlazorBlueprint.Components.Card
+
+<Card Class="max-w-xs">
+    <CardContent Class="pt-6">
+        <div class="flex items-center justify-between">
+            <Button Variant="ButtonVariant.Outline" Size="ButtonSize.Icon" OnClick="Decrement">
+                <span class="text-lg">-</span>
+            </Button>
+            <span class="text-4xl font-bold tabular-nums">@_count</span>
+            <Button Variant="ButtonVariant.Outline" Size="ButtonSize.Icon" OnClick="Increment">
+                <span class="text-lg">+</span>
+            </Button>
+        </div>
+        <p class="text-xs text-muted-foreground text-center mt-2">
+            This counter works because it's in an interactive island.
+        </p>
+    </CardContent>
+</Card>
+
+@code {
+    private int _count = 0;
+
+    private void Increment() => _count++;
+    private void Decrement() => _count--;
+}

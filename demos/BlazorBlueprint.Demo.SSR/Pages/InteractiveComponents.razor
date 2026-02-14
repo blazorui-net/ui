@@ -1,0 +1,283 @@
+@page "/interactive-components"
+
+<PageTitle>Needs Interactivity - BlazorBlueprint</PageTitle>
+
+<div class="max-w-4xl space-y-8">
+    <div class="space-y-3">
+        <h1 class="text-4xl font-bold tracking-tight">Needs Interactivity</h1>
+        <p class="text-xl text-muted-foreground">
+            These components render their HTML shell correctly, but their interactive behavior
+            (opening menus, switching tabs, toggling state) doesn't work without a render mode.
+        </p>
+        <div class="rounded-md bg-yellow-500/10 border border-yellow-500/20 p-3 text-sm text-yellow-700 dark:text-yellow-400">
+            Visually these should look correct on initial render, but clicking / hovering / typing won't do anything.
+        </div>
+    </div>
+
+    @* ───── Accordion ───── *@
+    <section class="space-y-3">
+        <h2 class="text-2xl font-semibold">Accordion</h2>
+        <p class="text-sm text-muted-foreground">Renders collapsed. Clicking items won't expand them.</p>
+        <Accordion Type="AccordionType.Single" Class="w-full max-w-lg">
+            <AccordionItem Value="item-1">
+                <AccordionTrigger>Is it accessible?</AccordionTrigger>
+                <AccordionContent>Yes. It adheres to the WAI-ARIA design pattern.</AccordionContent>
+            </AccordionItem>
+            <AccordionItem Value="item-2">
+                <AccordionTrigger>Is it styled?</AccordionTrigger>
+                <AccordionContent>Yes. It comes with default styles using Tailwind CSS.</AccordionContent>
+            </AccordionItem>
+            <AccordionItem Value="item-3">
+                <AccordionTrigger>Is it animated?</AccordionTrigger>
+                <AccordionContent>Yes. It uses CSS transitions for smooth animations.</AccordionContent>
+            </AccordionItem>
+        </Accordion>
+    </section>
+
+    <Separator />
+
+    @* ───── Tabs ───── *@
+    <section class="space-y-3">
+        <h2 class="text-2xl font-semibold">Tabs</h2>
+        <p class="text-sm text-muted-foreground">The active tab renders. Switching tabs requires interactivity.</p>
+        <Tabs DefaultValue="account" Class="w-full max-w-lg">
+            <TabsList>
+                <TabsTrigger Value="account">Account</TabsTrigger>
+                <TabsTrigger Value="password">Password</TabsTrigger>
+            </TabsList>
+            <TabsContent Value="account">
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Account</CardTitle>
+                        <CardDescription>Make changes to your account here.</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <p class="text-sm">Account settings content.</p>
+                    </CardContent>
+                </Card>
+            </TabsContent>
+            <TabsContent Value="password">
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Password</CardTitle>
+                        <CardDescription>Change your password here.</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <p class="text-sm">Password settings content.</p>
+                    </CardContent>
+                </Card>
+            </TabsContent>
+        </Tabs>
+    </section>
+
+    <Separator />
+
+    @* ───── Collapsible ───── *@
+    <section class="space-y-3">
+        <h2 class="text-2xl font-semibold">Collapsible</h2>
+        <p class="text-sm text-muted-foreground">Renders in collapsed state. Toggle button won't work.</p>
+        <Collapsible Class="w-[350px] space-y-2">
+            <div class="flex items-center justify-between space-x-4 px-4">
+                <h4 class="text-sm font-semibold">3 items tagged</h4>
+                <CollapsibleTrigger AsChild="true">
+                    <Button Variant="ButtonVariant.Ghost" Size="ButtonSize.Small">
+                        <LucideIcon Name="chevrons-up-down" Class="h-4 w-4" />
+                    </Button>
+                </CollapsibleTrigger>
+            </div>
+            <div class="rounded-md border px-4 py-3 text-sm">@@radix-ui/primitives</div>
+            <CollapsibleContent>
+                <div class="space-y-2">
+                    <div class="rounded-md border px-4 py-3 text-sm">@@radix-ui/colors</div>
+                    <div class="rounded-md border px-4 py-3 text-sm">@@stitches/react</div>
+                </div>
+            </CollapsibleContent>
+        </Collapsible>
+    </section>
+
+    <Separator />
+
+    @* ───── Carousel ───── *@
+    <section class="space-y-3">
+        <h2 class="text-2xl font-semibold">Carousel</h2>
+        <p class="text-sm text-muted-foreground">First slide renders. Navigation buttons won't work.</p>
+        <Carousel Class="w-full max-w-xs mx-auto">
+            <CarouselContent>
+                @for (int i = 1; i <= 5; i++)
+                {
+                    <CarouselItem>
+                        <Card>
+                            <CardContent Class="flex aspect-square items-center justify-center p-6">
+                                <span class="text-4xl font-semibold">@i</span>
+                            </CardContent>
+                        </Card>
+                    </CarouselItem>
+                }
+            </CarouselContent>
+            <CarouselPrevious />
+            <CarouselNext />
+        </Carousel>
+    </section>
+
+    <Separator />
+
+    @* ───── Toggle ───── *@
+    <section class="space-y-3">
+        <h2 class="text-2xl font-semibold">Toggle</h2>
+        <p class="text-sm text-muted-foreground">Renders in unpressed state. Clicking won't toggle.</p>
+        <div class="flex gap-2">
+            <Toggle AriaLabel="Toggle bold">
+                <LucideIcon Name="bold" Class="h-4 w-4" />
+            </Toggle>
+            <Toggle AriaLabel="Toggle italic">
+                <LucideIcon Name="italic" Class="h-4 w-4" />
+            </Toggle>
+            <Toggle AriaLabel="Toggle underline">
+                <LucideIcon Name="underline" Class="h-4 w-4" />
+            </Toggle>
+        </div>
+    </section>
+
+    <Separator />
+
+    @* ───── Dialog ───── *@
+    <section class="space-y-3">
+        <h2 class="text-2xl font-semibold">Dialog / AlertDialog</h2>
+        <p class="text-sm text-muted-foreground">
+            The trigger button renders. Clicking it won't open the dialog — dialog content requires
+            JS for focus trapping, click-outside detection, and portal rendering.
+        </p>
+        <div class="flex gap-4">
+            <Dialog>
+                <DialogTrigger AsChild="true">
+                    <Button Variant="ButtonVariant.Outline">Open Dialog</Button>
+                </DialogTrigger>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Dialog Title</DialogTitle>
+                        <DialogDescription>This dialog won't open in static SSR.</DialogDescription>
+                    </DialogHeader>
+                </DialogContent>
+            </Dialog>
+
+            <AlertDialog>
+                <AlertDialogTrigger AsChild="true">
+                    <Button Variant="ButtonVariant.Destructive">Delete Item</Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                        <AlertDialogDescription>This action cannot be undone.</AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction>Continue</AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+        </div>
+    </section>
+
+    <Separator />
+
+    @* ───── Sheet / Drawer ───── *@
+    <section class="space-y-3">
+        <h2 class="text-2xl font-semibold">Sheet / Drawer</h2>
+        <p class="text-sm text-muted-foreground">Trigger renders. Panel won't slide open.</p>
+        <Sheet>
+            <SheetTrigger AsChild="true">
+                <Button Variant="ButtonVariant.Outline">Open Sheet</Button>
+            </SheetTrigger>
+            <SheetContent>
+                <SheetHeader>
+                    <SheetTitle>Sheet Title</SheetTitle>
+                    <SheetDescription>This sheet won't open in static SSR.</SheetDescription>
+                </SheetHeader>
+            </SheetContent>
+        </Sheet>
+    </section>
+
+    <Separator />
+
+    @* ───── DropdownMenu ───── *@
+    <section class="space-y-3">
+        <h2 class="text-2xl font-semibold">DropdownMenu</h2>
+        <p class="text-sm text-muted-foreground">Trigger renders. Menu won't open.</p>
+        <DropdownMenu>
+            <DropdownMenuTrigger AsChild="true">
+                <Button Variant="ButtonVariant.Outline">
+                    Open Menu
+                    <LucideIcon Name="chevron-down" Class="ml-2 h-4 w-4" />
+                </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+                <DropdownMenuItem>Profile</DropdownMenuItem>
+                <DropdownMenuItem>Settings</DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem>Log out</DropdownMenuItem>
+            </DropdownMenuContent>
+        </DropdownMenu>
+    </section>
+
+    <Separator />
+
+    @* ───── Popover ───── *@
+    <section class="space-y-3">
+        <h2 class="text-2xl font-semibold">Popover</h2>
+        <p class="text-sm text-muted-foreground">Trigger renders. Popover content won't appear (requires JS positioning).</p>
+        <Popover>
+            <PopoverTrigger AsChild="true">
+                <Button Variant="ButtonVariant.Outline">Open Popover</Button>
+            </PopoverTrigger>
+            <PopoverContent>
+                <div class="space-y-2">
+                    <h4 class="font-medium leading-none">Dimensions</h4>
+                    <p class="text-sm text-muted-foreground">Set the dimensions for the layer.</p>
+                </div>
+            </PopoverContent>
+        </Popover>
+    </section>
+
+    <Separator />
+
+    @* ───── Tooltip ───── *@
+    <section class="space-y-3">
+        <h2 class="text-2xl font-semibold">Tooltip</h2>
+        <p class="text-sm text-muted-foreground">Trigger element renders. Tooltip won't appear on hover.</p>
+        <TooltipProvider>
+            <Tooltip>
+                <TooltipTrigger AsChild="true">
+                    <Button Variant="ButtonVariant.Outline">Hover me</Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                    <p>This tooltip won't show in SSR</p>
+                </TooltipContent>
+            </Tooltip>
+        </TooltipProvider>
+    </section>
+
+    <Separator />
+
+    @* ───── Select ───── *@
+    <section class="space-y-3">
+        <h2 class="text-2xl font-semibold">Select</h2>
+        <p class="text-sm text-muted-foreground">Trigger button renders with placeholder. Dropdown won't open.</p>
+        <Select Placeholder="Select a fruit...">
+            <SelectItem Value="apple">Apple</SelectItem>
+            <SelectItem Value="banana">Banana</SelectItem>
+            <SelectItem Value="cherry">Cherry</SelectItem>
+        </Select>
+    </section>
+
+    <Separator />
+
+    @* ───── Toast ───── *@
+    <section class="space-y-3">
+        <h2 class="text-2xl font-semibold">Toast</h2>
+        <p class="text-sm text-muted-foreground">
+            ToastService is pure C#, but toasts won't visually appear because PortalHost
+            needs JS for auto-focus observation. The button click also won't fire.
+        </p>
+        <Button Variant="ButtonVariant.Outline">Show Toast (won't work)</Button>
+    </section>
+</div>

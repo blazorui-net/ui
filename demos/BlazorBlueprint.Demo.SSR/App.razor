@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="default">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <base href="/" />
+    <link href="_content/BlazorBlueprint.Demo.Shared/css/app.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/quill@2/dist/quill.core.css" rel="stylesheet" />
+    <link href="_content/BlazorBlueprint.Components/blazorblueprint.css" rel="stylesheet" />
+    <link rel="icon" type="image/png" href="_content/BlazorBlueprint.Demo.Shared/favicon.png"/>
+    <HeadOutlet />
+</head>
+<body>
+    @*
+        NO @rendermode on Routes — this is the key difference from the other demos.
+        The entire app renders as static SSR by default. Components are plain HTML
+        with no interactivity until they individually opt-in via @rendermode.
+        This lets us test which components work as pure static HTML.
+    *@
+    <BlazorBlueprint.Demo.SSR.Routes />
+
+    <div id="blazor-error-ui" style="display: none;">
+        An error has occurred. This application may no longer respond until reloaded.
+        <a href="" class="reload">Reload</a>
+        <a class="dismiss">X</a>
+    </div>
+
+    <script src="_framework/blazor.web.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/quill@2/dist/quill.js"></script>
+    <script>
+        window.toggleDarkMode = () => document.documentElement.classList.toggle('dark');
+        window.isDarkModeEnabled = () => document.documentElement.classList.contains('dark');
+    </script>
+</body>
+</html>

@@ -1,0 +1,159 @@
+@page "/form-components"
+
+<PageTitle>Form Components (SSR) - BlazorBlueprint</PageTitle>
+
+<div class="max-w-4xl space-y-8">
+    <div class="space-y-3">
+        <h1 class="text-4xl font-bold tracking-tight">Form Components</h1>
+        <p class="text-xl text-muted-foreground">
+            Testing form inputs with SSR. In static SSR, forms submit via HTTP POST — not Blazor event handlers.
+        </p>
+        <div class="rounded-md bg-blue-500/10 border border-blue-500/20 p-3 text-sm text-blue-700 dark:text-blue-400">
+            Components using the <code class="bg-muted px-1 py-0.5 rounded text-xs">Name</code> parameter will participate in
+            traditional form submission. Two-way <code class="bg-muted px-1 py-0.5 rounded text-xs">@@bind</code> does not work in static SSR.
+        </div>
+    </div>
+
+    @* ───── SSR Form Demo ───── *@
+    <section class="space-y-4">
+        <h2 class="text-2xl font-semibold">EditForm with SSR Postback</h2>
+        <p class="text-sm text-muted-foreground">
+            This form uses <code class="bg-muted px-1 py-0.5 rounded text-xs">EditForm</code> with
+            <code class="bg-muted px-1 py-0.5 rounded text-xs">FormName</code> for SSR form handling.
+            Submit the form and the page will reload with the posted values.
+        </p>
+
+        <Card Class="max-w-lg">
+            <CardHeader>
+                <CardTitle>Contact Form</CardTitle>
+                <CardDescription>A basic form that works with SSR postback.</CardDescription>
+            </CardHeader>
+            <CardContent>
+                <EditForm method="post" FormName="contact-form" Model="_formModel" OnValidSubmit="HandleSubmit" class="space-y-4">
+                    <AntiforgeryToken />
+
+                    <div class="space-y-2">
+                        <Label For="name">Name</Label>
+                        <InputText @bind-Value="_formModel.Name" name="Name" id="name"
+                                   class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm" />
+                    </div>
+
+                    <div class="space-y-2">
+                        <Label For="email">Email</Label>
+                        <InputText @bind-Value="_formModel.Email" name="Email" id="email" type="email"
+                                   class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm" />
+                    </div>
+
+                    <div class="space-y-2">
+                        <Label For="message">Message</Label>
+                        <InputTextArea @bind-Value="_formModel.Message" name="Message" id="message" rows="3"
+                                       class="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm" />
+                    </div>
+
+                    <Button type="submit">Submit</Button>
+                </EditForm>
+
+                @if (_submitted)
+                {
+                    <div class="mt-4 rounded-md bg-green-500/10 border border-green-500/20 p-3 text-sm text-green-700 dark:text-green-400">
+                        Form submitted! Name: @_formModel.Name, Email: @_formModel.Email
+                    </div>
+                }
+            </CardContent>
+        </Card>
+    </section>
+
+    <Separator />
+
+    @* ───── Standard HTML form inputs ───── *@
+    <section class="space-y-4">
+        <h2 class="text-2xl font-semibold">Component Rendering (Static)</h2>
+        <p class="text-sm text-muted-foreground">
+            These components render as standard HTML form elements. They appear correctly but
+            <code class="bg-muted px-1 py-0.5 rounded text-xs">@@bind</code> / event callbacks don't work without interactivity.
+        </p>
+
+        <div class="grid gap-6 max-w-lg">
+            @* Input *@
+            <div class="space-y-2">
+                <Label>Input</Label>
+                <Input Placeholder="Type here..." />
+            </div>
+
+            @* Textarea *@
+            <div class="space-y-2">
+                <Label>Textarea</Label>
+                <Textarea Placeholder="Enter your message..." />
+            </div>
+
+            @* Checkbox *@
+            <div class="flex items-center space-x-2">
+                <Checkbox Id="terms" />
+                <Label For="terms">Accept terms and conditions</Label>
+            </div>
+
+            @* Switch *@
+            <div class="flex items-center space-x-2">
+                <Switch Id="airplane" />
+                <Label For="airplane">Airplane Mode</Label>
+            </div>
+
+            @* RadioGroup *@
+            <div class="space-y-2">
+                <Label>Preferred contact</Label>
+                <RadioGroup Value="email">
+                    <div class="flex items-center space-x-2">
+                        <RadioGroupItem Value="email" Id="email-radio" />
+                        <Label For="email-radio">Email</Label>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <RadioGroupItem Value="phone" Id="phone-radio" />
+                        <Label For="phone-radio">Phone</Label>
+                    </div>
+                </RadioGroup>
+            </div>
+
+            @* NativeSelect *@
+            <div class="space-y-2">
+                <Label>Native Select</Label>
+                <NativeSelect>
+                    <option value="">Choose a framework...</option>
+                    <option value="blazor">Blazor</option>
+                    <option value="react">React</option>
+                    <option value="vue">Vue</option>
+                    <option value="angular">Angular</option>
+                </NativeSelect>
+            </div>
+
+            @* Label *@
+            <div class="space-y-2">
+                <Label>Label component</Label>
+                <p class="text-sm text-muted-foreground">Labels are standard &lt;label&gt; elements — fully SSR safe.</p>
+            </div>
+        </div>
+    </section>
+</div>
+
+@code {
+    private ContactModel _formModel = new();
+    private bool _submitted;
+
+    private void HandleSubmit()
+    {
+        _submitted = true;
+    }
+
+    [SupplyParameterFromForm]
+    private ContactModel FormModel
+    {
+        get => _formModel;
+        set => _formModel = value;
+    }
+
+    private sealed class ContactModel
+    {
+        public string Name { get; set; } = "";
+        public string Email { get; set; } = "";
+        public string Message { get; set; } = "";
+    }
+}

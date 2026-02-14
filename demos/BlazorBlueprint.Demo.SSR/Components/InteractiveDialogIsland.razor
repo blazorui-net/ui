@@ -1,0 +1,35 @@
+@using BlazorBlueprint.Components.Button
+@using BlazorBlueprint.Components.Dialog
+@using BlazorBlueprint.Components.Input
+@using BlazorBlueprint.Components.Label
+@using BlazorBlueprint.Primitives.Services
+
+@inject IPortalService PortalService
+
+<div>
+    <Dialog>
+        <DialogTrigger AsChild="true">
+            <Button Variant="ButtonVariant.Outline">Open Dialog</Button>
+        </DialogTrigger>
+        <DialogContent>
+            <DialogHeader>
+                <DialogTitle>Edit Profile</DialogTitle>
+                <DialogDescription>Make changes to your profile. Click save when you're done.</DialogDescription>
+            </DialogHeader>
+            <div class="grid gap-4 py-4">
+                <div class="grid grid-cols-4 items-center gap-4">
+                    <Label Class="text-right">Name</Label>
+                    <Input Value="Pedro Duarte" Class="col-span-3" />
+                </div>
+                <div class="grid grid-cols-4 items-center gap-4">
+                    <Label Class="text-right">Username</Label>
+                    <Input Value="@@peduarte" Class="col-span-3" />
+                </div>
+            </div>
+            <DialogFooter>
+                <Button type="submit">Save changes</Button>
+            </DialogFooter>
+        </DialogContent>
+    </Dialog>
+    <PortalHost />
+</div>

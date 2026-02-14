@@ -1,0 +1,103 @@
+@page "/interactive-island"
+@using static Microsoft.AspNetCore.Components.Web.RenderMode
+
+<PageTitle>Interactive Island Demo - BlazorBlueprint</PageTitle>
+
+<div class="max-w-4xl space-y-8">
+    <div class="space-y-3">
+        <h1 class="text-4xl font-bold tracking-tight">Interactive Island Demo</h1>
+        <p class="text-xl text-muted-foreground">
+            This page is statically rendered, but individual components opt-in to
+            <code class="bg-muted px-1 py-0.5 rounded text-xs">@@rendermode="InteractiveServer"</code>
+            creating "islands" of interactivity in a sea of static HTML.
+        </p>
+        <div class="rounded-md bg-purple-500/10 border border-purple-500/20 p-3 text-sm text-purple-700 dark:text-purple-400">
+            This is the recommended pattern for SSR apps that need some interactive components.
+            The page HTML is served instantly, and only the marked components establish a SignalR connection.
+        </div>
+    </div>
+
+    @* ───── Static section ───── *@
+    <section class="space-y-3">
+        <h2 class="text-2xl font-semibold">Static Content (no rendermode)</h2>
+        <p class="text-sm text-muted-foreground">This section is pure static HTML. Served instantly, no JS.</p>
+        <div class="flex gap-2 flex-wrap">
+            <Badge>Static</Badge>
+            <Badge Variant="BadgeVariant.Secondary">SSR</Badge>
+            <Badge Variant="BadgeVariant.Outline">No JS</Badge>
+        </div>
+        <Card Class="max-w-md">
+            <CardHeader>
+                <CardTitle>Static Card</CardTitle>
+                <CardDescription>This card is server-rendered HTML. No interactivity.</CardDescription>
+            </CardHeader>
+            <CardContent>
+                <div class="flex gap-4">
+                    <LucideIcon Name="zap" Class="h-5 w-5 text-yellow-500" />
+                    <p class="text-sm">Instant load. Zero JavaScript.</p>
+                </div>
+            </CardContent>
+        </Card>
+    </section>
+
+    <Separator />
+
+    @* ───── Interactive island: Accordion ───── *@
+    <section class="space-y-3">
+        <h2 class="text-2xl font-semibold">Interactive Accordion</h2>
+        <p class="text-sm text-muted-foreground">
+            This accordion has <code class="bg-muted px-1 py-0.5 rounded text-xs">@@rendermode="InteractiveServer"</code>.
+            It will hydrate after the page loads and become fully interactive.
+        </p>
+        <InteractiveAccordionIsland @rendermode="InteractiveServer" />
+    </section>
+
+    <Separator />
+
+    @* ───── Interactive island: Tabs ───── *@
+    <section class="space-y-3">
+        <h2 class="text-2xl font-semibold">Interactive Tabs</h2>
+        <p class="text-sm text-muted-foreground">
+            These tabs are an interactive island. You can switch between them after hydration.
+        </p>
+        <InteractiveTabsIsland @rendermode="InteractiveServer" />
+    </section>
+
+    <Separator />
+
+    @* ───── Interactive island: Dialog ───── *@
+    <section class="space-y-3">
+        <h2 class="text-2xl font-semibold">Interactive Dialog</h2>
+        <p class="text-sm text-muted-foreground">
+            The dialog trigger and dialog content are in an interactive island.
+            After hydration, clicking "Open Dialog" will work.
+        </p>
+        <InteractiveDialogIsland @rendermode="InteractiveServer" />
+    </section>
+
+    <Separator />
+
+    @* ───── Interactive island: Counter ───── *@
+    <section class="space-y-3">
+        <h2 class="text-2xl font-semibold">Interactive Counter</h2>
+        <p class="text-sm text-muted-foreground">
+            A simple interactive counter to prove the SignalR connection is working for this island.
+        </p>
+        <InteractiveCounterIsland @rendermode="InteractiveServer" />
+    </section>
+
+    <Separator />
+
+    @* ───── Static footer ───── *@
+    <section class="space-y-3">
+        <h2 class="text-2xl font-semibold">Back to Static</h2>
+        <p class="text-sm text-muted-foreground">
+            This section is static again. The interactive islands above are independent —
+            they each have their own SignalR circuit scope.
+        </p>
+        <div class="flex items-center gap-2">
+            <LucideIcon Name="check-circle" Class="h-5 w-5 text-green-500" />
+            <span class="text-sm">Static HTML — rendered on the server, no JS overhead.</span>
+        </div>
+    </section>
+</div>
