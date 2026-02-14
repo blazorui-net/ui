@@ -12,9 +12,9 @@
     Maintains Select-specific behavior: keyboard navigation, item focus, ARIA attributes.
 *@
 
-@if (_context?.IsOpen == true)
+@if (_shouldRender && _context != null)
 {
-    <FloatingPortal IsOpen="true"
+    <FloatingPortal IsOpen="@_context.IsOpen"
                     AnchorElement="@_context.State.TriggerElement"
                     PortalId="@_portalId"
                     Side="@Side"
@@ -23,12 +23,16 @@
                     MatchAnchorWidth="@MatchTriggerWidth"
                     Strategy="fixed"
                     ZIndex="9999"
-                    OnReady="@HandleFloatingReady">
+                    OnReady="@HandleFloatingReady"
+                    OnPlacementChanged="@HandlePlacementChanged">
         @RenderSelectListbox()
     </FloatingPortal>
 }
 
 @code {
+    private bool _shouldRender => ForceMount || _context?.IsOpen == true;
+    private string _actualPlacement = "bottom";
+    
     [CascadingParameter]
     private SelectContext<TValue>? _context { get; set; }
 
@@ -79,6 +83,14 @@
     /// </summary>
     [Parameter]
     public bool MatchTriggerWidth { get; set; } = true;
+    
+    /// <summary>
+    /// Whether to force mount the content even when the select is closed.
+    /// When true, content remains mounted (useful for CSS animations).
+    /// When false (default), content unmounts immediately (lower memory, no animation).
+    /// </summary>
+    [Parameter]
+    public bool ForceMount { get; set; } = false;
 
     protected override void OnInitialized()
     {
@@ -119,12 +131,21 @@
             contentBuilder.AddAttribute(4, "aria-activedescendant", GetActiveDescendantId());
             contentBuilder.AddAttribute(5, "data-select-content", "true");
             contentBuilder.AddAttribute(6, "tabindex", "-1");
-            contentBuilder.AddMultipleAttributes(7, AdditionalAttributes);
-            contentBuilder.AddContent(8, ChildContent);
+            contentBuilder.AddAttribute(7, "data-state", _context.IsOpen ? "open" : "closed");
+            contentBuilder.AddAttribute(8, "data-side", _actualPlacement);
+            contentBuilder.AddMultipleAttributes(9, AdditionalAttributes);
+            contentBuilder.AddContent(10, ChildContent);
             contentBuilder.CloseElement();
         }));
         builder.CloseComponent();
     };
+    
+    private void HandlePlacementChanged(string placement)
+    {
+        // Extract just the side part (e.g., "top" from "top-start")
+        _actualPlacement = string.IsNullOrEmpty(placement) ? "bottom" : placement.Split('-')[0];
+        StateHasChanged();
+    }
 
     private async Task HandleFloatingReady()
     {

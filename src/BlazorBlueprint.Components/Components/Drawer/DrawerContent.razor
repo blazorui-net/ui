@@ -8,7 +8,7 @@
 @if (Context?.IsOpen == true)
 {
     @* Overlay *@
-    <div class="fixed inset-0 z-50 bg-black/80 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0"
+    <div class="fixed inset-0 z-50 bg-black/80 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=open]:animate-overlay-fade-in data-[state=closed]:animate-overlay-fade-out"
          data-state="open"
          @onclick="HandleOverlayClick">
     </div>
@@ -165,11 +165,11 @@
 
     private string DirectionClasses => Context?.Direction switch
     {
-        DrawerDirection.Top => "inset-x-0 top-0 border-b data-[state=open]:slide-in-from-top data-[state=closed]:slide-out-to-top",
-        DrawerDirection.Bottom => "inset-x-0 bottom-0 border-t data-[state=open]:slide-in-from-bottom data-[state=closed]:slide-out-to-bottom",
-        DrawerDirection.Left => "inset-y-0 left-0 h-full w-3/4 border-r data-[state=open]:slide-in-from-left data-[state=closed]:slide-out-to-left sm:max-w-sm",
-        DrawerDirection.Right => "inset-y-0 right-0 h-full w-3/4 border-l data-[state=open]:slide-in-from-right data-[state=closed]:slide-out-to-right sm:max-w-sm",
-        _ => "inset-x-0 bottom-0 border-t data-[state=open]:slide-in-from-bottom data-[state=closed]:slide-out-to-bottom"
+        DrawerDirection.Top => "inset-x-0 top-0 border-b data-[state=open]:animate-slide-in-from-top data-[state=closed]:animate-slide-out-to-top",
+        DrawerDirection.Bottom => "inset-x-0 bottom-0 border-t data-[state=open]:animate-slide-in-from-bottom data-[state=closed]:animate-slide-out-to-bottom",
+        DrawerDirection.Left => "inset-y-0 left-0 h-full w-3/4 border-r data-[state=open]:animate-slide-in-from-left data-[state=closed]:animate-slide-out-to-left sm:max-w-sm",
+        DrawerDirection.Right => "inset-y-0 right-0 h-full w-3/4 border-l data-[state=open]:animate-slide-in-from-right data-[state=closed]:animate-slide-out-to-right sm:max-w-sm",
+        _ => "inset-x-0 bottom-0 border-t data-[state=open]:animate-slide-in-from-bottom data-[state=closed]:animate-slide-out-to-bottom"
     };
 
     private string CssClass => BlazorBlueprint.Components.Utilities.ClassNames.cn(

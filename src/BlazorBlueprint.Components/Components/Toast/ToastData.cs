@@ -55,4 +55,9 @@ public class ToastData
     /// Timestamp when the toast was created.
     /// </summary>
     public DateTime CreatedAt { get; set; } = DateTime.Now;
+    
+    /// <summary>
+    /// Position where the toast is displayed (for animation direction awareness).
+    /// </summary>
+    public ToastPosition? Position { get; set; }
 }

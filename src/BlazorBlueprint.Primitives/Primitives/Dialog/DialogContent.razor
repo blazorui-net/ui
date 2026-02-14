@@ -8,7 +8,7 @@
     Handles focus trap, escape key, scroll lock, and ARIA attributes.
 *@
 
-@if (Context.IsOpen)
+@if (_shouldRender)
 {
     <div @ref="_contentRef"
          id="@Context.ContentId"
@@ -19,12 +19,14 @@
          tabindex="-1"
          @onkeydown="HandleKeyDown"
          @attributes="AdditionalAttributes"
-         data-state="open">
+         data-state="@(Context.IsOpen ? "open" : "closed")">
         @ChildContent
     </div>
 }
 
 @code {
+    private bool _shouldRender => ForceMount || Context.IsOpen;
+
     [CascadingParameter]
     private DialogContext Context { get; set; } = null!;
 
@@ -60,6 +62,14 @@
     /// </summary>
     [Parameter]
     public bool LockScroll { get; set; } = true;
+
+    /// <summary>
+    /// Whether to force mount the content even when the dialog is closed.
+    /// When true, content remains mounted (useful for CSS animations when styled).
+    /// When false (default), content is unmounted when closed.
+    /// </summary>
+    [Parameter]
+    public bool ForceMount { get; set; } = false;
 
     /// <summary>
     /// Event callback invoked when Escape key is pressed.

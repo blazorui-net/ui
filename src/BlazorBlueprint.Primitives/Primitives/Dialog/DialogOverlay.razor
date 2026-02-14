@@ -7,7 +7,7 @@
     Can handle click-outside-to-close if configured.
 *@
 
-@if (Context.IsOpen)
+@if (_shouldRender)
 {
     <div @ref="_overlayRef"
          id="@(Context.Id)-overlay"
@@ -19,6 +19,8 @@
 }
 
 @code {
+    private bool _shouldRender => ForceMount || Context.IsOpen;
+
     [CascadingParameter]
     private DialogContext Context { get; set; } = null!;
 
@@ -40,6 +42,14 @@
     /// </summary>
     [Parameter]
     public bool CloseOnClick { get; set; } = true;
+
+    /// <summary>
+    /// Whether to force mount the overlay even when the dialog is closed.
+    /// When true, overlay remains mounted (useful for CSS animations when styled).
+    /// When false (default), overlay is unmounted when closed.
+    /// </summary>
+    [Parameter]
+    public bool ForceMount { get; set; } = false;
 
     /// <summary>
     /// Event callback invoked when the overlay is clicked.

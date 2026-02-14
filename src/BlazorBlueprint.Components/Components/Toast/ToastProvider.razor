@@ -45,6 +45,13 @@
 
     private void HandleToastsChanged()
     {
+        // Set position on newly added toasts that don't have it
+        var effectivePosition = EffectivePosition;
+        foreach (var toast in ToastService.Toasts.Where(t => !t.Position.HasValue))
+        {
+            toast.Position = effectivePosition;
+        }
+        
         InvokeAsync(StateHasChanged);
     }
 

@@ -10,9 +10,9 @@
     Maintains DropdownMenu-specific behavior: click-outside, keyboard navigation, focus management.
 *@
 
-@if (Context.IsOpen && Context.State.TriggerElement.HasValue)
+@if (_shouldRender && Context.State.TriggerElement.HasValue)
 {
-    <FloatingPortal IsOpen="true"
+    <FloatingPortal IsOpen="@Context.IsOpen"
                     AnchorElement="@Context.State.TriggerElement"
                     PortalId="@_portalId"
                     Side="@Side"
@@ -21,12 +21,16 @@
                     MatchAnchorWidth="@MatchTriggerWidth"
                     Strategy="@Strategy.ToValue()"
                     ZIndex="@ZIndex"
-                    OnReady="@HandleFloatingReady">
+                    OnReady="@HandleFloatingReady"
+                    OnPlacementChanged="@HandlePlacementChanged">
         @RenderDropdownContent()
     </FloatingPortal>
 }
 
 @code {
+    private bool _shouldRender => ForceMount || Context.IsOpen;
+    private string _actualPlacement = "bottom";
+    
     [CascadingParameter]
     private DropdownMenuContext Context { get; set; } = null!;
 
@@ -118,6 +122,14 @@
     /// </summary>
     [Parameter]
     public PositioningStrategy Strategy { get; set; } = PositioningStrategy.Absolute;
+    
+    /// <summary>
+    /// Whether to force mount the content even when the dropdown is closed.
+    /// When true (default), content remains mounted enabling CSS exit animations.
+    /// When false, content unmounts immediately (no animation, lower memory).
+    /// </summary>
+    [Parameter]
+    public bool ForceMount { get; set; } = true;
 
     private ElementReference _contentRef;
     private IJSObjectReference? _clickOutsideModule;
@@ -158,7 +170,8 @@
              @onkeydown="HandleKeyDown"
              @onkeydown:preventDefault="true"
              @attributes="GetAttributesWithoutStyle()"
-             data-state="open">
+             data-state="@(Context.IsOpen ? "open" : "closed")"
+             data-side="@_actualPlacement">
             <CascadingValue Value="Context" IsFixed="false">
                 <CascadingValue Value="this" Name="DropdownMenuContentContext" IsFixed="false">
                     @ChildContent
@@ -166,6 +179,13 @@
             </CascadingValue>
         </div>
     };
+    
+    private void HandlePlacementChanged(string placement)
+    {
+        // Extract just the side part (e.g., "top" from "top-start")
+        _actualPlacement = string.IsNullOrEmpty(placement) ? "bottom" : placement.Split('-')[0];
+        StateHasChanged();
+    }
 
     private async Task HandleFloatingReady()
     {
