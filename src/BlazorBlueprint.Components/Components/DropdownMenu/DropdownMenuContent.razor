@@ -114,8 +114,14 @@
         "z-50 min-w-[8rem] overflow-hidden rounded-md border bg-popover",
         "text-popover-foreground shadow-md",
         "data-[state=open]:animate-in data-[state=closed]:animate-out",
-        "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
-        "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
+        "data-[state=open]:data-[side=top]:animate-content-slide-in-from-bottom",
+        "data-[state=open]:data-[side=bottom]:animate-content-slide-in-from-top",
+        "data-[state=open]:data-[side=left]:animate-content-slide-in-from-right",
+        "data-[state=open]:data-[side=right]:animate-content-slide-in-from-left",
+        "data-[state=closed]:data-[side=top]:animate-content-slide-out-to-bottom",
+        "data-[state=closed]:data-[side=bottom]:animate-content-slide-out-to-top",
+        "data-[state=closed]:data-[side=left]:animate-content-slide-out-to-right",
+        "data-[state=closed]:data-[side=right]:animate-content-slide-out-to-left",
         Class
     );
 }

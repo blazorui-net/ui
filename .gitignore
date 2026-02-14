@@ -50,3 +50,7 @@ NUL
 DEV-TASKS.md
 .instructions
 .reviews
+
+# Tailwind CSS build binaries
+tools/tailwindcss-linux
+tools/tailwindcss.exe

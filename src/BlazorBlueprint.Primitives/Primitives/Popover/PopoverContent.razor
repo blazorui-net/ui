@@ -10,9 +10,9 @@
     Maintains Popover-specific behavior: click-outside, escape key, ARIA attributes.
 *@
 
-@if (Context.IsOpen && Context.State.TriggerElement.HasValue)
+@if (_shouldRender && Context.State.TriggerElement.HasValue)
 {
-    <FloatingPortal IsOpen="true"
+    <FloatingPortal IsOpen="@Context.IsOpen"
                     AnchorElement="@Context.State.TriggerElement"
                     PortalId="@_portalId"
                     Side="@Side"
@@ -21,12 +21,16 @@
                     MatchAnchorWidth="@MatchTriggerWidth"
                     Strategy="@Strategy"
                     ZIndex="@ZIndex"
-                    OnReady="@HandleFloatingReady">
+                    OnReady="@HandleFloatingReady"
+                    OnPlacementChanged="@HandlePlacementChanged">
         @RenderPopoverContent()
     </FloatingPortal>
 }
 
 @code {
+    private bool _shouldRender => ForceMount || Context.IsOpen;
+    private string _actualPlacement = "bottom";
+    
     [CascadingParameter]
     private PopoverContext Context { get; set; } = null!;
 
@@ -118,6 +122,14 @@
     [Parameter]
     public EventCallback OnContentReady { get; set; }
 
+    /// <summary>
+    /// Whether to force mount the content even when the popover is closed.
+    /// When true (default), content remains mounted enabling CSS exit animations.
+    /// When false, content unmounts immediately (no animation, lower memory).
+    /// </summary>
+    [Parameter]
+    public bool ForceMount { get; set; } = true;
+
     private IJSObjectReference? _clickOutsideModule;
     private IJSObjectReference? _clickOutsideCleanup;
     private DotNetObjectReference<PopoverContent>? _dotNetRef;
@@ -146,10 +158,18 @@
              tabindex="-1"
              @onkeydown="HandleKeyDown"
              @attributes="AdditionalAttributes"
-             data-state="open">
+             data-state="@(Context.IsOpen ? "open" : "closed")"
+             data-side="@_actualPlacement">
             @ChildContent
         </div>
     };
+    
+    private void HandlePlacementChanged(string placement)
+    {
+        // Extract just the side part (e.g., "top" from "top-start")
+        _actualPlacement = string.IsNullOrEmpty(placement) ? "bottom" : placement.Split('-')[0];
+        StateHasChanged();
+    }
 
     private async Task HandleFloatingReady()
     {
